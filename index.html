@@ -376,14 +376,16 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .contact-info-value{font-size:.93rem;color:rgba(245,241,235,.7);line-height:1.65}
 .contact-info-value a{color:rgba(245,241,235,.7);text-decoration:none;transition:color .2s}
 .contact-info-value a:hover{color:var(--gold)}
-.contact-map-full{position:relative;height:500px;overflow:hidden;background:var(--cream2)}
-.contact-map-full iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block;filter:grayscale(100%)}
-.contact-map-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 3rem;background:linear-gradient(to top,rgba(26,23,20,.92) 0%,transparent 100%);display:flex;align-items:center;gap:2.5rem;z-index:2;flex-wrap:wrap}
-.contact-map-label{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,241,235,.35)}
-.contact-branch{display:flex;align-items:center;gap:.7rem}
-.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
-.contact-branch-link{font-size:.82rem;color:rgba(245,241,235,.65);text-decoration:none;transition:color .2s}
+.contact-map-full{height:520px;overflow:hidden;background:var(--cream2)}
+.contact-map-full iframe{width:100%;height:100%;border:none;display:block}
+.contact-branch-bar{background:var(--dark);padding:1.5rem 5rem;display:flex;align-items:center;gap:3.5rem;flex-wrap:wrap;border-top:2px solid rgba(212,175,55,.18)}
+.contact-branch-item{display:flex;align-items:center;gap:.85rem}
+.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);flex-shrink:0;white-space:nowrap}
+.contact-branch-sep{color:rgba(212,175,55,.3);font-size:1rem;font-weight:300}
+.contact-branch-link{font-size:.88rem;color:rgba(245,241,235,.55);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.5rem;white-space:nowrap}
+.contact-branch-link i{font-size:.72rem;transition:transform .2s}
 .contact-branch-link:hover{color:var(--gold)}
+.contact-branch-link:hover i{transform:translateX(3px)}
 .form-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--dark);margin-bottom:.4rem;line-height:1}
 .form-sub{font-size:.88rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
 .fg{margin-bottom:1rem}
@@ -423,6 +425,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   .split-section,.story-wrap,.partners-hero,.story-chapter{grid-template-columns:1fr}
   .contact-split{grid-template-columns:1fr}
   .contact-map-full{height:400px}
+  .contact-branch-bar{padding:1.25rem 2.5rem;gap:1.5rem}
   .contact-info-col,.contact-form-col{padding:4rem 2.5rem}
   .split-img{height:380px}
   .story-chapter-img{min-height:320px;height:320px}
@@ -786,27 +789,30 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <!-- FULL-WIDTH MAP -->
 <div class="contact-map-full">
   <iframe
-    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d26256.39!2d-5.8499!3d35.7387!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0b43b741d4dac1%3A0x3c1c5f79c5de6ca4!2sZone%20Industrielle%20Gzenaya%2C%20Tanger%2090000!5e0!3m2!1sen!2sma!4v1700000000000"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13128.195!2d-5.862745!3d35.734218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sma!4v1700000000000"
     allowfullscreen=""
     loading="lazy"
     referrerpolicy="no-referrer-when-downgrade"
     title="Ava Marie — Tangier Facilities">
   </iframe>
-  <div class="contact-map-overlay">
-    <span class="contact-map-label">OUR LOCATIONS</span>
-    <div class="contact-branch">
-      <span class="contact-branch-num">Branch 01</span>
-      <a class="contact-branch-link" href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener noreferrer">
-        <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:.4rem;font-size:.7rem;"></i>Tangier — Facility A · View on Maps →
-      </a>
-    </div>
-    <div class="contact-branch">
-      <span class="contact-branch-num">Branch 02</span>
-      <a class="contact-branch-link" href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener noreferrer">
-        <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:.4rem;font-size:.7rem;"></i>Tangier — Facility B · View on Maps →
-      </a>
-    </div>
+</div>
+<!-- BRANCH LINKS BAR -->
+<div class="contact-branch-bar">
+  <div class="contact-branch-item">
+    <span class="contact-branch-num">Branch 01</span>
+    <span class="contact-branch-sep">—</span>
+    <a class="contact-branch-link" href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener noreferrer">
+      Tangier — Facility A &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
+    </a>
   </div>
+  <div class="contact-branch-item">
+    <span class="contact-branch-num">Branch 02</span>
+    <span class="contact-branch-sep">—</span>
+    <a class="contact-branch-link" href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener noreferrer">
+      Tangier — Facility B &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
+    </a>
+  </div>
+</div>
 </div>
 <footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('portfolio')">Portfolio</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contacts</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="mailto:sara@avamarie.ma">sara@avamarie.ma</a><a href="tel:+447845847104">+44 7845 847104</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
