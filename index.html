@@ -28,7 +28,7 @@ img{display:block;max-width:100%}a{text-decoration:none}
 #curtain.slide-out{animation:curtainOut .55s var(--ease-in-out) forwards}
 @keyframes curtainIn{from{transform:scaleX(0);transform-origin:right center}to{transform:scaleX(1);transform-origin:right center}}
 @keyframes curtainOut{from{transform:scaleX(1);transform-origin:left center}to{transform:scaleX(0);transform-origin:left center}}
-.curtain-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(7rem,16vw,14rem);letter-spacing:.15em;color:var(--white);opacity:0;transition:opacity .2s;text-align:center;line-height:1}
+.curtain-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,12vw,10rem);letter-spacing:.15em;color:var(--white);opacity:0;transition:opacity .2s}
 #curtain.slide-in .curtain-logo{opacity:1}
 
 /* NAV — transparent default, solid on scroll */
@@ -365,34 +365,33 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .pc-desc{margin-top:.75rem;color:var(--muted);font-size:.85rem;line-height:1.7;transition:color .35s}
 .pc:hover .pc-desc{color:rgba(245,241,235,.4)}
 
-/* CONTACT — 50/50 SPLIT + FULL-WIDTH MAP */
-.contact-split{display:grid;grid-template-columns:1fr 1fr;min-height:calc(80vh - 72px)}
-.contact-info-col{background:var(--dark);padding:6rem 5rem;display:flex;flex-direction:column;justify-content:center}
-.contact-form-col{background:var(--white);padding:6rem 5rem;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border)}
-.contact-info-item{display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:2rem}
-.contact-info-item:last-child{margin-bottom:0}
-.contact-info-icon{width:42px;height:42px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.22);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:.9rem;flex-shrink:0;margin-top:.1rem}
-.contact-info-label{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
-.contact-info-value{font-size:.93rem;color:rgba(245,241,235,.7);line-height:1.65}
-.contact-info-value a{color:rgba(245,241,235,.7);text-decoration:none;transition:color .2s}
-.contact-info-value a:hover{color:var(--gold)}
-.contact-map-full{height:520px;overflow:hidden;background:var(--cream2)}
-.contact-map-full iframe{width:100%;height:100%;border:none;display:block}
-.contact-branch-bar{background:var(--dark);padding:1.5rem 5rem;display:flex;align-items:center;gap:3.5rem;flex-wrap:wrap;border-top:2px solid rgba(212,175,55,.18)}
-.contact-branch-item{display:flex;align-items:center;gap:.85rem}
-.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);flex-shrink:0;white-space:nowrap}
-.contact-branch-sep{color:rgba(212,175,55,.3);font-size:1rem;font-weight:300}
-.contact-branch-link{font-size:.88rem;color:rgba(245,241,235,.55);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.5rem;white-space:nowrap}
-.contact-branch-link i{font-size:.72rem;transition:transform .2s}
+/* CONTACT — 3-COLUMN PREMIUM LAYOUT */
+.contact-3col{display:grid;grid-template-columns:1fr 1fr 1fr;min-height:calc(100vh - 72px)}
+.contact-col-form{background:var(--white);padding:5rem 4rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)}
+.contact-col-team{background:var(--dark);padding:5rem 4rem;display:flex;flex-direction:column;justify-content:center}
+.contact-col-map{position:relative;overflow:hidden;min-height:600px;background:var(--cream2)}
+.contact-col-map iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block;filter:contrast(1.05) saturate(.9)}
+.contact-map-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.25rem 1.5rem;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,transparent 100%);display:flex;flex-direction:column;gap:.6rem;z-index:2}
+.contact-branch{display:flex;align-items:center;gap:.7rem}
+.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+.contact-branch-link{font-size:.8rem;color:rgba(245,241,235,.7);text-decoration:none;transition:color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .contact-branch-link:hover{color:var(--gold)}
-.contact-branch-link:hover i{transform:translateX(3px)}
-.form-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--dark);margin-bottom:.4rem;line-height:1}
+.team-card{border:1px solid rgba(255,255,255,.09);padding:1.4rem 1.5rem;margin-bottom:.85rem;transition:border-color .3s,background .3s}
+.team-card:last-child{margin-bottom:0}
+.team-card:hover{border-color:var(--gold);background:rgba(212,175,55,.04)}
+.tc-role{font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
+.tc-name{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.06em;color:var(--white);margin-bottom:.65rem;line-height:1}
+.tc-contact{display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:rgba(245,241,235,.45);text-decoration:none;margin-bottom:.3rem;transition:color .2s}
+.tc-contact:last-child{margin-bottom:0}
+.tc-contact:hover{color:var(--gold)}
+.tc-contact i{color:var(--gold);width:13px;font-size:.72rem;flex-shrink:0}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.05em;color:var(--dark);margin-bottom:.4rem;line-height:1}
 .form-sub{font-size:.88rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
 .fg{margin-bottom:1rem}
 .fg label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
 .fg input,.fg textarea{width:100%;padding:.8rem 1rem;background:var(--cream);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .25s,background .25s}
 .fg input:focus,.fg textarea:focus{border-color:var(--gold);background:var(--white)}
-.fg textarea{height:100px;resize:vertical}
+.fg textarea{height:90px;resize:vertical}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
 .btn-submit{width:100%;padding:1.05rem;margin-top:.4rem;background:var(--dark);color:var(--white);border:none;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.1em;cursor:pointer;position:relative;overflow:hidden;transition:background .3s}
 .btn-submit::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .4s var(--ease-out)}
@@ -423,15 +422,14 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   .hero-right{flex-direction:row;flex-wrap:wrap;align-items:center}
   .hero-stat{text-align:left;border-right:none;border-left:2px solid var(--gold);padding:0 0 0 1rem}
   .split-section,.story-wrap,.partners-hero,.story-chapter{grid-template-columns:1fr}
-  .contact-split{grid-template-columns:1fr}
-  .contact-map-full{height:400px}
-  .contact-branch-bar{padding:1.25rem 2.5rem;gap:1.5rem}
-  .contact-info-col,.contact-form-col{padding:4rem 2.5rem}
+  .contact-3col{grid-template-columns:1fr 1fr}
+  .contact-col-map{grid-column:1/-1;min-height:380px}
   .split-img{height:380px}
   .story-chapter-img{min-height:320px;height:320px}
   .story-chapter:nth-child(even){direction:ltr}
   .story-chapter:nth-child(even) .story-chapter-text{border-right:none;border-left:none}
   .story-chapter-text{padding:3.5rem 2.5rem;border-left:none!important;border-right:none!important;border-top:1px solid var(--border)}
+  .contact-col-form,.contact-col-team{padding:3.5rem 2.5rem}
   .partners-map-area{height:350px}
   .numbers-bar{grid-template-columns:repeat(3,1fr)}
   .spec-grid{grid-template-columns:1fr 1fr}
@@ -468,9 +466,8 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   .spec-grid,.partner-cards,.why-grid{grid-template-columns:1fr}
   .svc-grid{grid-template-columns:1fr}
   .client-item{flex:0 0 calc(50% - 2px);min-width:80px}
-  .contact-split{grid-template-columns:1fr}
-  .contact-map-full{height:300px}
-  .contact-map-overlay{padding:1rem 1.5rem;gap:1rem}
+  .contact-3col{grid-template-columns:1fr}
+  .contact-col-map{grid-column:1;min-height:300px}
   .form-row{grid-template-columns:1fr}
   footer{grid-template-columns:1fr}
   .numbers-bar{grid-template-columns:1fr 1fr}
@@ -570,7 +567,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 </div>
 <div style="text-align:center;margin-top:3.5rem;" class="sr"><button class="btn-primary" onclick="goPage('portfolio')"><span>View Full Portfolio</span><i class="fas fa-arrow-right"></i></button></div></section>
 
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('journey')">Manufacturing</a><a onclick="goPage('services')">Services</a><a onclick="goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Specialties</p><div class="ft-links"><a onclick="openGal('evening')">Evening Dresses</a><a onclick="openGal('woven')">Woven Fashion</a><a onclick="openGal('jersey')">Jerseywear</a><a onclick="openGal('sportswear')">Sportswear</a><a onclick="openGal('casualwear')">Casualwear</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('journey')">Manufacturing</a><a onclick="goPage('services')">Services</a><a onclick="goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Specialties</p><div class="ft-links"><a onclick="openGal('evening')">Evening Dresses</a><a onclick="openGal('woven')">Woven Fashion</a><a onclick="openGal('jersey')">Jerseywear</a><a onclick="openGal('sportswear')">Sportswear</a><a onclick="openGal('casualwear')">Casualwear</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div>
 </div>
 
@@ -603,7 +600,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   </div>
 </div>
 
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('journey')">Manufacturing</a><a onclick="goPage('services')">Services</a></div></div><div><p class="ft-col-h">Our Process</p><div class="ft-links"><a onclick="goPage('journey')">10-Step Journey</a><a>Design & Pattern</a><a>Full Production</a><a>Finishing & Delivery</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('journey')">Manufacturing</a><a onclick="goPage('services')">Services</a></div></div><div><p class="ft-col-h">Our Process</p><div class="ft-links"><a onclick="goPage('journey')">10-Step Journey</a><a>Design & Pattern</a><a>Full Production</a><a>Finishing & Delivery</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <!-- ====== MANUFACTURING JOURNEY (New Standalone Page) ====== -->
@@ -622,7 +619,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 09</p><h3 class="tl-step-title">FINISHING & QUALITY CHECK</h3><p class="tl-step-body">Final impression is everything. Our dedicated finishing team applies professional steam pressing, precision trimming and comprehensive quality inspection to every single garment. Thread cleanliness, label placement, button security, and overall presentation are verified item by item.</p><div class="tl-step-img"><img src="https://i.postimg.cc/gcMSGJJ5/Adobe-Stock-1197639117-Preview.jpg" alt="Finishing"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">09</span></div></div><div class="tl-right-content"></div></div>
 <div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">10</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 10</p><h3 class="tl-step-title">PACKAGING & DELIVERY</h3><p class="tl-step-body">Your garments are packaged to your exact brand specifications — from custom hangtags and polybags to branded boxes with tissue paper. Our global logistics network ensures on-time delivery to any destination worldwide, with real-time shipment tracking and dedicated account management.</p><div class="tl-step-img"><img src="https://i.postimg.cc/QMYMm1Ss/shutterstock-1929908654.jpg" alt="Packaging"></div></div></div>
 </div></section>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <!-- ====== SERVICES ====== -->
@@ -650,7 +647,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   <div class="why-card sr sr-d3"><i class="fas fa-handshake why-icon"></i><h4 class="why-title">DEDICATED SUPPORT</h4><p class="why-body">Expert guidance throughout your entire production journey — from first enquiry to final delivery. Your dedicated account team.</p></div>
 </div></div>
 <div class="svc-cta"><div><h2 class="svc-cta-title sr">READY TO START YOUR<br>NEXT COLLECTION?</h2><p class="svc-cta-sub sr sr-d1">Let's discuss your requirements and build something exceptional together.</p></div><button class="btn-primary sr sr-d2" onclick="goPage('contact')"><span>Contact Our Team</span><i class="fas fa-arrow-right"></i></button></div>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('portfolio')">Portfolio</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('portfolio')">Portfolio</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <!-- ====== PORTFOLIO ====== -->
@@ -680,7 +677,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 </section>
 </div>
 <div class="lb-wrap" id="lbWrap"><button class="lb-close" onclick="lbClose()"><i class="fas fa-times"></i></button><button class="lb-nav lb-prev" onclick="lbNav(-1)"><i class="fas fa-chevron-left"></i></button><img class="lb-img" id="lbImg" src="" alt=""><button class="lb-nav lb-next" onclick="lbNav(1)"><i class="fas fa-chevron-right"></i></button></div>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Collections</p><div class="ft-links"><a onclick="portShowCat('evening')">Evening</a><a onclick="portShowCat('woven')">Woven</a><a onclick="portShowCat('jersey')">Jersey</a><a onclick="portShowCat('sportswear')">Sport</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Collections</p><div class="ft-links"><a onclick="portShowCat('evening')">Evening</a><a onclick="portShowCat('woven')">Woven</a><a onclick="portShowCat('jersey')">Jersey</a><a onclick="portShowCat('sportswear')">Sport</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <div class="gal-modal" id="galModal">
@@ -707,70 +704,15 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <section class="clients-section"><div class="eyebrow sr">Our Clients</div><h2 class="display-title sr sr-d1">BRANDS WE <span>MANUFACTURE FOR</span></h2><div class="clients-grid">
 <div class="client-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/2560px-Adidas_Logo.svg.png" alt="Adidas"></div><div class="client-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Asos.svg/1024px-Asos.svg.png" alt="ASOS"></div><div class="client-item"><img src="https://1000logos.net/wp-content/uploads/2018/07/River-Island-Logo-2012.png" alt="River Island"></div><div class="client-item"><img src="https://cdn.influenster.com/media/product/image/1d8620166e73cc7b5a4608d7e86c93be.png" alt="PLT"></div><div class="client-item"><img src="https://static2.hotukdeals.com/images/260x136/images/l/Little_Mistress_Logo.png" alt="Little Mistress"></div><div class="client-item"><img src="https://images.squarespace-cdn.com/content/v1/560314b7e4b0743e1c078a6a/1615143564449-2X08YROXUITV5ON90RBL/logo-inthestyle%402x.png" alt="In The Style"></div><div class="client-item"><img src="https://logos-world.net/wp-content/uploads/2023/03/Fashion-Nova-Logo.png" alt="Fashion Nova"></div><div class="client-item"><img src="https://cdn.freelogovectors.net/wp-content/uploads/2019/01/Boohoo-logo.png" alt="Boohoo"></div><div class="client-item"><img src="https://www.prshots.com/contents/archives/2751/1290/1598/logo/logo_v1.png?v=223_1739204605" alt="Roman"></div><div class="client-item"><img src="https://static.independent.co.uk/s3fs-public/thumbnails/image/2018/05/22/15/isaw-png.png" alt="ISAW"></div><div class="client-item"><img src="https://www.studentsaviour.com/_next/image/?url=http%3A%2F%2F20.77.104.94%3A9000%2Fmedia%2FMissguided%20Logo.png&w=3840&q=75" alt="Missguided"></div>
 </div></section>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Partners</p><div class="ft-links"><a>Ava Marie</a><a>FIGA UK</a><a>Sweet Threads</a><a>Jaguar</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Partners</p><div class="ft-links"><a>Ava Marie</a><a>FIGA UK</a><a>Sweet Threads</a><a>Jaguar</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
-<!-- ====== CONTACT — 50/50 SPLIT + FULL MAP ====== -->
+<!-- ====== CONTACT — 3-COLUMN LAYOUT ====== -->
 <div id="pg-contact" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="contact-3col">
 
-<!-- 50/50 SPLIT: INFO LEFT | FORM RIGHT -->
-<div class="contact-split">
-
-  <!-- LEFT: CONTACT INFORMATION -->
-  <div class="contact-info-col">
-    <div class="eyebrow sr" style="color:var(--gold2);">Get In Touch</div>
-    <h2 class="display-title on-dark sr sr-d1" style="font-size:clamp(2.5rem,4vw,4.5rem);margin-bottom:2.5rem;">LET'S<br><span>TALK</span></h2>
-
-    <div class="contact-info-item sr sr-d2">
-      <div class="contact-info-icon"><i class="fas fa-envelope"></i></div>
-      <div>
-        <p class="contact-info-label">Email Addresses</p>
-        <div class="contact-info-value">
-          <a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><br>
-          <a href="mailto:sara@avamarie.ma">sara@avamarie.ma</a><br>
-          <a href="mailto:abico@avamarie.ma">abico@avamarie.ma</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="contact-info-item sr sr-d3">
-      <div class="contact-info-icon"><i class="fas fa-phone"></i></div>
-      <div>
-        <p class="contact-info-label">Phone Numbers</p>
-        <div class="contact-info-value">
-          <a href="tel:+447845847104">+44 7845 847104</a>&ensp;<span style="color:var(--gold);font-size:.68rem;letter-spacing:.1em;font-weight:700;">UK</span><br>
-          <a href="tel:+212666945417">+212 666 945 417</a>&ensp;<span style="color:var(--gold);font-size:.68rem;letter-spacing:.1em;font-weight:700;">MA</span><br>
-          <a href="tel:+212656660050">+212 656 660 050</a>&ensp;<span style="color:var(--gold);font-size:.68rem;letter-spacing:.1em;font-weight:700;">MA</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="contact-info-item sr sr-d4">
-      <div class="contact-info-icon"><i class="fas fa-building"></i></div>
-      <div>
-        <p class="contact-info-label">Headquarters</p>
-        <div class="contact-info-value">
-          FIGA Ltd — London, United Kingdom<br>
-          <span style="color:rgba(245,241,235,.38);font-size:.82rem;">Company No. 09542579</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="contact-info-item sr sr-d5">
-      <div class="contact-info-icon"><i class="fas fa-industry"></i></div>
-      <div>
-        <p class="contact-info-label">Production Facilities</p>
-        <div class="contact-info-value">
-          Zone Industrielle Gzenaya<br>Tanger 90000, Morocco<br>
-          <a href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener" style="font-size:.8rem;">Branch 01 → View on Maps</a><br>
-          <a href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener" style="font-size:.8rem;">Branch 02 → View on Maps</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: CONTACT FORM -->
-  <div class="contact-form-col">
+  <!-- COL 1: FORM -->
+  <div class="contact-col-form">
     <h3 class="form-title sr">START A<br>PARTNERSHIP</h3>
     <p class="form-sub sr sr-d1">Fill in the form and our team will respond within 24 hours.</p>
     <div class="form-row">
@@ -784,37 +726,60 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
     <button class="btn-submit sr sr-d5" onclick="submitForm(this)"><span>SEND MESSAGE &nbsp;→</span></button>
   </div>
 
-</div>
+  <!-- COL 2: TEAM CONTACTS -->
+  <div class="contact-col-team">
+    <div class="eyebrow sr" style="color:var(--gold2);">Management Team</div>
+    <h2 class="display-title on-dark sr sr-d1" style="font-size:clamp(2rem,3vw,3.2rem);line-height:.92;margin-bottom:1.5rem;">LET'S BUILD<br><span>SOMETHING</span><br>GREAT TOGETHER</h2>
+    <div class="gold-line sr sr-d2"></div>
+    <p class="sr sr-d2" style="font-size:.92rem;line-height:1.75;color:rgba(245,241,235,.4);margin-bottom:2rem;">Our team is ready to guide you from the first conversation to final delivery.</p>
 
-<!-- FULL-WIDTH MAP -->
-<div class="contact-map-full">
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13128.195!2d-5.862745!3d35.734218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sma!4v1700000000000"
-    allowfullscreen=""
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade"
-    title="Ava Marie — Tangier Facilities">
-  </iframe>
-</div>
-<!-- BRANCH LINKS BAR -->
-<div class="contact-branch-bar">
-  <div class="contact-branch-item">
-    <span class="contact-branch-num">Branch 01</span>
-    <span class="contact-branch-sep">—</span>
-    <a class="contact-branch-link" href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener noreferrer">
-      Tangier — Facility A &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
-    </a>
+    <div class="team-card sr sr-d2">
+      <p class="tc-role"><i class="fas fa-crown" style="margin-right:.4rem;font-size:.7rem;"></i>Chief Executive Officer</p>
+      <h4 class="tc-name">ANWAR SARODIYA</h4>
+      <a class="tc-contact" href="mailto:anwar@figaltd.co.uk"><i class="fas fa-envelope"></i>anwar@figaltd.co.uk</a>
+      <a class="tc-contact" href="tel:+447845847104"><i class="fas fa-phone"></i>+44 7845 847104</a>
+    </div>
+    <div class="team-card sr sr-d3">
+      <p class="tc-role"><i class="fas fa-industry" style="margin-right:.4rem;font-size:.7rem;"></i>Operations Manager — Morocco</p>
+      <h4 class="tc-name">SARA OUMALIK</h4>
+      <a class="tc-contact" href="mailto:sara@avamarie.ma"><i class="fas fa-envelope"></i>sara@avamarie.ma</a>
+      <a class="tc-contact" href="tel:+212666945417"><i class="fas fa-phone"></i>+212 666 945 417</a>
+    </div>
+    <div class="team-card sr sr-d4">
+      <p class="tc-role"><i class="fas fa-pen-ruler" style="margin-right:.4rem;font-size:.7rem;"></i>Design Director</p>
+      <h4 class="tc-name">ABDERRAHMAN HADJ HAMMOU</h4>
+      <a class="tc-contact" href="mailto:abico@avamarie.ma"><i class="fas fa-envelope"></i>abico@avamarie.ma</a>
+      <a class="tc-contact" href="tel:+212656660050"><i class="fas fa-phone"></i>+212 656 660 050</a>
+    </div>
   </div>
-  <div class="contact-branch-item">
-    <span class="contact-branch-num">Branch 02</span>
-    <span class="contact-branch-sep">—</span>
-    <a class="contact-branch-link" href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener noreferrer">
-      Tangier — Facility B &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
-    </a>
+
+  <!-- COL 3: EMBEDDED MAP -->
+  <div class="contact-col-map sr">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d26256.39!2d-5.8499!3d35.7387!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0b43b741d4dac1%3A0x3c1c5f79c5de6ca4!2sZone%20Industrielle%20Gzenaya%2C%20Tanger%2090000!5e0!3m2!1sen!2sma!4v1700000000000"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Ava Marie — Tangier Facilities">
+    </iframe>
+    <div class="contact-map-overlay">
+      <div class="contact-branch">
+        <span class="contact-branch-num">Branch 01</span>
+        <a class="contact-branch-link" href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener noreferrer">
+          <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:.4rem;font-size:.7rem;"></i>Tangier — Facility A · View on Maps →
+        </a>
+      </div>
+      <div class="contact-branch">
+        <span class="contact-branch-num">Branch 02</span>
+        <a class="contact-branch-link" href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener noreferrer">
+          <i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:.4rem;font-size:.7rem;"></i>Tangier — Facility B · View on Maps →
+        </a>
+      </div>
+    </div>
   </div>
+
 </div>
-</div>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigation</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('portfolio')">Portfolio</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contacts</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="mailto:sara@avamarie.ma">sara@avamarie.ma</a><a href="tel:+447845847104">+44 7845 847104</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing for global brands. Delivering speed, control, and excellence.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('portfolio')">Portfolio</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contacts</p><div class="ft-links"><a href="mailto:anwar@figaltd.co.uk">anwar@figaltd.co.uk</a><a href="mailto:sara@avamarie.ma">sara@avamarie.ma</a><a href="tel:+447845847104">+44 7845 847104</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <script>
