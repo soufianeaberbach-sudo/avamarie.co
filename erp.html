@@ -6,44 +6,503 @@
 <title>Ava Marie — ERP</title>
 <link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ─── RESET & ROOT ────────────────────────────────────────────── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;-webkit-font-smoothing:antialiased}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:#fff;
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;flex-direction:column;gap:1.5rem;
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+:root{
+  --gold:#C4A35A;
+  --gold-bg:rgba(196,163,90,.1);
+  --gold-border:rgba(196,163,90,.25);
+  --sidebar:#1A1A1A;
+  --sidebar-w:255px;
+  --topbar-h:60px;
+  --white:#fff;
+  --bg:#F5F3EF;
+  --card:#fff;
+  --border:#E6E2DC;
+  --text:#1A1714;
+  --muted:#7A756A;
+  --muted2:#B0AB9F;
+  --ease:cubic-bezier(.16,1,.3,1);
 }
-.logo{
+body{font-family:'DM Sans',sans-serif;background:var(--bg)}
+
+/* ─── LAYOUT ──────────────────────────────────────────────────── */
+#sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+  background:var(--sidebar);z-index:200;
+  display:flex;flex-direction:column;
+  transition:transform .28s var(--ease);
+}
+#main{
+  margin-left:var(--sidebar-w);height:100vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:margin .28s var(--ease);
+}
+#topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  background:var(--white);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;
+}
+#content{flex:1;overflow-y:auto;padding:28px 30px;background:var(--bg)}
+
+/* ─── SIDEBAR LOGO ────────────────────────────────────────────── */
+.sb-logo{
+  padding:20px 20px 16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.sb-logo-text{
   font-family:'Bebas Neue',sans-serif;
-  font-size:2.2rem;letter-spacing:.2em;color:#1A1A1A;
+  font-size:1.65rem;letter-spacing:.18em;color:#fff;line-height:1;
 }
-.logo span{color:#C4A35A}
-.spinner{
-  width:36px;height:36px;border-radius:50%;
-  border:2px solid rgba(196,163,90,.2);
-  border-top-color:#C4A35A;
-  animation:spin .8s linear infinite;
+.sb-logo-text span{color:var(--gold)}
+.sb-logo-sub{
+  font-size:.58rem;font-weight:600;letter-spacing:.32em;
+  text-transform:uppercase;color:rgba(255,255,255,.22);margin-top:4px;
 }
-.msg{
-  font-family:'DM Sans',sans-serif;
-  font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:#9A9490;
+
+/* ─── SIDEBAR NAV ─────────────────────────────────────────────── */
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 16px 9px 20px;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;
+  color:rgba(255,255,255,.42);background:none;
+  border:none;border-left:3px solid transparent;
+  cursor:pointer;text-align:left;
+  transition:color .15s,background .15s,border-color .15s;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
+.nav-item:hover{color:rgba(255,255,255,.72);background:rgba(255,255,255,.04)}
+.nav-item.active{
+  color:var(--gold);background:var(--gold-bg);
+  border-left-color:var(--gold);font-weight:600;
+}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;stroke-width:1.8}
+.nav-sep{
+  height:1px;background:rgba(255,255,255,.07);
+  margin:6px 0;
+}
+
+/* ─── SIDEBAR USER ────────────────────────────────────────────── */
+.sb-user{
+  display:flex;align-items:center;gap:11px;
+  padding:14px 20px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.sb-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#C4A35A 0%,#9A7A30 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:800;color:#fff;
+}
+.sb-uname{font-size:.8rem;font-weight:600;color:rgba(255,255,255,.78);line-height:1.25}
+.sb-urole{
+  font-size:.6rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);opacity:.75;margin-top:1px;
+}
+
+/* ─── TOP BAR ─────────────────────────────────────────────────── */
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-icon{display:flex;color:var(--gold)}
+.tb-icon svg{width:18px;height:18px;stroke-width:1.8}
+#tb-title{
+  font-family:'DM Sans',sans-serif;font-size:.92rem;
+  font-weight:600;color:var(--text);letter-spacing:.01em;
+}
+.tb-right{display:flex;align-items:center;gap:14px}
+#tb-date{font-size:.75rem;font-weight:500;color:var(--muted)}
+.tb-btn{
+  background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px;border-radius:5px;color:var(--muted);
+  transition:color .15s,background .15s;
+}
+.tb-btn:hover{color:var(--text);background:#EDEBE7}
+.tb-btn svg{width:18px;height:18px;stroke-width:1.8}
+.tb-bell-wrap{position:relative}
+.bell-dot{
+  position:absolute;top:4px;right:4px;
+  width:7px;height:7px;border-radius:50%;
+  background:#E05050;border:1.5px solid var(--white);
+}
+.tb-ham{display:none}
+
+/* ─── SECTIONS ────────────────────────────────────────────────── */
+.sec{display:none}
+.sec.active{display:block}
+
+/* ─── PLACEHOLDER ─────────────────────────────────────────────── */
+.ph{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:65vh;gap:18px;text-align:center;
+}
+.ph-ring{
+  width:76px;height:76px;border-radius:50%;
+  background:var(--gold-bg);border:1px solid var(--gold-border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold);
+}
+.ph-ring svg{width:30px;height:30px;stroke-width:1.5}
+.ph-name{
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem;font-weight:600;color:var(--text);letter-spacing:.01em;
+}
+.ph-desc{
+  font-size:.82rem;color:var(--muted);
+  max-width:300px;line-height:1.75;
+}
+.ph-tag{
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-border);
+  background:var(--gold-bg);padding:4px 14px;border-radius:20px;
+}
+.gold-line{
+  width:32px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* ─── OVERLAY (mobile) ────────────────────────────────────────── */
+#sb-overlay{
+  display:none;position:fixed;inset:0;z-index:190;
+  background:rgba(0,0,0,.45);
+}
+
+/* ─── TOAST ───────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999}
+.toast-inner{
+  background:var(--text);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:10px 20px;border-radius:4px;
+  border-left:3px solid var(--gold);
+  box-shadow:0 4px 20px rgba(0,0,0,.18);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .22s,transform .22s;
+  pointer-events:none;
+}
+.toast-inner.show{opacity:1;transform:translateY(0)}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:1024px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #sb-overlay.show{display:block}
+  .tb-ham{display:flex}
+  #tb-date{display:none}
+}
+@media(max-width:600px){
+  #content{padding:18px 16px}
+}
 </style>
 </head>
 <body>
-<div class="logo">AVA <span>MARIE</span></div>
-<div class="spinner"></div>
-<div class="msg">Loading ERP…</div>
 
+<!-- ═══════════════════════════ SIDEBAR ══════════════════════════ -->
+<nav id="sidebar">
+
+  <div class="sb-logo">
+    <div class="sb-logo-text">AVA <span>MARIE</span></div>
+    <div class="sb-logo-sub">ERP System</div>
+  </div>
+
+  <div class="sb-nav">
+
+    <button class="nav-item" data-sec="dashboard" onclick="nav(this)">
+      <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
+    </button>
+    <button class="nav-item active" data-sec="models" onclick="nav(this)">
+      <i data-lucide="scissors"></i><span>Models</span>
+    </button>
+    <button class="nav-item" data-sec="orders" onclick="nav(this)">
+      <i data-lucide="package"></i><span>Orders</span>
+    </button>
+    <button class="nav-item" data-sec="planning" onclick="nav(this)">
+      <i data-lucide="calendar-range"></i><span>Planning</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" data-sec="cutting" onclick="nav(this)">
+      <i data-lucide="ruler"></i><span>Cutting</span>
+    </button>
+    <button class="nav-item" data-sec="sewing" onclick="nav(this)">
+      <i data-lucide="cpu"></i><span>Sewing</span>
+    </button>
+    <button class="nav-item" data-sec="finishing" onclick="nav(this)">
+      <i data-lucide="wind"></i><span>Finishing</span>
+    </button>
+    <button class="nav-item" data-sec="packing" onclick="nav(this)">
+      <i data-lucide="archive"></i><span>Packing</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" data-sec="materials" onclick="nav(this)">
+      <i data-lucide="truck"></i><span>Materials</span>
+    </button>
+    <button class="nav-item" data-sec="settings" onclick="nav(this)">
+      <i data-lucide="settings"></i><span>Settings</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" onclick="logout()">
+      <i data-lucide="log-out"></i><span>Logout</span>
+    </button>
+
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-avatar">S</div>
+    <div>
+      <div class="sb-uname">Soufiane</div>
+      <div class="sb-urole">Admin</div>
+    </div>
+  </div>
+
+</nav>
+
+<!-- ═══════════════════════════ OVERLAY ══════════════════════════ -->
+<div id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════ MAIN ═════════════════════════════ -->
+<div id="main">
+
+  <!-- TOP BAR -->
+  <header id="topbar">
+    <div class="tb-left">
+      <button class="tb-btn tb-ham" onclick="openSidebar()" aria-label="Menu">
+        <i data-lucide="menu"></i>
+      </button>
+      <div class="tb-icon" id="tb-icon"><i data-lucide="scissors"></i></div>
+      <span id="tb-title">Models</span>
+    </div>
+    <div class="tb-right">
+      <span id="tb-date"></span>
+      <div class="tb-bell-wrap">
+        <button class="tb-btn" aria-label="Notifications">
+          <i data-lucide="bell"></i>
+        </button>
+        <span class="bell-dot"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main id="content">
+
+    <!-- ── DASHBOARD ─────────────────────────────────────── -->
+    <div id="sec-dashboard" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="layout-dashboard"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Dashboard</div>
+        <div class="ph-desc">KPI overview, production alerts, and daily activity feed.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── MODELS ─────────────────────────────────────────── -->
+    <div id="sec-models" class="sec active">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="scissors"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Models</div>
+        <div class="ph-desc">Manage garment models, revisions, BOM, tech packs, and costing sheets.</div>
+        <div class="ph-tag">Building Now</div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS ─────────────────────────────────────────── -->
+    <div id="sec-orders" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="package"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Orders</div>
+        <div class="ph-desc">Track client purchase orders, quantities by size and colour, and deadlines.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── PLANNING ───────────────────────────────────────── -->
+    <div id="sec-planning" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="calendar-range"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Planning</div>
+        <div class="ph-desc">Visual Gantt calendar — assign models to production lines across 20 lines.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── CUTTING ────────────────────────────────────────── -->
+    <div id="sec-cutting" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="ruler"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Cutting</div>
+        <div class="ph-desc">Log cutting sessions — quantities, fabric consumption, waste percentage, and bundle tickets.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── SEWING ─────────────────────────────────────────── -->
+    <div id="sec-sewing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="cpu"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Sewing</div>
+        <div class="ph-desc">Daily sewing output per line, AM/PM periods, defect tracking, and cumulative progress.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── FINISHING ──────────────────────────────────────── -->
+    <div id="sec-finishing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="wind"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Finishing &amp; QC</div>
+        <div class="ph-desc">Steam pressing, final inspection, AQL quality control, and defect reporting.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── PACKING ────────────────────────────────────────── -->
+    <div id="sec-packing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="archive"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Packing</div>
+        <div class="ph-desc">Create cartons, assign size ratios, record weights, and print carton labels.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── MATERIALS ──────────────────────────────────────── -->
+    <div id="sec-materials" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="truck"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Materials</div>
+        <div class="ph-desc">Requirements by order, incoming shipments, and outgoing dispatch management.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ───────────────────────────────────────── -->
+    <div id="sec-settings" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="settings"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Settings</div>
+        <div class="ph-desc">Company info, production line configuration, users, and roles.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div id="toast-inner" class="toast-inner"></div></div>
+
+<!-- ═══════════════════════════ SCRIPTS ══════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
-if(!sessionStorage.getItem('erp_auth')){
+/* ── Auth guard ───────────────────────────────────────────────── */
+if (!sessionStorage.getItem('erp_auth')) {
   window.location.replace('login.html');
 }
+
+/* ── Section meta ─────────────────────────────────────────────── */
+const SECTION_META = {
+  dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
+  models:    { title: 'Models',           icon: 'scissors'         },
+  orders:    { title: 'Orders',           icon: 'package'          },
+  planning:  { title: 'Planning',         icon: 'calendar-range'   },
+  cutting:   { title: 'Cutting',          icon: 'ruler'            },
+  sewing:    { title: 'Sewing',           icon: 'cpu'              },
+  finishing: { title: 'Finishing & QC',   icon: 'wind'             },
+  packing:   { title: 'Packing',          icon: 'archive'          },
+  materials: { title: 'Materials',        icon: 'truck'            },
+  settings:  { title: 'Settings',        icon: 'settings'         },
+};
+
+let currentSec = 'models';
+
+/* ── Navigate ─────────────────────────────────────────────────── */
+function nav(btn) {
+  const sec = btn.dataset.sec;
+  if (!sec) return;
+
+  // Sections
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('sec-' + sec);
+  if (target) target.classList.add('active');
+
+  // Nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Topbar
+  const meta = SECTION_META[sec] || { title: sec, icon: 'circle' };
+  document.getElementById('tb-title').textContent = meta.title;
+  document.getElementById('tb-icon').innerHTML = `<i data-lucide="${meta.icon}"></i>`;
+
+  currentSec = sec;
+  lucide.createIcons();   // re-render any new icons
+  closeSidebar();         // close on mobile
+}
+
+/* ── Logout ───────────────────────────────────────────────────── */
+function logout() {
+  sessionStorage.removeItem('erp_auth');
+  sessionStorage.removeItem('erp_user');
+  window.location.href = 'login.html';
+}
+
+/* ── Mobile sidebar ───────────────────────────────────────────── */
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+/* ── Date ─────────────────────────────────────────────────────── */
+function updateDate() {
+  const d = new Date();
+  const s = d.toLocaleDateString('en-GB', {
+    weekday:'short', day:'numeric', month:'short', year:'numeric'
+  });
+  document.getElementById('tb-date').textContent = s;
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const el = document.getElementById('toast-inner');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── Init ─────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+  lucide.createIcons();
+  updateDate();
+  setInterval(updateDate, 60000);
+});
 </script>
 </body>
 </html>
