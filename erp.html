@@ -189,6 +189,143 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 }
 .toast-inner.show{opacity:1;transform:translateY(0)}
 
+/* ─── CARDS ───────────────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px}
+
+/* ─── KPI GRID ────────────────────────────────────────────────── */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  margin-bottom:18px;
+}
+.kpi-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:20px 22px 18px;position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--border);transition:background .2s;
+}
+.kpi-card:hover::after{background:var(--gold)}
+.kpi-eyebrow{
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted2);margin-bottom:8px;
+}
+.kpi-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;line-height:1;letter-spacing:.02em;color:var(--text);
+}
+.kpi-num.gold{color:var(--gold)}
+.kpi-num.muted{color:var(--muted2)}
+.kpi-sub{
+  font-size:.7rem;font-weight:500;color:var(--muted);margin-top:4px;
+}
+
+/* ─── FILTER BAR ──────────────────────────────────────────────── */
+.filter-bar{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:14px 16px;margin-bottom:12px;
+}
+.f-input,.f-select{
+  height:36px;padding:0 12px;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.f-input{flex:1;min-width:200px}
+.f-input::placeholder{color:var(--muted2)}
+.f-input:focus,.f-select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(196,163,90,.12);
+  background:var(--white);
+}
+.f-select{cursor:pointer;padding-right:28px;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A756A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+
+/* ─── TOOLBAR ─────────────────────────────────────────────────── */
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.toolbar-count{
+  font-size:.78rem;font-weight:600;color:var(--muted);
+}
+
+/* ─── BUTTONS ─────────────────────────────────────────────────── */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold);color:#fff;border:none;border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+  padding:8px 16px;transition:background .15s,transform .1s;
+}
+.btn-primary:hover{background:#A88430}
+.btn-primary:active{transform:scale(.97)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;color:var(--muted);
+  border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  padding:7px 14px;transition:color .15s,border-color .15s,background .15s;
+}
+.btn-outline:hover{color:var(--text);border-color:var(--text);background:var(--bg)}
+.btn-primary svg,.btn-outline svg{width:13px;height:13px;stroke-width:2}
+
+/* ─── TABLE ───────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:#FAFAF8;border-bottom:1px solid var(--border)}
+.tbl th{
+  padding:10px 14px;
+  font-family:'DM Sans',sans-serif;font-size:.64rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;text-align:left;
+}
+.tbl th:first-child{padding-left:20px}
+.tbl th:last-child{padding-right:20px}
+.tbl td{
+  padding:12px 14px;border-bottom:1px solid #F0EDE8;
+  font-size:.82rem;color:var(--text);
+  vertical-align:middle;white-space:nowrap;
+}
+.tbl td:first-child{padding-left:20px}
+.tbl td:last-child{padding-right:20px}
+.tbl-row{cursor:pointer;transition:background .12s}
+.tbl-row:hover td{background:#FFFDF7}
+.tbl-row:last-child td{border-bottom:none}
+.model-id{
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;
+  letter-spacing:.05em;color:var(--gold);
+}
+.cost-cell{
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;
+  letter-spacing:.03em;text-align:right;
+}
+.ref-cell{font-family:'Courier New',monospace;font-size:.75rem;color:var(--muted)}
+.fw-600{font-weight:600}
+.muted-cell{color:var(--muted);font-size:.78rem}
+
+/* ─── STATUS BADGES ───────────────────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;
+  font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;
+}
+.badge-draft    {background:#F0EDE8;color:#7A756A}
+.badge-sample   {background:#EEF2FF;color:#2A55CC}
+.badge-confirmed{background:#E8F5EF;color:#0D7A4E}
+.badge-production{background:rgba(196,163,90,.14);color:#8B6514}
+.badge-completed{background:#EDFAF2;color:#0A6634}
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────── */
+.tbl-empty{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 20px;gap:10px;color:var(--muted);
+}
+.tbl-empty svg{width:28px;height:28px;stroke-width:1.4;color:var(--muted2)}
+.tbl-empty p{font-size:.82rem}
+
 /* ─── RESPONSIVE ──────────────────────────────────────────────── */
 @media(max-width:1024px){
   #sidebar{transform:translateX(-100%)}
@@ -197,9 +334,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   #sb-overlay.show{display:block}
   .tb-ham{display:flex}
   #tb-date{display:none}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .f-input{min-width:unset}
 }
 @media(max-width:600px){
-  #content{padding:18px 16px}
+  #content{padding:18px 14px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi-num{font-size:2.2rem}
+  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
 }
 </style>
 </head>
@@ -312,13 +455,97 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── MODELS ─────────────────────────────────────────── -->
     <div id="sec-models" class="sec active">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="scissors"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Models</div>
-        <div class="ph-desc">Manage garment models, revisions, BOM, tech packs, and costing sheets.</div>
-        <div class="ph-tag">Building Now</div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Models</div>
+          <div class="kpi-num">5</div>
+          <div class="kpi-sub">All garment styles</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Production</div>
+          <div class="kpi-num gold">1</div>
+          <div class="kpi-sub">Active on factory floor</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Development</div>
+          <div class="kpi-num">2</div>
+          <div class="kpi-sub">Sample &amp; Confirmed</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Drafts</div>
+          <div class="kpi-num muted">1</div>
+          <div class="kpi-sub">Awaiting tech pack</div>
+        </div>
       </div>
+
+      <!-- Filter bar -->
+      <div class="card filter-bar">
+        <input class="f-input" type="text" id="m-search"
+          placeholder="Search by model #, name, or client ref…"
+          oninput="filterModels()">
+        <select class="f-select" id="m-client" onchange="filterModels()">
+          <option value="">All Clients</option>
+          <option>ASOS</option>
+          <option>PrettyLittleThing</option>
+          <option>River Island</option>
+        </select>
+        <select class="f-select" id="m-status" onchange="filterModels()">
+          <option value="">All Statuses</option>
+          <option>Draft</option>
+          <option>Sample</option>
+          <option>Confirmed</option>
+          <option>In Production</option>
+          <option>Completed</option>
+        </select>
+        <select class="f-select" id="m-cat" onchange="filterModels()">
+          <option value="">All Categories</option>
+          <option>Robe</option>
+          <option>Top</option>
+          <option>Pantalon</option>
+          <option>Jupe</option>
+          <option>Veste</option>
+        </select>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-count" id="m-count">5 models</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="exportModelsCSV()">
+            <i data-lucide="download"></i> Export CSV
+          </button>
+          <button class="btn-primary" onclick="showToast('New Model form — coming next')">
+            <i data-lucide="plus"></i> New Model
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="m-table">
+          <thead>
+            <tr>
+              <th>Model #</th>
+              <th>Name</th>
+              <th>Client</th>
+              <th>Client Ref</th>
+              <th>Category</th>
+              <th style="text-align:center">Rev</th>
+              <th>Status</th>
+              <th style="text-align:right">Cost / pc</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+        <div id="m-empty" class="tbl-empty" style="display:none">
+          <i data-lucide="search-x"></i>
+          <p>No models match your filters.</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── ORDERS ─────────────────────────────────────────── -->
@@ -497,11 +724,149 @@ function showToast(msg) {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
+/* ── Models data ──────────────────────────────────────────────── */
+const MODELS = [
+  {
+    id:'AM-0045', name:'Robe Satin Longue',
+    client:'ASOS', ref:'ASOS-ST-44521',
+    cat:'Robe', rev:4, status:'In Production',
+    cost:19.29, updated:'28 Mar 2026', updatedBy:'Soufiane',
+    desc:'Long satin duchess dress with fitted silhouette. Invisible zip at centre back. Full poly lining on bodice.'
+  },
+  {
+    id:'AM-0052', name:'Crop Top Jersey',
+    client:'PrettyLittleThing', ref:'PLT-CR-8821',
+    cat:'Top', rev:2, status:'Sample',
+    cost:8.00, updated:'02 Apr 2026', updatedBy:'Karim',
+    desc:'Fitted jersey crop top with elasticated hem. Round neckline, short puff sleeves. 95% poly, 5% elastane.'
+  },
+  {
+    id:'AM-0039', name:'Wide Leg Linen Trousers',
+    client:'River Island', ref:'RI-PL-3301',
+    cat:'Pantalon', rev:1, status:'Completed',
+    cost:11.22, updated:'15 Jan 2026', updatedBy:'Ahmed',
+    desc:'Relaxed wide-leg trouser in linen-viscose blend. Side pockets, concealed hook bar waist, turn-up hem.'
+  },
+  {
+    id:'AM-0060', name:'Pleated Midi Skirt',
+    client:'ASOS', ref:'ASOS-JP-9933',
+    cat:'Jupe', rev:1, status:'Draft',
+    cost:null, updated:'05 Apr 2026', updatedBy:'Fatima',
+    desc:'Knife-pleated midi skirt, satin finish. Elasticated back waistband. Pending fabric and costing sign-off.'
+  },
+  {
+    id:'AM-0061', name:'Wrap Blouse Viscose',
+    client:'PrettyLittleThing', ref:'PLT-WB-1105',
+    cat:'Top', rev:3, status:'Confirmed',
+    cost:10.12, updated:'19 Mar 2026', updatedBy:'Soufiane',
+    desc:'Wrap-front blouse in 100% viscose challis. Long sleeves with button cuff, self-tie belt, V neckline.'
+  },
+];
+
+const STATUS_CLASS = {
+  'Draft':'badge-draft','Sample':'badge-sample',
+  'Confirmed':'badge-confirmed','In Production':'badge-production',
+  'Completed':'badge-completed',
+};
+
+/* ── Render models table ──────────────────────────────────────── */
+function renderModels(data) {
+  const tbody = document.getElementById('m-tbody');
+  const empty = document.getElementById('m-empty');
+  const count = document.getElementById('m-count');
+
+  count.textContent = `${data.length} model${data.length !== 1 ? 's' : ''}`;
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    lucide.createIcons();
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(m => `
+    <tr class="tbl-row" onclick="openModel('${m.id}')">
+      <td><span class="model-id">${m.id}</span></td>
+      <td class="fw-600">${m.name}</td>
+      <td>${m.client}</td>
+      <td class="ref-cell">${m.ref}</td>
+      <td>${m.cat}</td>
+      <td style="text-align:center" class="fw-600">${m.rev}</td>
+      <td><span class="badge ${STATUS_CLASS[m.status]||''}">${m.status}</span></td>
+      <td class="cost-cell">${m.cost !== null ? '€'+m.cost.toFixed(2) : '<span style="color:var(--muted2)">—</span>'}</td>
+      <td class="muted-cell">${m.updated}</td>
+    </tr>
+  `).join('');
+}
+
+/* ── Filter ───────────────────────────────────────────────────── */
+function filterModels() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const result = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)  &&
+             !m.client.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  renderModels(result);
+}
+
+/* ── Export CSV ───────────────────────────────────────────────── */
+function exportModelsCSV() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const data = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  const header = ['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc (EUR)','Updated'];
+  const rows   = data.map(m => [
+    m.id, m.name, m.client, m.ref, m.cat, m.rev, m.status,
+    m.cost !== null ? m.cost.toFixed(2) : '', m.updated,
+  ]);
+  const csv = [header,...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'),{href:url, download:`ava-marie-models-${new Date().toISOString().slice(0,10)}.csv`});
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${data.length} model${data.length!==1?'s':''} to CSV`);
+}
+
+/* ── Open model detail (stub) ─────────────────────────────────── */
+function openModel(id) {
+  const m = MODELS.find(x => x.id === id);
+  showToast(`${id} — ${m ? m.name : ''} (detail view coming next)`);
+}
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
   updateDate();
   setInterval(updateDate, 60000);
+  renderModels(MODELS);   // initial render
 });
 </script>
 </body>
