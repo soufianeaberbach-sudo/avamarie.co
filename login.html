@@ -6,334 +6,212 @@
 <title>ERP Login — Ava Marie</title>
 <link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/gotrue-js@0.9.29/lib/index.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --dark:#1A1714;--dark2:#252119;--dark3:#312E27;
-  --gold:#D4AF37;--gold2:#E0C35C;--gold3:#A88B2A;
-  --cream:#F5F1EB;--border:rgba(212,175,55,.2);
-  --white:#FFFFFF;--muted:rgba(245,241,235,.4);
-  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --gold:#C4A35A;--dark:#1A1A1A;--cream:#F5F1EB;--cream2:#EDE8DF;
+  --border:#E0DAD2;--text:#1A1A1A;--muted:#7A756A;--white:#fff;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
-body{
-  background:var(--dark);
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;position:relative;overflow:hidden;
-}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);display:flex;flex-direction:column;min-height:100vh}
 
-/* Textured background */
-body::before{
-  content:'';position:absolute;inset:0;
-  background:
-    repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 0,transparent 72px),
-    repeating-linear-gradient(180deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 0,transparent 72px);
-  pointer-events:none;z-index:0;
-}
-body::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 80% at 50% 0%,rgba(212,175,55,.07) 0%,transparent 65%);
-  pointer-events:none;z-index:0;
-}
-
-/* Gold accent line at top */
-.top-bar{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);z-index:100}
-
-/* Back link */
+.top-stripe{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .back-link{
-  position:fixed;top:2rem;left:2.5rem;z-index:100;
-  display:inline-flex;align-items:center;gap:.5rem;
-  font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(245,241,235,.3);text-decoration:none;transition:color .25s;
-}
-.back-link:hover{color:var(--gold)}
-.back-link svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* Card */
-.card{
-  position:relative;z-index:1;
-  width:100%;max-width:440px;
-  background:var(--dark2);
-  border:1px solid var(--border);
-  padding:3.5rem 3.5rem 3rem;
-  animation:cardIn .7s var(--ease-out) both;
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-
-/* Logo */
-.card-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2rem;letter-spacing:.12em;
-  color:var(--white);margin-bottom:.25rem;
-  cursor:pointer;display:inline-block;
-}
-.card-logo span{color:var(--gold)}
-
-/* Divider */
-.card-rule{
-  width:100%;height:1px;
-  background:linear-gradient(to right,var(--border),transparent);
-  margin:.75rem 0 2rem;
-}
-
-/* Eyebrow */
-.card-eyebrow{
-  font-size:.62rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--gold);display:flex;align-items:center;gap:.65rem;margin-bottom:.9rem;
-}
-.card-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold)}
-
-/* Title */
-.card-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2.6rem;letter-spacing:.04em;line-height:.95;
-  color:var(--white);margin-bottom:2rem;
-}
-.card-title span{color:var(--gold)}
-
-/* Form fields */
-.fg{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.25rem}
-.fg label{
+  position:fixed;top:1.5rem;left:2rem;z-index:10;
+  display:inline-flex;align-items:center;gap:.4rem;
   font-size:.68rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(245,241,235,.4);
+  color:var(--muted);text-decoration:none;transition:color .2s
 }
-.fg input{
-  background:var(--dark3);border:1px solid rgba(255,255,255,.08);
-  color:var(--white);font-family:'DM Sans',sans-serif;font-size:.95rem;
-  padding:.85rem 1rem;outline:none;transition:border-color .25s,box-shadow .25s;
-  -webkit-appearance:none;
-}
-.fg input:-webkit-autofill{-webkit-box-shadow:0 0 0 40px var(--dark3) inset!important;-webkit-text-fill-color:var(--white)!important}
-.fg input:focus{border-color:rgba(212,175,55,.5);box-shadow:0 0 0 3px rgba(212,175,55,.08)}
+.back-link:hover{color:var(--dark)}
+.back-link svg{width:13px;height:13px}
 
-/* Password wrapper */
-.pwd-wrap{position:relative}
-.pwd-wrap input{width:100%;padding-right:3rem}
-.pwd-toggle{
-  position:absolute;right:.9rem;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;padding:.2rem;
-  color:rgba(245,241,235,.3);transition:color .2s;line-height:0;
-}
-.pwd-toggle:hover{color:var(--gold)}
-.pwd-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 1.5rem}
 
-/* Remember / Forgot row */
-.form-footer{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:1.75rem;margin-top:-.25rem;
+.card{
+  width:100%;max-width:420px;
+  background:var(--white);
+  border:1px solid var(--border);
+  padding:0;
+  box-shadow:0 4px 60px rgba(0,0,0,.06)
 }
-.remember{
-  display:flex;align-items:center;gap:.55rem;
-  font-size:.82rem;color:rgba(245,241,235,.35);cursor:pointer;user-select:none;
-}
-.remember input[type="checkbox"]{
-  appearance:none;-webkit-appearance:none;
-  width:16px;height:16px;border:1px solid rgba(255,255,255,.15);
-  background:var(--dark3);cursor:pointer;position:relative;flex-shrink:0;
-  transition:border-color .2s,background .2s;
-}
-.remember input[type="checkbox"]:checked{background:var(--gold);border-color:var(--gold)}
-.remember input[type="checkbox"]:checked::after{
-  content:'';position:absolute;left:4px;top:1.5px;
-  width:5px;height:9px;border:2px solid var(--dark);
-  border-top:none;border-left:none;transform:rotate(42deg);
-}
-.forgot{
-  font-size:.8rem;color:rgba(212,175,55,.55);
-  text-decoration:none;transition:color .2s;letter-spacing:.03em;
-}
-.forgot:hover{color:var(--gold)}
 
-/* Error / success message */
-.msg{
-  font-size:.82rem;line-height:1.5;margin-bottom:1rem;
-  min-height:1.2rem;text-align:center;
-  transition:opacity .3s;
+.card-header{
+  padding:2.5rem 2.5rem 0;
+  text-align:center;
+  border-bottom:1px solid var(--cream2);
+  padding-bottom:2rem;
+  margin-bottom:0
 }
-.msg.error{color:#e07070}
-.msg.success{color:var(--gold2)}
+.logo-wrap{display:inline-flex;flex-direction:column;align-items:center;gap:.3rem}
+.logo-eyebrow{
+  font-size:.6rem;font-weight:600;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--muted)
+}
+.logo-text{
+  font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.18em;
+  color:var(--dark);line-height:1
+}
+.logo-text span{color:var(--gold)}
+.logo-divider{width:28px;height:1px;background:var(--gold);margin:.6rem auto}
+.logo-tagline{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:.88rem;color:var(--muted);line-height:1.65
+}
 
-/* Submit button */
+.card-body{padding:2rem 2.5rem 2.5rem}
+
+.form-group{margin-bottom:1.1rem}
+.form-label{
+  display:block;margin-bottom:.45rem;
+  font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)
+}
+.form-input{
+  width:100%;height:46px;padding:0 1rem;
+  background:#FAFAF8;border:1.5px solid var(--border);
+  font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);
+  outline:none;transition:border-color .2s,box-shadow .2s
+}
+.form-input:focus{
+  border-color:var(--gold);background:#fff;
+  box-shadow:0 0 0 3px rgba(196,163,90,.1)
+}
+.form-input::placeholder{color:#C0BAB0}
+
+.password-wrap{position:relative}
+.password-toggle{
+  position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  padding:4px;display:flex;align-items:center;transition:color .2s
+}
+.password-toggle:hover{color:var(--dark)}
+.password-toggle svg{width:16px;height:16px}
+
+.error-msg{
+  display:none;
+  background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.2);
+  color:#C0392B;font-size:.8rem;padding:.6rem .85rem;margin-bottom:1rem;
+  border-left:3px solid #C0392B
+}
+
 .btn-login{
-  width:100%;padding:1.1rem;
-  background:var(--gold);color:var(--dark);
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.12em;
-  border:none;cursor:pointer;transition:background .25s,color .25s,opacity .25s;
-  position:relative;overflow:hidden;
+  width:100%;height:50px;
+  background:var(--gold);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  border:none;cursor:pointer;transition:background .2s;
+  margin-bottom:1.25rem
 }
-.btn-login::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(255,255,255,.18);
-  transform:translateX(-101%);transition:transform .4s var(--ease-out);
-}
-.btn-login:hover::before{transform:translateX(0)}
-.btn-login:disabled{opacity:.55;cursor:not-allowed}
-.btn-login:disabled::before{display:none}
+.btn-login:hover{background:#A88430}
+.btn-login:active{transform:scale(.995)}
 
-/* Bottom note */
-.card-note{
-  margin-top:1.5rem;text-align:center;
-  font-size:.72rem;color:rgba(245,241,235,.18);letter-spacing:.06em;
-  line-height:1.6;
+.demo-hint{
+  text-align:center;font-size:.72rem;color:var(--muted);
+  background:rgba(196,163,90,.07);border:1px dashed rgba(196,163,90,.3);
+  padding:.55rem .75rem;border-radius:2px
 }
-.card-note a{color:rgba(212,175,55,.4);text-decoration:none;transition:color .2s}
-.card-note a:hover{color:var(--gold)}
+.demo-hint strong{color:var(--gold);font-weight:700}
 
-/* Security badge */
-.security-badge{
-  display:flex;align-items:center;justify-content:center;gap:.5rem;
-  margin-top:1.25rem;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(245,241,235,.15);
+footer.foot{
+  text-align:center;padding:1.25rem;
+  font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(122,117,106,.4)
 }
-.security-badge svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.6}
 </style>
 </head>
 <body>
+<div class="top-stripe"></div>
 
-<div class="top-bar"></div>
-
-<a class="back-link" href="index.html">
-  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-  Back to Site
+<a href="index.html" class="back-link">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  Back to site
 </a>
 
-<div class="card">
-
-  <div class="card-logo" onclick="window.location.href='index.html'">AVA <span>MARIE</span></div>
-  <div class="card-rule"></div>
-
-  <div class="card-eyebrow">Secure Access</div>
-  <h1 class="card-title">ERP<br><span>SYSTEM</span></h1>
-
-  <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
-
-    <div class="fg">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" required>
-    </div>
-
-    <div class="fg">
-      <label for="pwd">Password</label>
-      <div class="pwd-wrap">
-        <input type="password" id="pwd" name="password" placeholder="••••••••••••" autocomplete="current-password" required>
-        <button type="button" class="pwd-toggle" id="pwdToggle" aria-label="Show/hide password" onclick="togglePwd()">
-          <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
+<main class="main">
+  <div class="card">
+    <div class="card-header">
+      <div class="logo-wrap">
+        <span class="logo-eyebrow">Internal ERP System</span>
+        <div class="logo-text">AVA <span>MARIE</span></div>
+        <div class="logo-divider"></div>
+        <p class="logo-tagline">Precision at every step,<br>from pattern to dispatch.</p>
       </div>
     </div>
 
-    <div class="form-footer">
-      <label class="remember">
-        <input type="checkbox" id="remember">
-        Remember me
-      </label>
-      <a class="forgot" href="#" onclick="handleForgot(event)">Forgot Password?</a>
+    <div class="card-body">
+      <div id="errorMsg" class="error-msg"></div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input class="form-input" type="email" id="email" placeholder="you@avamarie.ma" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="password-wrap">
+          <input class="form-input" type="password" id="password" placeholder="••••••••••" autocomplete="current-password" style="padding-right:2.75rem">
+          <button class="password-toggle" type="button" onclick="togglePw(this)" aria-label="Show password">
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-login" onclick="doLogin()">Sign In to ERP</button>
+
+      <p class="demo-hint">Demo password: <strong>avamarie2026</strong></p>
     </div>
-
-    <div class="msg" id="msg" role="alert"></div>
-
-    <button class="btn-login" type="submit" id="loginBtn">LOGIN</button>
-
-  </form>
-
-  <p class="card-note">
-    Authorized personnel only.<br>
-    Need access? <a href="mailto:anwar@figaltd.co.uk">Contact your administrator</a>
-  </p>
-
-  <div class="security-badge">
-    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    Secured by Netlify Identity
   </div>
+</main>
 
-</div>
+<footer class="foot">© 2026 Ava Marie · Tanger, Maroc · Système confidentiel</footer>
 
 <script>
-// Initialise GoTrue with the current site's Netlify Identity endpoint
-var auth = new GoTrue.default({
-  APIUrl: window.location.origin + '/.netlify/identity',
-  audience: '',
-  setCookie: true,
-});
-
 // Redirect if already authenticated
-(function() {
-  try {
-    var u = auth.currentUser();
-    if (u && u.token) {
-      window.location.replace('/admin/');
-    }
-  } catch (e) {}
-})();
-
-function showMsg(text, type) {
-  var el = document.getElementById('msg');
-  el.textContent = text;
-  el.className = 'msg ' + (type || '');
+if (sessionStorage.getItem('erp_auth') === '1') {
+  window.location.replace('erp.html');
 }
 
-function handleLogin(e) {
-  e.preventDefault();
-  var email    = document.getElementById('email').value.trim();
-  var password = document.getElementById('pwd').value;
-  var remember = document.getElementById('remember').checked;
-  var btn      = document.getElementById('loginBtn');
-
-  if (!email || !password) {
-    showMsg('Please enter your email and password.', 'error');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'AUTHENTICATING…';
-  showMsg('');
-
-  auth.login(email, password, remember)
-    .then(function(user) {
-      btn.textContent = 'ACCESS GRANTED ✓';
-      showMsg('Welcome back. Redirecting…', 'success');
-      setTimeout(function() { window.location.replace('/admin/'); }, 900);
-    })
-    .catch(function(err) {
-      var msg = (err && err.json && err.json.error_description)
-        ? err.json.error_description
-        : 'Invalid email or password. Please try again.';
-      showMsg(msg, 'error');
-      btn.disabled = false;
-      btn.textContent = 'LOGIN';
-    });
-}
-
-function handleForgot(e) {
-  e.preventDefault();
-  var email = document.getElementById('email').value.trim();
-  if (!email) {
-    showMsg('Enter your email address above, then click Forgot Password.', 'error');
-    document.getElementById('email').focus();
-    return;
-  }
-  auth.requestPasswordRecovery(email)
-    .then(function() {
-      showMsg('Recovery email sent — check your inbox.', 'success');
-    })
-    .catch(function() {
-      showMsg('Could not send recovery email. Please contact your administrator.', 'error');
-    });
-}
-
-function togglePwd() {
-  var input = document.getElementById('pwd');
-  var icon  = document.getElementById('eyeIcon');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+function togglePw(btn) {
+  var inp = document.getElementById('password');
+  var eye = document.getElementById('eyeIcon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
   } else {
-    input.type = 'password';
-    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    inp.type = 'password';
+    eye.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
   }
 }
+
+function doLogin() {
+  var email = document.getElementById('email').value.trim();
+  var pass  = document.getElementById('password').value;
+  var err   = document.getElementById('errorMsg');
+  err.style.display = 'none';
+
+  if (!email) {
+    err.textContent = 'Please enter your email address.';
+    err.style.display = 'block';
+    return;
+  }
+  if (pass === 'avamarie2026') {
+    sessionStorage.setItem('erp_auth', '1');
+    sessionStorage.setItem('erp_user', email.split('@')[0]);
+    window.location.href = 'erp.html';
+  } else {
+    err.textContent = 'Incorrect password. Please try again.';
+    err.style.display = 'block';
+    document.getElementById('password').focus();
+    document.getElementById('password').select();
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
 </script>
 </body>
 </html>

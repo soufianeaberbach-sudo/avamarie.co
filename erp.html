@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ava Marie — ERP</title>
+<link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;flex-direction:column;gap:1.5rem;
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.2rem;letter-spacing:.2em;color:#1A1A1A;
+}
+.logo span{color:#C4A35A}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid rgba(196,163,90,.2);
+  border-top-color:#C4A35A;
+  animation:spin .8s linear infinite;
+}
+.msg{
+  font-family:'DM Sans',sans-serif;
+  font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:#9A9490;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="logo">AVA <span>MARIE</span></div>
+<div class="spinner"></div>
+<div class="msg">Loading ERP…</div>
+
+<script>
+if(!sessionStorage.getItem('erp_auth')){
+  window.location.replace('login.html');
+}
+</script>
+</body>
+</html>
