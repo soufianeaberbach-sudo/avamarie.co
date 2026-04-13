@@ -695,6 +695,90 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   .kpi-num{font-size:2.2rem}
   .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
   .md-header-card{flex-direction:column}
+  .cs-layout{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+  .defect-checks{grid-template-columns:1fr}
+}
+
+/* ─── CUTTING & SEWING ────────────────────────────────────────── */
+.cs-layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.cs-form-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;padding:22px;
+}
+.cs-log-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.cs-card-title{
+  font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:16px;
+}
+.cs-field{margin-bottom:13px}
+.cs-field label{
+  display:block;font-size:.6rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:5px;
+}
+.cs-field input,.cs-field select{
+  width:100%;height:36px;padding:0 12px;box-sizing:border-box;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.cs-field input:focus,.cs-field select:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,163,90,.12);background:var(--white);
+}
+.cs-field input[readonly]{color:var(--muted);cursor:default}
+.cs-field select{
+  appearance:none;cursor:pointer;padding-right:28px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A756A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.waste-display{
+  height:36px;display:flex;align-items:center;gap:6px;
+  padding:0 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+}
+.waste-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.35rem;line-height:1;color:var(--text);
+}
+.waste-num.high{color:#DC2626}
+.waste-unit{font-size:.72rem;color:var(--muted)}
+.waste-alert{
+  display:none;align-items:flex-start;gap:9px;
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;
+  padding:10px 13px;margin-bottom:13px;font-size:.78rem;color:#B91C1C;line-height:1.4;
+}
+.waste-alert.show{display:flex}
+.waste-alert svg{flex-shrink:0;margin-top:1px;stroke:#DC2626}
+/* Defect checkboxes */
+.defect-checks{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.defect-check{
+  display:flex;align-items:center;gap:7px;font-size:.79rem;color:var(--text);
+  cursor:pointer;padding:4px 6px;border-radius:4px;transition:background .1s;
+}
+.defect-check:hover{background:var(--bg)}
+.defect-check input[type=checkbox]{
+  accent-color:var(--gold);width:14px;height:14px;flex-shrink:0;cursor:pointer;
+}
+/* Defect pill in table */
+.defect-pill{
+  display:inline-block;background:#FEF9EC;border:1px solid #E8D5A3;border-radius:3px;
+  padding:1px 6px;font-size:.65rem;font-weight:600;color:#9C7C2E;margin:1px;
+}
+.cut-high{color:#DC2626;font-weight:700}
+/* KPI bar above sections */
+.cs-kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.log-empty{
+  padding:48px 20px;text-align:center;
+  font-size:.8rem;color:var(--muted2);
+}
+.sew-period-row{display:flex;gap:14px;align-items:center;margin-top:6px}
+.period-btn{
+  flex:1;height:36px;border:1.5px solid var(--border);border-radius:5px;background:var(--bg);
+  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.period-btn.active{
+  background:var(--gold);border-color:var(--gold);color:#fff;
 }
 </style>
 </head>
@@ -1042,23 +1126,143 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── CUTTING ────────────────────────────────────────── -->
     <div id="sec-cutting" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="ruler"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Cutting</div>
-        <div class="ph-desc">Log cutting sessions — quantities, fabric consumption, waste percentage, and bundle tickets.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="cut-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Log Cutting Session</div>
+
+          <!-- Waste alert -->
+          <div id="cut-waste-alert" class="waste-alert">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Waste exceeds 3% — please review fabric allocation for this batch.
+          </div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="cut-po" onchange="onCutPoChange()">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="cs-field">
+            <label>Model</label>
+            <input type="text" id="cut-model" readonly placeholder="Auto-filled from order">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Qty Cut (pcs)</label>
+              <input type="number" id="cut-qty" min="1" placeholder="0" oninput="onCutCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Fabric Consumed (m)</label>
+              <input type="number" id="cut-consumed" min="0" step="0.1" placeholder="0.0" oninput="onCutCalc()">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Fabric Required (m)</label>
+              <input type="number" id="cut-required" min="0" step="0.1" placeholder="0.0" oninput="onCutCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Waste %</label>
+              <div class="waste-display">
+                <span id="cut-waste-num" class="waste-num">—</span>
+                <span class="waste-unit">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Operator</label>
+            <input type="text" id="cut-op" placeholder="e.g. Youssef B.">
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="saveCutLog()">
+            <i data-lucide="check"></i> Save Entry
+          </button>
+        </div>
+
+        <!-- Log table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Cutting Log</div>
+            <span id="cut-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="cut-log-table"></div>
+        </div>
+
       </div>
     </div>
 
     <!-- ── SEWING ─────────────────────────────────────────── -->
     <div id="sec-sewing" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="cpu"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Sewing</div>
-        <div class="ph-desc">Daily sewing output per line, AM/PM periods, defect tracking, and cumulative progress.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="sew-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Log Sewing Session</div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="sew-po">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Line</label>
+              <input type="number" id="sew-line" min="1" max="20" placeholder="1–20">
+            </div>
+            <div class="cs-field">
+              <label>Date</label>
+              <input type="date" id="sew-date">
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Period</label>
+            <div class="sew-period-row">
+              <button class="period-btn active" id="btn-AM" onclick="selectPeriod('AM')">AM</button>
+              <button class="period-btn" id="btn-PM" onclick="selectPeriod('PM')">PM</button>
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Pieces Completed</label>
+            <input type="number" id="sew-pieces" min="0" placeholder="0">
+          </div>
+
+          <div class="cs-field">
+            <label>Defects</label>
+            <div class="defect-checks" id="defect-checks"></div>
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="saveSewLog()">
+            <i data-lucide="check"></i> Save Entry
+          </button>
+        </div>
+
+        <!-- Summary table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Daily Output Log</div>
+            <span id="sew-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="sew-log-table"></div>
+        </div>
+
       </div>
     </div>
 
@@ -2627,6 +2831,291 @@ function printGantt() {
   window.print();
 }
 
+/* ══════════════════════════════════════════════════════════════
+   CUTTING
+   ══════════════════════════════════════════════════════════════ */
+
+/* Standard fabric consumption per piece (metres) per model */
+const CUT_SPEC = { 'AM-0045': 0.43, 'AM-0052': 0.38, 'AM-0039': 0.41 };
+
+const CUTTING_LOG = [
+  { id:'C001', date:'07 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    qty:450, consumed:197.2, required:193.5, waste:1.88, op:'Youssef B.' },
+  { id:'C002', date:'08 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    qty:550, consumed:248.5, required:236.5, waste:4.83, op:'Youssef B.' },
+];
+
+let cutIdSeq = CUTTING_LOG.length + 1;
+
+function renderCutKPIs() {
+  const total  = CUTTING_LOG.reduce((a,r)=>a+r.qty,0);
+  const avgW   = CUTTING_LOG.length ? (CUTTING_LOG.reduce((a,r)=>a+r.waste,0)/CUTTING_LOG.length).toFixed(2) : '—';
+  const alerts = CUTTING_LOG.filter(r=>r.waste>3).length;
+  document.getElementById('cut-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Cut</div>
+      <div class="kpi-num">${total.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${CUTTING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Avg Waste %</div>
+      <div class="kpi-num${avgW>3?' gold':''}">${avgW}<span style="font-size:1.2rem">%</span></div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">High-Waste Alerts</div>
+      <div class="kpi-num${alerts?' gold':''}">${alerts}</div></div>`;
+}
+
+function renderCutTable() {
+  const el = document.getElementById('cut-log-table');
+  document.getElementById('cut-log-count').textContent = CUTTING_LOG.length + ' entries';
+  if (!CUTTING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...CUTTING_LOG].reverse().map(r=>{
+    const hi = r.waste > 3;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.model}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.qty.toLocaleString()}</td>
+      <td style="text-align:right">${r.consumed.toFixed(1)} m</td>
+      <td style="text-align:right">${r.required.toFixed(1)} m</td>
+      <td style="text-align:right" class="${hi?'cut-high':''}">${r.waste.toFixed(2)}%${hi?' ⚠':''}
+      </td>
+      <td>${r.op}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>PO</th><th>Model</th>
+      <th style="text-align:right">Qty</th>
+      <th style="text-align:right">Consumed</th>
+      <th style="text-align:right">Required</th>
+      <th style="text-align:right">Waste %</th>
+      <th>Operator</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderCutting() {
+  /* Populate order dropdown */
+  const sel = document.getElementById('cut-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+
+  renderCutKPIs();
+  renderCutTable();
+}
+
+function onCutPoChange() {
+  const po = document.getElementById('cut-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('cut-model').value = ord ? ord.model : '';
+  onCutCalc();
+}
+
+function onCutCalc() {
+  const qty      = parseFloat(document.getElementById('cut-qty').value)      || 0;
+  const consumed = parseFloat(document.getElementById('cut-consumed').value) || 0;
+  const required = parseFloat(document.getElementById('cut-required').value) || 0;
+
+  /* Auto-fill required if model has a spec and user hasn't entered it */
+  const model = document.getElementById('cut-model').value;
+  const reqInput = document.getElementById('cut-required');
+  if (!reqInput.value && qty > 0 && CUT_SPEC[model]) {
+    const autoReq = +(qty * CUT_SPEC[model]).toFixed(1);
+    reqInput.value = autoReq;
+  }
+
+  const req = parseFloat(reqInput.value) || 0;
+  const numEl = document.getElementById('cut-waste-num');
+  const alertEl = document.getElementById('cut-waste-alert');
+
+  if (consumed > 0 && req > 0) {
+    const w = ((consumed - req) / consumed * 100);
+    const wDisp = w < 0 ? '0.00' : w.toFixed(2);
+    numEl.textContent = wDisp;
+    numEl.className = 'waste-num' + (w > 3 ? ' high' : '');
+    alertEl.classList.toggle('show', w > 3);
+  } else {
+    numEl.textContent = '—';
+    numEl.className = 'waste-num';
+    alertEl.classList.remove('show');
+  }
+}
+
+function saveCutLog() {
+  const po       = document.getElementById('cut-po').value;
+  const model    = document.getElementById('cut-model').value;
+  const qty      = parseFloat(document.getElementById('cut-qty').value);
+  const consumed = parseFloat(document.getElementById('cut-consumed').value);
+  const required = parseFloat(document.getElementById('cut-required').value);
+  const op       = document.getElementById('cut-op').value.trim();
+
+  if (!po)            { showToast('Select a PO number.'); return; }
+  if (!qty || qty<1)  { showToast('Enter a valid quantity.'); return; }
+  if (!consumed)      { showToast('Enter fabric consumed.'); return; }
+  if (!required)      { showToast('Enter fabric required.'); return; }
+  if (!op)            { showToast('Enter the operator name.'); return; }
+
+  const waste = Math.max(0, (consumed - required) / consumed * 100);
+  const now   = new Date();
+  const dateStr = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id    = 'C' + String(cutIdSeq++).padStart('3','0');
+
+  CUTTING_LOG.push({ id, date:dateStr, po, model, qty, consumed, required,
+                     waste:+waste.toFixed(2), op });
+
+  /* Clear form */
+  ['cut-po','cut-model','cut-qty','cut-consumed','cut-required','cut-op'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el.tagName==='SELECT') el.value=''; else el.value='';
+  });
+  document.getElementById('cut-waste-num').textContent='—';
+  document.getElementById('cut-waste-num').className='waste-num';
+  document.getElementById('cut-waste-alert').classList.remove('show');
+
+  renderCutKPIs();
+  renderCutTable();
+  lucide.createIcons();
+  showToast(waste>3 ? '⚠ Entry saved — waste above 3%!' : 'Cutting session saved.');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SEWING
+   ══════════════════════════════════════════════════════════════ */
+
+const DEFECT_TYPES = ['Stitching','Tension','Skip Stitch','Seam Pucker','Raw Edge','Open Seam'];
+
+const SEWING_LOG = [
+  { id:'S001', date:'10 Apr 2026', line:5, period:'AM', po:'ASOS-PO-44521-A', pieces:48, defects:['Tension','Skip Stitch'] },
+  { id:'S002', date:'10 Apr 2026', line:5, period:'PM', po:'ASOS-PO-44521-A', pieces:52, defects:['Stitching'] },
+  { id:'S003', date:'11 Apr 2026', line:6, period:'AM', po:'ASOS-PO-44521-A', pieces:44, defects:[] },
+  { id:'S004', date:'11 Apr 2026', line:6, period:'PM', po:'ASOS-PO-44521-A', pieces:49, defects:['Seam Pucker'] },
+  { id:'S005', date:'12 Apr 2026', line:5, period:'AM', po:'ASOS-PO-44521-A', pieces:51, defects:[] },
+  { id:'S006', date:'12 Apr 2026', line:6, period:'AM', po:'ASOS-PO-44521-A', pieces:47, defects:['Raw Edge'] },
+];
+
+let sewIdSeq  = SEWING_LOG.length + 1;
+let sewPeriod = 'AM';
+
+function selectPeriod(p) {
+  sewPeriod = p;
+  document.getElementById('btn-AM').classList.toggle('active', p==='AM');
+  document.getElementById('btn-PM').classList.toggle('active', p==='PM');
+}
+
+function renderSewKPIs() {
+  const totalPcs   = SEWING_LOG.reduce((a,r)=>a+r.pieces,0);
+  const totalDef   = SEWING_LOG.reduce((a,r)=>a+r.defects.length,0);
+  const defRate    = totalPcs ? (totalDef/totalPcs*100).toFixed(1) : '0.0';
+  document.getElementById('sew-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Output</div>
+      <div class="kpi-num">${totalPcs.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${SEWING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Defects</div>
+      <div class="kpi-num${totalDef?'':' muted'}">${totalDef}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Defect Rate</div>
+      <div class="kpi-num${defRate>2?' gold':''}">${defRate}<span style="font-size:1.2rem">%</span></div></div>`;
+}
+
+function renderSewTable() {
+  const el = document.getElementById('sew-log-table');
+  document.getElementById('sew-log-count').textContent = SEWING_LOG.length + ' entries';
+  if (!SEWING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...SEWING_LOG].reverse().map(r=>{
+    const defRate = r.pieces ? (r.defects.length/r.pieces*100).toFixed(1) : '0.0';
+    const pills   = r.defects.map(d=>`<span class="defect-pill">${d}</span>`).join('');
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.1rem">${r.line}</td>
+      <td style="text-align:center">${r.period}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.pieces}</td>
+      <td>${pills||'<span style="color:var(--muted2);font-size:.75rem">None</span>'}</td>
+      <td style="text-align:right;color:${r.defects.length?'#9C7C2E':'var(--muted)'}">${defRate}%</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th>
+      <th style="text-align:center">Line</th>
+      <th style="text-align:center">Period</th>
+      <th>PO</th>
+      <th style="text-align:right">Pieces</th>
+      <th>Defects</th>
+      <th style="text-align:right">Rate %</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderDefectChecks() {
+  document.getElementById('defect-checks').innerHTML = DEFECT_TYPES.map(d=>
+    `<label class="defect-check">
+      <input type="checkbox" value="${d}" id="dc-${d.replace(/\s/g,'-')}">
+      ${d}
+    </label>`
+  ).join('');
+}
+
+function renderSewing() {
+  /* Order dropdown */
+  const sel = document.getElementById('sew-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+
+  /* Today as default date */
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('sew-date').value = today;
+
+  renderDefectChecks();
+  renderSewKPIs();
+  renderSewTable();
+}
+
+function saveSewLog() {
+  const po     = document.getElementById('sew-po').value;
+  const line   = parseInt(document.getElementById('sew-line').value);
+  const dateRaw= document.getElementById('sew-date').value;
+  const pieces = parseInt(document.getElementById('sew-pieces').value);
+
+  if (!po)              { showToast('Select a PO number.'); return; }
+  if (!line||line<1||line>20) { showToast('Enter a line number (1–20).'); return; }
+  if (!dateRaw)         { showToast('Select a date.'); return; }
+  if (!pieces||pieces<0){ showToast('Enter pieces completed.'); return; }
+
+  const defects = DEFECT_TYPES.filter(d=>{
+    const el = document.getElementById('dc-' + d.replace(/\s/g,'-'));
+    return el && el.checked;
+  });
+
+  const dateObj = new Date(dateRaw);
+  const dateStr = dateObj.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id      = 'S' + String(sewIdSeq++).padStart(3,'0');
+
+  SEWING_LOG.push({ id, date:dateStr, line, period:sewPeriod, po, pieces, defects });
+
+  /* Clear form */
+  document.getElementById('sew-pieces').value = '';
+  document.getElementById('sew-line').value   = '';
+  DEFECT_TYPES.forEach(d=>{
+    const el=document.getElementById('dc-'+d.replace(/\s/g,'-'));
+    if(el) el.checked=false;
+  });
+
+  renderSewKPIs();
+  renderSewTable();
+  lucide.createIcons();
+  showToast('Sewing session saved.');
+}
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
@@ -2635,6 +3124,8 @@ document.addEventListener('DOMContentLoaded', function () {
   renderModels(MODELS);   // initial render
   renderOrders(ORDERS);   // initial render
   renderGantt();          // initial render
+  renderCutting();        // initial render
+  renderSewing();         // initial render
 });
 </script>
 </body>
