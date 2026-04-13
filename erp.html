@@ -698,14 +698,107 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     </div>
 
-    <!-- ── ORDERS ─────────────────────────────────────────── -->
+    <!-- ── ORDERS LIST ──────────────────────────────────────── -->
     <div id="sec-orders" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="package"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Orders</div>
-        <div class="ph-desc">Track client purchase orders, quantities by size and colour, and deadlines.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Orders</div>
+          <div class="kpi-num" id="o-kpi-total">2</div>
+          <div class="kpi-sub">Active purchase orders</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Units</div>
+          <div class="kpi-num gold" id="o-kpi-units">3,200</div>
+          <div class="kpi-sub">Pieces across all orders</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Production</div>
+          <div class="kpi-num" id="o-kpi-inprod">1</div>
+          <div class="kpi-sub">Currently on factory floor</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Value</div>
+          <div class="kpi-num gold" style="font-size:2rem" id="o-kpi-value">€61,728</div>
+          <div class="kpi-sub">Ex-factory (EUR)</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="card filter-bar">
+        <input class="f-input" type="text" id="o-search"
+          placeholder="Search by PO number, client, or model…"
+          oninput="filterOrders()">
+        <select class="f-select" id="o-client" onchange="filterOrders()">
+          <option value="">All Clients</option>
+          <option>ASOS</option>
+          <option>PrettyLittleThing</option>
+          <option>River Island</option>
+        </select>
+        <select class="f-select" id="o-status" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option>Confirmed</option>
+          <option>In Production</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
+        <select class="f-select" id="o-season" onchange="filterOrders()">
+          <option value="">All Seasons</option>
+          <option>SS26</option>
+          <option>AW26</option>
+          <option>SS27</option>
+        </select>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-count" id="o-count">2 orders</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="exportOrdersCSV()">
+            <i data-lucide="download"></i> Export CSV
+          </button>
+          <button class="btn-primary" onclick="showToast('New order form — coming next')">
+            <i data-lucide="plus"></i> New Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="o-table">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Client</th>
+              <th>Model</th>
+              <th>Season</th>
+              <th>Issued</th>
+              <th>Delivery</th>
+              <th style="text-align:right">Qty</th>
+              <th>Status</th>
+              <th style="text-align:right">Value (EUR)</th>
+            </tr>
+          </thead>
+          <tbody id="o-tbody"></tbody>
+        </table>
+        <div id="o-empty" class="tbl-empty" style="display:none">
+          <i data-lucide="search-x"></i>
+          <p>No orders match your filters.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ORDER DETAIL (filled by JS) ──────────────────────── -->
+    <div id="sec-order-detail" class="sec">
+      <button class="md-back" onclick="closeOrder()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Orders
+      </button>
+      <div id="od-header" class="md-header-card"></div>
+      <div style="padding:52px 0;text-align:center">
+        <p style="font-size:.82rem;color:var(--muted)">Order detail — coming next</p>
       </div>
     </div>
 
@@ -951,8 +1044,192 @@ const MODELS = [
 const STATUS_CLASS = {
   'Draft':'badge-draft','Sample':'badge-sample',
   'Confirmed':'badge-confirmed','In Production':'badge-production',
-  'Completed':'badge-completed',
+  'Completed':'badge-completed','Cancelled':'badge-draft',
 };
+
+/* ══════════════════════════════════════════════════════════════
+   ORDERS — data & functions
+   ══════════════════════════════════════════════════════════════ */
+
+const ORDERS = [
+  {
+    po:       'ASOS-PO-44521-A',
+    client:   'ASOS',
+    model:    'AM-0045',
+    modelName:'Robe Satin Longue',
+    season:   'SS26',
+    issued:   '01 Apr 2026',
+    delivery: '15 May 2026',
+    qty:      2400,
+    sizes:    'XS×240 / S×540 / M×720 / L×540 / XL×360',
+    colours:  'Ivory',
+    status:   'In Production',
+    value:    46296,
+    notes:    'Priority shipment. All cartons to be labelled per ASOS routing guide v3.2. AQL 2.5 required.',
+  },
+  {
+    po:       'ASOS-PO-44521-B',
+    client:   'ASOS',
+    model:    'AM-0045',
+    modelName:'Robe Satin Longue',
+    season:   'SS26',
+    issued:   '05 Apr 2026',
+    delivery: '30 Jun 2026',
+    qty:      800,
+    sizes:    'S×200 / M×280 / L×200 / XL×120',
+    colours:  'Dusty Rose',
+    status:   'Confirmed',
+    value:    15432,
+    notes:    'Second colourway. Fabric ETA from supplier 20 Apr. Cutting to follow once PP approved.',
+  },
+];
+
+/* ── KPI recalc ───────────────────────────────────────────────── */
+function recalcOrderKPIs(data) {
+  const totalUnits = data.reduce((s, o) => s + o.qty, 0);
+  const totalValue = data.reduce((s, o) => s + o.value, 0);
+  const inProd     = data.filter(o => o.status === 'In Production').length;
+  document.getElementById('o-kpi-total').textContent  = data.length;
+  document.getElementById('o-kpi-units').textContent  = totalUnits.toLocaleString();
+  document.getElementById('o-kpi-inprod').textContent = inProd;
+  document.getElementById('o-kpi-value').textContent  = '€' + totalValue.toLocaleString();
+}
+
+/* ── Render orders table ──────────────────────────────────────── */
+function renderOrders(data) {
+  const tbody = document.getElementById('o-tbody');
+  const empty = document.getElementById('o-empty');
+  const count = document.getElementById('o-count');
+
+  count.textContent = `${data.length} order${data.length !== 1 ? 's' : ''}`;
+  recalcOrderKPIs(data);
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    lucide.createIcons();
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(o => `
+    <tr class="tbl-row" onclick="openOrder('${o.po}')">
+      <td style="font-family:'Courier New',monospace;font-size:.78rem;font-weight:600;color:var(--text)">${o.po}</td>
+      <td class="fw-600">${o.client}</td>
+      <td>
+        <span class="model-id" style="font-size:.9rem">${o.model}</span>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:1px">${o.modelName}</div>
+      </td>
+      <td><span class="badge badge-draft" style="background:#F0EDE8">${o.season}</span></td>
+      <td class="muted-cell">${o.issued}</td>
+      <td class="muted-cell">${o.delivery}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.02em">${o.qty.toLocaleString()}</td>
+      <td><span class="badge ${STATUS_CLASS[o.status]||'badge-draft'}">${o.status}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.02em;color:var(--gold)">€${o.value.toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+
+/* ── Filter orders ────────────────────────────────────────────── */
+function filterOrders() {
+  const q      = document.getElementById('o-search').value.toLowerCase().trim();
+  const client = document.getElementById('o-client').value;
+  const status = document.getElementById('o-status').value;
+  const season = document.getElementById('o-season').value;
+
+  const result = ORDERS.filter(o => {
+    if (q && !o.po.toLowerCase().includes(q) &&
+             !o.client.toLowerCase().includes(q) &&
+             !o.model.toLowerCase().includes(q) &&
+             !o.modelName.toLowerCase().includes(q)) return false;
+    if (client && o.client !== client) return false;
+    if (status && o.status !== status) return false;
+    if (season && o.season !== season) return false;
+    return true;
+  });
+
+  renderOrders(result);
+  lucide.createIcons();
+}
+
+/* ── Export orders CSV ────────────────────────────────────────── */
+function exportOrdersCSV() {
+  const q      = document.getElementById('o-search').value.toLowerCase().trim();
+  const client = document.getElementById('o-client').value;
+  const status = document.getElementById('o-status').value;
+  const season = document.getElementById('o-season').value;
+
+  const data = ORDERS.filter(o => {
+    if (q && !o.po.toLowerCase().includes(q) &&
+             !o.client.toLowerCase().includes(q) &&
+             !o.model.toLowerCase().includes(q)) return false;
+    if (client && o.client !== client) return false;
+    if (status && o.status !== status) return false;
+    if (season && o.season !== season) return false;
+    return true;
+  });
+
+  const header = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (EUR)','Notes'];
+  const rows   = data.map(o => [
+    o.po, o.client, o.model, o.modelName, o.season,
+    o.issued, o.delivery, o.qty, o.colours, o.status, o.value, o.notes,
+  ]);
+  const csv = [header, ...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `ava-marie-orders-${new Date().toISOString().slice(0,10)}.csv`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${data.length} order${data.length !== 1 ? 's' : ''} to CSV`);
+}
+
+/* ── Open order detail ────────────────────────────────────────── */
+function openOrder(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+
+  document.getElementById('sec-orders').classList.remove('active');
+  document.getElementById('sec-order-detail').classList.add('active');
+
+  document.getElementById('tb-title').textContent = o.po;
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  lucide.createIcons();
+  document.getElementById('content').scrollTop = 0;
+
+  document.getElementById('od-header').innerHTML = `
+    <div>
+      <div class="md-id-badge">${o.po}</div>
+      <div class="md-model-name">${o.modelName} <span style="font-size:1rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400">(${o.model})</span></div>
+      <div class="md-meta-row">
+        <div><div class="md-meta-label">Client</div><div class="md-meta-value">${o.client}</div></div>
+        <div><div class="md-meta-label">Season</div><div class="md-meta-value">${o.season}</div></div>
+        <div><div class="md-meta-label">Issued</div><div class="md-meta-value">${o.issued}</div></div>
+        <div><div class="md-meta-label">Delivery</div><div class="md-meta-value">${o.delivery}</div></div>
+        <div><div class="md-meta-label">Colours</div><div class="md-meta-value">${o.colours}</div></div>
+        <div><div class="md-meta-label">Status</div><div class="md-meta-value"><span class="badge ${STATUS_CLASS[o.status]||''}">${o.status}</span></div></div>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="md-cost-big">€${o.value.toLocaleString()}</div>
+      <div class="md-cost-sub">${o.qty.toLocaleString()} units</div>
+    </div>
+  `;
+}
+
+/* ── Close order detail ───────────────────────────────────────── */
+function closeOrder() {
+  document.getElementById('sec-order-detail').classList.remove('active');
+  document.getElementById('sec-orders').classList.add('active');
+  document.getElementById('tb-title').textContent = 'Orders';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  lucide.createIcons();
+}
 
 /* ── Render models table ──────────────────────────────────────── */
 function renderModels(data) {
@@ -1614,6 +1891,7 @@ document.addEventListener('DOMContentLoaded', function () {
   updateDate();
   setInterval(updateDate, 60000);
   renderModels(MODELS);   // initial render
+  renderOrders(ORDERS);   // initial render
 });
 </script>
 </body>
