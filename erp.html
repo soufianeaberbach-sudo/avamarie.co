@@ -469,6 +469,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 .audit-badge.ab-approved    {background:#EDFAF2;color:#0A6634}
 .audit-badge.ab-rejected    {background:#FDEAEA;color:#C0392B}
 .audit-badge.ab-statuschange{background:rgba(196,163,90,.14);color:#8B6514}
+.audit-badge.ab-revision    {background:rgba(196,163,90,.18);color:var(--gold)}
 .audit-detail{font-size:.8rem;color:var(--text);line-height:1.5}
 .audit-ts{font-size:.68rem;color:var(--muted2);margin-top:2px}
 .audit-arow{display:flex;align-items:center;gap:8px;margin-bottom:3px}
@@ -1098,6 +1099,67 @@ const MD = {
         feedback: '',
       },
     ],
+
+    /* ── Tab 7 · Linked Orders ─────────────────────────────── */
+    orders: [
+      {
+        po: 'ASOS-PO-44521-A',
+        issued:   '01 Apr 2026',
+        delivery: '15 May 2026',
+        qty: 2400,
+        sizes: 'XS×240 / S×540 / M×720 / L×540 / XL×360',
+        status: 'In Production',
+        value: 46296,
+      },
+      {
+        po: 'ASOS-PO-44521-B',
+        issued:   '05 Apr 2026',
+        delivery: '30 Jun 2026',
+        qty: 800,
+        sizes: 'S×200 / M×280 / L×200 / XL×120',
+        status: 'Confirmed',
+        value: 15432,
+      },
+    ],
+
+    /* ── Tab 8 · Audit ─────────────────────────────────────── */
+    audit: [
+      {
+        ts: '28 Mar 2026, 14:32', user: 'Soufiane',
+        action: 'STATUS CHANGE',
+        detail: 'Status changed: Confirmed → In Production following PP sign-off',
+      },
+      {
+        ts: '28 Mar 2026, 14:28', user: 'Soufiane',
+        action: 'APPROVED',
+        detail: 'Rev.4 PP sample approved — ASOS buyer ref PPAM0045-04',
+      },
+      {
+        ts: '18 Feb 2026, 10:15', user: 'Karim',
+        action: 'REVISION',
+        detail: 'Rev.3 created — back vent removed, zip upgraded to YKK concealed 60 cm',
+      },
+      {
+        ts: '15 Feb 2026, 16:42', user: 'Ahmed',
+        action: 'UPLOADED',
+        detail: 'Tech pack Rev.3 uploaded — AM-0045-TP-r3.pdf (2.4 MB)',
+      },
+      {
+        ts: '04 Feb 2026, 09:20', user: 'Soufiane',
+        action: 'REVISION',
+        detail: 'Rev.2 created — neckline adjusted to subtle V, sleeve +2 cm, SMV revised to 24.2 min',
+      },
+      {
+        ts: '28 Jan 2026, 11:55', user: 'Soufiane',
+        action: 'REJECTED',
+        detail: 'Proto sample (Rev.1) rejected — bust ease 4 cm too tight, zip placket visible, neckline 1.5 cm low',
+      },
+      {
+        ts: '15 Jan 2026, 08:00', user: 'Fatima',
+        action: 'CREATED',
+        detail: 'Model AM-0045 created — initial tech pack uploaded, BOM drafted (8 components)',
+      },
+    ],
   },
 };
 
@@ -1395,12 +1457,155 @@ function renderMdSamples(id) {
 
 /* ── Tab 7 · Linked Orders (placeholder) ──────────────────────── */
 function renderMdOrders(id) {
-  document.getElementById('md-orders').innerHTML = emptyPane('Linked Orders — coming next');
+  const d = MD[id];
+  if (!d || !d.orders) { document.getElementById('md-orders').innerHTML = emptyPane('No linked orders for this model.'); return; }
+
+  const o = d.orders;
+  const totalQty = o.reduce((s, r) => s + r.qty, 0);
+  const totalVal = o.reduce((s, r) => s + r.value, 0);
+
+  const STATUS_CLS = {
+    'In Production': 'badge-production',
+    'Confirmed':     'badge-confirmed',
+    'Completed':     'badge-completed',
+    'Sample':        'badge-sample',
+    'Draft':         'badge-draft',
+  };
+
+  const rows = o.map(r => `
+    <tr class="tbl-row">
+      <td style="font-family:'Courier New',monospace;font-size:.78rem;color:var(--text);font-weight:600">${r.po}</td>
+      <td class="muted-cell">${r.issued}</td>
+      <td class="muted-cell">${r.delivery}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.03em;color:var(--text)">${r.qty.toLocaleString()}</td>
+      <td style="font-size:.75rem;color:var(--muted);max-width:220px;white-space:normal;line-height:1.5">${r.sizes}</td>
+      <td><span class="badge ${STATUS_CLS[r.status]||'badge-draft'}">${r.status}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.02em;color:var(--gold)">€${r.value.toLocaleString()}</td>
+    </tr>`).join('');
+
+  document.getElementById('md-orders').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Linked Orders &mdash; ${o.length} purchase orders</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+          onclick="showToast('New order form — coming next')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Link Order
+        </button>
+      </div>
+
+      <!-- Summary strip -->
+      <div class="lo-summary">
+        <div>
+          <div class="lo-stat-val">${o.length}</div>
+          <div class="lo-stat-lbl">Purchase Orders</div>
+        </div>
+        <div>
+          <div class="lo-stat-val gold">${totalQty.toLocaleString()}</div>
+          <div class="lo-stat-lbl">Total Units</div>
+        </div>
+        <div>
+          <div class="lo-stat-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.02em;color:var(--gold)">€${totalVal.toLocaleString()}</div>
+          <div class="lo-stat-lbl">Total Value (ex-factory)</div>
+        </div>
+        <div>
+          <div class="lo-stat-val" style="font-size:1.75rem">${o.filter(r=>r.status==='In Production').length}</div>
+          <div class="lo-stat-lbl">In Production</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Issued</th>
+              <th>Delivery</th>
+              <th style="text-align:right">Qty</th>
+              <th>Size Breakdown</th>
+              <th>Status</th>
+              <th style="text-align:right">Value (EUR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+            <tr style="background:#FFFDF7;border-top:2px solid rgba(196,163,90,.15)">
+              <td colspan="3" style="padding:13px 20px;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Total</td>
+              <td style="padding:13px 20px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--text)">${totalQty.toLocaleString()}</td>
+              <td></td>
+              <td></td>
+              <td style="padding:13px 20px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.02em;color:var(--gold)">€${totalVal.toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
-/* ── Tab 8 · Audit (placeholder) ─────────────────────────────── */
+/* ── Tab 8 · Audit ────────────────────────────────────────────── */
 function renderMdAudit(id) {
-  document.getElementById('md-audit').innerHTML = emptyPane('Audit Log — coming next');
+  const d = MD[id];
+  if (!d || !d.audit) { document.getElementById('md-audit').innerHTML = emptyPane('No audit log entries.'); return; }
+
+  const BADGE = {
+    'CREATED':         'ab-created',
+    'UPDATED':         'ab-updated',
+    'UPLOADED':        'ab-uploaded',
+    'APPROVED':        'ab-approved',
+    'REJECTED':        'ab-rejected',
+    'STATUS CHANGE':   'ab-statuschange',
+    'REVISION':        'ab-revision',
+  };
+
+  const entries = d.audit.map(e => `
+    <div class="audit-entry">
+      <div class="audit-av">${e.user.charAt(0)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="audit-arow">
+          <span class="audit-badge ${BADGE[e.action]||'ab-updated'}">${e.action}</span>
+          <span style="font-size:.76rem;font-weight:600;color:var(--text)">${e.user}</span>
+        </div>
+        <div class="audit-detail">${e.detail}</div>
+        <div class="audit-ts">${e.ts}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('md-audit').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Audit Log &mdash; ${d.audit.length} entries</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px" onclick="exportAuditCSV('${id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+      </div>
+      <div>${entries}</div>
+    </div>`;
+}
+
+/* ── Audit CSV export ─────────────────────────────────────────── */
+function exportAuditCSV(id) {
+  const d = MD[id];
+  if (!d || !d.audit) return;
+  const header = ['Timestamp', 'User', 'Action', 'Detail'];
+  const rows   = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
+  const csv    = [header, ...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `audit-${id}-${new Date().toISOString().slice(0,10)}.csv`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${d.audit.length} audit entries to CSV`);
 }
 
 /* ── Init ─────────────────────────────────────────────────────── */
