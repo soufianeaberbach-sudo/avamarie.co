@@ -563,12 +563,117 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
 /* Print layout */
 @media print{
-  #sidebar,#topbar,.od-actions,.md-back,.note-add-wrap{display:none!important}
+  #sidebar,#topbar,.od-actions,.md-back,.note-add-wrap,
+  #gantt-popup,.toolbar button,.gantt-print-hide{display:none!important}
+  #sb-overlay{display:none!important}
   #main{margin-left:0!important}
-  #content{overflow:visible!important;padding:20px!important}
+  #content{overflow:visible!important;height:auto!important;padding:16px!important}
   .sec{display:none!important}
-  #sec-order-detail{display:block!important}
+  .sec.active{display:block!important}
   .sc{break-inside:avoid}
+  .gantt-wrap{overflow:visible!important;border:none!important}
+  .gantt-inner{min-width:unset!important}
+}
+
+/* ─── GANTT ───────────────────────────────────────────────────── */
+.gantt-wrap{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;overflow-x:auto;
+}
+.gantt-inner{min-width:860px}
+.gantt-header-row{
+  display:flex;height:52px;
+  background:#FAFAF8;border-bottom:2px solid var(--border);
+  position:sticky;top:0;z-index:5;
+}
+.gantt-lbl-hd{
+  width:128px;flex-shrink:0;padding:0 14px;
+  display:flex;align-items:center;
+  font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted2);border-right:1px solid var(--border);
+}
+.gantt-dhd-wrap{flex:1;display:flex}
+.gantt-dhd{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;border-right:1px solid rgba(230,226,220,.5);user-select:none;
+}
+.gantt-dhd .dnum{font-size:.8rem;font-weight:700;color:var(--text)}
+.gantt-dhd .dday{font-size:.54rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
+.gantt-dhd.g-weekend{background:rgba(0,0,0,.024)}
+.gantt-dhd.g-weekend .dnum{color:var(--muted2)}
+.gantt-dhd.g-today{background:rgba(196,163,90,.08)}
+.gantt-dhd.g-today .dnum{color:var(--gold);font-weight:800}
+.gantt-rows{display:flex;flex-direction:column}
+.gantt-row{display:flex;height:44px;border-bottom:1px solid #F4F2EE}
+.gantt-row:last-child{border-bottom:none}
+.gantt-row-lbl{
+  width:128px;flex-shrink:0;padding:0 14px;
+  display:flex;align-items:center;gap:6px;
+  border-right:1px solid var(--border);background:var(--white);
+  font-size:.74rem;font-weight:600;color:var(--text);
+}
+.gantt-row-lbl .lnum{
+  font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted2);flex-shrink:0;
+}
+.gantt-cells-area{flex:1;position:relative;overflow:hidden}
+.gantt-bg-cells{position:absolute;inset:0;display:flex;pointer-events:none}
+.gantt-bg-cell{flex:1;border-right:1px solid rgba(230,226,220,.35)}
+.gantt-bg-cell.g-weekend{background:rgba(0,0,0,.024)}
+.gantt-bg-cell.g-today{background:rgba(196,163,90,.06)}
+.gantt-block{
+  position:absolute;top:6px;height:32px;
+  border-radius:4px;cursor:pointer;
+  display:flex;align-items:center;padding:0 10px;
+  overflow:hidden;z-index:1;
+  transition:filter .15s,box-shadow .15s;
+}
+.gantt-block:hover{filter:brightness(1.1);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.gantt-block-lbl{
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+  color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+/* Gantt legend */
+.gantt-legend{
+  display:flex;gap:18px;flex-wrap:wrap;
+  padding:12px 16px;background:var(--white);
+  border:1px solid var(--border);border-radius:8px;margin-bottom:14px;
+  align-items:center;
+}
+.g-legend-item{display:flex;align-items:center;gap:6px}
+.g-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.g-legend-txt{font-size:.74rem;font-weight:600;color:var(--text)}
+/* Popup */
+#gantt-popup{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(26,23,20,.32);
+  display:none;align-items:center;justify-content:center;
+}
+#gantt-popup.open{display:flex}
+#gantt-popup-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:24px 26px;width:100%;max-width:400px;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);position:relative;
+}
+.popup-close{
+  position:absolute;top:12px;right:12px;
+  background:none;border:none;cursor:pointer;padding:5px;
+  color:var(--muted);border-radius:4px;transition:color .15s,background .15s;
+  line-height:0;
+}
+.popup-close:hover{color:var(--text);background:#F0EDE8}
+.popup-model-id{
+  font-family:'Bebas Neue',sans-serif;font-size:1.35rem;
+  letter-spacing:.08em;color:var(--gold);margin-bottom:1px;
+}
+.popup-op-lbl{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:14px}
+.popup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:14px}
+.popup-item-lbl{font-size:.57rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);margin-bottom:2px}
+.popup-item-val{font-size:.8rem;font-weight:600;color:var(--text)}
+.popup-notes-box{
+  font-size:.78rem;color:var(--muted);line-height:1.65;
+  background:#FAFAF8;border:1px solid var(--border);border-radius:4px;padding:9px 11px;
 }
 
 /* ─── RESPONSIVE ──────────────────────────────────────────────── */
@@ -899,13 +1004,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── PLANNING ───────────────────────────────────────── -->
     <div id="sec-planning" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="calendar-range"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Planning</div>
-        <div class="ph-desc">Visual Gantt calendar — assign models to production lines across 20 lines.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- Toolbar -->
+      <div class="toolbar" style="margin-bottom:14px">
+        <div>
+          <div style="font-size:.92rem;font-weight:600;color:var(--text)">Production Planning</div>
+          <div style="font-size:.74rem;color:var(--muted);margin-top:2px">07 Apr – 27 Apr 2026 &nbsp;·&nbsp; 20 Lines &nbsp;·&nbsp; 5 scheduled jobs</div>
+        </div>
+        <button class="btn-outline gantt-print-hide" onclick="printGantt()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Gantt
+        </button>
       </div>
+
+      <!-- Legend -->
+      <div class="gantt-legend gantt-print-hide">
+        <div class="g-legend-item"><div class="g-legend-dot" style="background:#C4A35A"></div><span class="g-legend-txt">Cutting</span></div>
+        <div class="g-legend-item"><div class="g-legend-dot" style="background:#2455CC"></div><span class="g-legend-txt">Sewing</span></div>
+        <div class="g-legend-item"><div class="g-legend-dot" style="background:#7B5EA7"></div><span class="g-legend-txt">Proto</span></div>
+        <div class="g-legend-item"><div class="g-legend-dot" style="background:#196741"></div><span class="g-legend-txt">Finishing / QC</span></div>
+        <div class="g-legend-item" style="margin-left:auto;display:flex;align-items:center;gap:6px">
+          <div style="width:12px;height:12px;background:rgba(0,0,0,.04);border:1px solid #E6E2DC;border-radius:2px"></div>
+          <span class="g-legend-txt" style="color:var(--muted)">Weekend</span>
+        </div>
+        <div class="g-legend-item">
+          <div style="width:12px;height:12px;background:rgba(196,163,90,.12);border:1px solid rgba(196,163,90,.3);border-radius:2px"></div>
+          <span class="g-legend-txt" style="color:var(--gold)">Today</span>
+        </div>
+      </div>
+
+      <!-- Gantt chart -->
+      <div class="gantt-wrap">
+        <div id="gantt-root"></div>
+      </div>
+
     </div>
 
     <!-- ── CUTTING ────────────────────────────────────────── -->
@@ -1010,6 +1142,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
     </div>
 
   </main>
+</div>
+
+<!-- GANTT POPUP -->
+<div id="gantt-popup" onclick="closeBlockPopup()">
+  <div id="gantt-popup-card" onclick="event.stopPropagation()"></div>
 </div>
 
 <!-- TOAST -->
@@ -2306,6 +2443,190 @@ function exportAuditCSV(id) {
   showToast(`Exported ${d.audit.length} audit entries to CSV`);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   GANTT — data & render
+   ══════════════════════════════════════════════════════════════ */
+
+const GANTT_ORIGIN = new Date('2026-04-07T00:00:00');
+const GANTT_TOTAL  = 21;   // days shown
+const GANTT_LINES  = 20;
+const GANTT_TODAY  = new Date('2026-04-13T00:00:00');
+
+const GANTT_BLOCKS = [
+  {
+    id:'B1', line:1, s:0, d:5,
+    label:'AM-0045 · Cutting — Ivory',
+    color:'#C4A35A',
+    model:'AM-0045', po:'ASOS-PO-44521-A',
+    op:'Fabric Cutting', colour:'Ivory', qty:1000,
+    dates:'07 Apr – 11 Apr 2026',
+    notes:'Ivory batch (1,000 pcs). Marker efficiency target 83%. Bundle tickets issued to cutting floor. Fusing press on interfacing before bundling.',
+  },
+  {
+    id:'B2', line:5, s:3, d:13,
+    label:'AM-0045 · Sewing — Ivory',
+    color:'#2455CC',
+    model:'AM-0045', po:'ASOS-PO-44521-A',
+    op:'Sewing', colour:'Ivory', qty:600,
+    dates:'10 Apr – 22 Apr 2026',
+    notes:'Line 5 target 80 pcs/day. SMV 24.6 min. AQL inline inspection at 50% mark. Operator briefing done for YKK zip insertion (Op 050).',
+  },
+  {
+    id:'B3', line:6, s:3, d:13,
+    label:'AM-0045 · Sewing — Ivory',
+    color:'#2455CC',
+    model:'AM-0045', po:'ASOS-PO-44521-A',
+    op:'Sewing', colour:'Ivory', qty:400,
+    dates:'10 Apr – 22 Apr 2026',
+    notes:'Supporting Line 5. Combined target 160 pcs/day across both lines. Same style — operators share briefing.',
+  },
+  {
+    id:'B4', line:12, s:7, d:5,
+    label:'AM-0052 · Sewing — Proto',
+    color:'#7B5EA7',
+    model:'AM-0052', po:'PLT-CR-8821',
+    op:'Proto Sewing', colour:'All colourways', qty:50,
+    dates:'14 Apr – 18 Apr 2026',
+    notes:'Proto run for PLT crop top jersey. 50 pcs, 100% QC inspection before dispatch to client. No AQL — full check required.',
+  },
+  {
+    id:'B5', line:15, s:0, d:11,
+    label:'AM-0039 · Finishing / QC',
+    color:'#196741',
+    model:'AM-0039', po:'RI-PL-3301',
+    op:'Finishing / QC', colour:'All colourways', qty:400,
+    dates:'07 Apr – 17 Apr 2026',
+    notes:'Steam press, final inspection, AQL 2.5. Folding + polybag per River Island packing spec. Target ex-factory 18 Apr 2026.',
+  },
+];
+
+/* ── Render Gantt ─────────────────────────────────────────────── */
+function renderGantt() {
+  const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const todayIdx  = Math.round((GANTT_TODAY - GANTT_ORIGIN) / 86400000);
+
+  /* day metadata */
+  const days = Array.from({ length: GANTT_TOTAL }, (_, i) => {
+    const d   = new Date(GANTT_ORIGIN);
+    d.setDate(d.getDate() + i);
+    const dow = d.getDay();
+    return {
+      num:     d.getDate(),
+      name:    DAY_NAMES[dow],
+      weekend: dow === 0 || dow === 6,
+      today:   i === todayIdx,
+    };
+  });
+
+  /* header row */
+  const headerCells = days.map(d => {
+    const cls = ['gantt-dhd', d.weekend ? 'g-weekend' : '', d.today ? 'g-today' : '']
+      .filter(Boolean).join(' ');
+    return `<div class="${cls}">
+      <span class="dnum">${d.num}</span>
+      <span class="dday">${d.name}</span>
+    </div>`;
+  }).join('');
+
+  /* one row per line */
+  const rowsHtml = Array.from({ length: GANTT_LINES }, (_, li) => {
+    const lineNum    = li + 1;
+    const lineBlocks = GANTT_BLOCKS.filter(b => b.line === lineNum);
+
+    const bgCells = days.map(d => {
+      const cls = ['gantt-bg-cell', d.weekend ? 'g-weekend' : '', d.today ? 'g-today' : '']
+        .filter(Boolean).join(' ');
+      return `<div class="${cls}"></div>`;
+    }).join('');
+
+    const blocks = lineBlocks.map(b => {
+      const left  = (b.s / GANTT_TOTAL * 100).toFixed(4);
+      const width = (b.d / GANTT_TOTAL * 100).toFixed(4);
+      return `<div class="gantt-block"
+        style="left:${left}%;width:calc(${width}% - 3px);background:${b.color}"
+        onclick="openBlockPopup('${b.id}')"
+        title="${b.label} · ${b.dates}">
+        <span class="gantt-block-lbl">${b.label}</span>
+      </div>`;
+    }).join('');
+
+    const modelTag = lineBlocks.length
+      ? `<span style="font-size:.7rem;color:var(--gold);font-weight:700">${lineBlocks[0].model}</span>`
+      : '';
+
+    return `<div class="gantt-row">
+      <div class="gantt-row-lbl">
+        <span class="lnum">L${String(lineNum).padStart(2,'0')}</span>
+        ${modelTag}
+      </div>
+      <div class="gantt-cells-area">
+        <div class="gantt-bg-cells">${bgCells}</div>
+        ${blocks}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('gantt-root').innerHTML = `
+    <div class="gantt-inner">
+      <div class="gantt-header-row">
+        <div class="gantt-lbl-hd">Line / Day</div>
+        <div class="gantt-dhd-wrap">${headerCells}</div>
+      </div>
+      <div class="gantt-rows">${rowsHtml}</div>
+    </div>`;
+}
+
+/* ── Block popup ──────────────────────────────────────────────── */
+function openBlockPopup(id) {
+  const b = GANTT_BLOCKS.find(x => x.id === id);
+  if (!b) return;
+
+  document.getElementById('gantt-popup-card').innerHTML = `
+    <button class="popup-close" onclick="closeBlockPopup()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="width:14px;height:14px;border-radius:3px;background:${b.color};flex-shrink:0"></div>
+      <div>
+        <div class="popup-model-id">${b.model}</div>
+        <div class="popup-op-lbl">${b.op} &mdash; ${b.colour}</div>
+      </div>
+    </div>
+    <div class="popup-grid">
+      <div>
+        <div class="popup-item-lbl">PO Number</div>
+        <div class="popup-item-val" style="font-family:'Courier New',monospace;font-size:.76rem">${b.po}</div>
+      </div>
+      <div>
+        <div class="popup-item-lbl">Line</div>
+        <div class="popup-item-val">Line ${b.line}</div>
+      </div>
+      <div>
+        <div class="popup-item-lbl">Dates</div>
+        <div class="popup-item-val">${b.dates}</div>
+      </div>
+      <div>
+        <div class="popup-item-lbl">Qty</div>
+        <div class="popup-item-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${b.qty.toLocaleString()} pcs</div>
+      </div>
+    </div>
+    <div class="popup-notes-box">${b.notes}</div>`;
+
+  document.getElementById('gantt-popup').classList.add('open');
+}
+
+function closeBlockPopup() {
+  document.getElementById('gantt-popup').classList.remove('open');
+}
+
+/* ── Print Gantt ──────────────────────────────────────────────── */
+function printGantt() {
+  window.print();
+}
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
@@ -2313,6 +2634,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(updateDate, 60000);
   renderModels(MODELS);   // initial render
   renderOrders(ORDERS);   // initial render
+  renderGantt();          // initial render
 });
 </script>
 </body>
