@@ -474,6 +474,103 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 .audit-ts{font-size:.68rem;color:var(--muted2);margin-top:2px}
 .audit-arow{display:flex;align-items:center;gap:8px;margin-bottom:3px}
 
+/* ─── ORDER DETAIL ───────────────────────────────────────────── */
+.od-actions{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+
+/* Matrix */
+.od-matrix{width:100%;border-collapse:collapse}
+.od-matrix th{
+  padding:9px 14px;font-family:'DM Sans',sans-serif;
+  font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;text-align:right;border-bottom:1px solid var(--border);
+  background:#FAFAF8;
+}
+.od-matrix th:first-child{text-align:left;padding-left:20px}
+.od-matrix th:last-child{padding-right:20px;color:var(--gold)}
+.od-matrix td{padding:8px 14px;border-bottom:1px solid #F4F2EE;vertical-align:middle}
+.od-matrix td:first-child{padding-left:20px}
+.od-matrix td:last-child{padding-right:20px}
+.od-matrix tfoot td{
+  background:#FFFDF7;border-top:2px solid rgba(196,163,90,.18);
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.03em;
+  text-align:right;color:var(--text);padding:11px 14px;
+}
+.od-matrix tfoot td:first-child{
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding-left:20px;
+}
+.od-matrix tfoot td:last-child{color:var(--gold);padding-right:20px}
+.colour-cell{display:flex;align-items:center;gap:9px}
+.colour-swatch{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(0,0,0,.1);
+}
+.qty-input{
+  width:72px;height:34px;padding:0 8px;text-align:right;
+  background:#FAFAF8;border:1.5px solid var(--border);border-radius:4px;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.03em;color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.qty-input:focus{
+  border-color:var(--gold);background:#fff;
+  box-shadow:0 0 0 3px rgba(196,163,90,.1);
+}
+.row-total{
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;
+  letter-spacing:.03em;color:var(--gold);text-align:right;
+}
+
+/* Materials */
+.mat-status{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 9px;border-radius:20px;white-space:nowrap;
+}
+.mat-instock  {background:#E8F5EF;color:#0D7A4E}
+.mat-awaiting {background:#FFF3E0;color:#C47000}
+.mat-partial  {background:#EEF2FF;color:#2A55CC}
+.mat-onorder  {background:#F4F2EE;color:var(--muted)}
+
+/* Progress bars */
+.prog-section{padding:20px 22px;display:flex;flex-direction:column;gap:18px}
+.prog-row-lbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.prog-stage{font-size:.78rem;font-weight:600;color:var(--text)}
+.prog-count{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.03em;color:var(--muted)}
+.prog-track{height:9px;background:#F0EDE8;border-radius:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:5px;background:var(--gold);transition:width .5s cubic-bezier(.16,1,.3,1)}
+.prog-fill.done{background:#22A06B}
+.prog-fill.zero{background:transparent}
+
+/* Meeting notes */
+.note-card{
+  padding:14px 18px;border-bottom:1px solid #F4F2EE;
+}
+.note-card:last-child{border-bottom:none}
+.note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:12px}
+.note-author{font-size:.8rem;font-weight:700;color:var(--text)}
+.note-date{font-size:.7rem;color:var(--muted2)}
+.note-text{font-size:.82rem;color:var(--text);line-height:1.7}
+.note-add-wrap{padding:14px 18px;border-top:1px solid #F4F2EE}
+.note-add-input{
+  width:100%;min-height:68px;resize:vertical;
+  background:#FAFAF8;border:1.5px solid var(--border);border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--text);
+  line-height:1.6;padding:9px 12px;outline:none;margin-bottom:8px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.note-add-input:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(196,163,90,.1)}
+
+/* Print layout */
+@media print{
+  #sidebar,#topbar,.od-actions,.md-back,.note-add-wrap{display:none!important}
+  #main{margin-left:0!important}
+  #content{overflow:visible!important;padding:20px!important}
+  .sec{display:none!important}
+  #sec-order-detail{display:block!important}
+  .sc{break-inside:avoid}
+}
+
 /* ─── RESPONSIVE ──────────────────────────────────────────────── */
 @media(max-width:1024px){
   #sidebar{transform:translateX(-100%)}
@@ -797,9 +894,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
         Back to Orders
       </button>
       <div id="od-header" class="md-header-card"></div>
-      <div style="padding:52px 0;text-align:center">
-        <p style="font-size:.82rem;color:var(--muted)">Order detail — coming next</p>
-      </div>
+      <div id="od-body"></div>
     </div>
 
     <!-- ── PLANNING ───────────────────────────────────────── -->
@@ -1066,6 +1161,45 @@ const ORDERS = [
     status:   'In Production',
     value:    46296,
     notes:    'Priority shipment. All cartons to be labelled per ASOS routing guide v3.2. AQL 2.5 required.',
+    matrix: {
+      sizes: ['S','M','L','XL'],
+      rows: [
+        { colour:'Ivory',     hex:'#F5F0E8', values:[240,320,240,200] },
+        { colour:'Black',     hex:'#1A1A1A', values:[180,220,160,140] },
+        { colour:'Navy',      hex:'#1B2A4A', values:[160,200,180,160] },
+      ],
+    },
+    materials: [
+      { name:'Satin Duchess — Ivory',    supplier:'Duchesse-Satin SA', req:'1,850 m', ordered:'1,850 m', received:'1,850 m', status:'In Stock'         },
+      { name:'Satin Duchess — Black',    supplier:'Duchesse-Satin SA', req:'666 m',   ordered:'666 m',   received:'0 m',     status:'Awaiting Delivery' },
+      { name:'Satin Duchess — Navy',     supplier:'Duchesse-Satin SA', req:'592 m',   ordered:'592 m',   received:'0 m',     status:'Awaiting Delivery' },
+      { name:'Poly Lining',              supplier:'Poly-Tissu MA',     req:'2,280 m', ordered:'2,280 m', received:'2,280 m', status:'In Stock'          },
+      { name:'YKK Zip 60 cm (concealed)',supplier:'YKK Morocco',       req:'2,400',   ordered:'2,400',   received:'1,200',   status:'Partial'           },
+      { name:'Label Set (brand+care+sz)',supplier:'Etiquettes SA',     req:'2,400',   ordered:'2,400',   received:'0',       status:'On Order'          },
+    ],
+    progress: [
+      { stage:'Fabric Cutting', done:450, total:1000, colour:'Ivory batch only' },
+      { stage:'Sewing',         done:220, total:1000, colour:'Ivory batch only' },
+      { stage:'Finishing / QC', done:80,  total:1000, colour:'Ivory batch only' },
+      { stage:'Packing',        done:0,   total:2400, colour:'All colours'      },
+    ],
+    meetingNotes: [
+      { date:'09 Apr 2026', author:'Soufiane', text:'Client confirmed Ivory is priority colourway. Black & Navy cutting to follow after Ivory QC clearance. AQL 2.5 mandatory — arrange third-party inspector.' },
+      { date:'05 Apr 2026', author:'Karim',    text:'PP sample approved by ASOS buyer (ref PPAM0045-04). Production go-ahead confirmed. Ivory fabric in stock, bulk cutting started 01 Apr.' },
+      { date:'01 Apr 2026', author:'Fatima',   text:'PO-44521-A received. Materials plan issued. Ivory fabric confirmed in stock. Black & Navy ordered from Duchesse-Satin SA — ETA 20 Apr 2026.' },
+    ],
+    cp: [
+      { milestone:'Tech pack issued',           planned:'15 Jan 2026', actual:'15 Jan 2026', status:'Done',     owner:'Fatima'   },
+      { milestone:'PP sample approval',         planned:'28 Mar 2026', actual:'28 Mar 2026', status:'Done',     owner:'Soufiane' },
+      { milestone:'Fabric delivery — Ivory',    planned:'28 Mar 2026', actual:'20 Mar 2026', status:'Done',     owner:'Ahmed'    },
+      { milestone:'Bulk cutting start — Ivory', planned:'01 Apr 2026', actual:'01 Apr 2026', status:'Done',     owner:'Karim'    },
+      { milestone:'Bulk sewing start — Ivory',  planned:'10 Apr 2026', actual:'10 Apr 2026', status:'Done',     owner:'Karim'    },
+      { milestone:'Fabric delivery — Blk/Navy', planned:'20 Apr 2026', actual:'',            status:'On Track', owner:'Ahmed'    },
+      { milestone:'QC inline inspection',       planned:'25 Apr 2026', actual:'',            status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Final inspection (AQL 2.5)', planned:'05 May 2026', actual:'',            status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Export booking',             planned:'08 May 2026', actual:'',            status:'Upcoming', owner:'Fatima'   },
+      { milestone:'Ex-factory',                 planned:'15 May 2026', actual:'',            status:'On Track', owner:'Soufiane' },
+    ],
   },
   {
     po:       'ASOS-PO-44521-B',
@@ -1077,10 +1211,45 @@ const ORDERS = [
     delivery: '30 Jun 2026',
     qty:      800,
     sizes:    'S×200 / M×280 / L×200 / XL×120',
-    colours:  'Dusty Rose',
+    colours:  'Dusty Rose, Mauve, Blush',
     status:   'Confirmed',
     value:    15432,
-    notes:    'Second colourway. Fabric ETA from supplier 20 Apr. Cutting to follow once PP approved.',
+    notes:    'Second colourway pack. Fabric ETA from supplier 20 Apr. Cutting to follow once PP for colourways approved.',
+    matrix: {
+      sizes: ['S','M','L','XL'],
+      rows: [
+        { colour:'Dusty Rose', hex:'#E8B4A0', values:[80,120,80,60]  },
+        { colour:'Mauve',      hex:'#C4A0B8', values:[70,100,70,50]  },
+        { colour:'Blush',      hex:'#F0D0C8', values:[50, 60,50,10]  },
+      ],
+    },
+    materials: [
+      { name:'Satin Duchess — Dusty Rose', supplier:'Duchesse-Satin SA', req:'296 m',  ordered:'296 m',  received:'0 m',  status:'On Order'          },
+      { name:'Satin Duchess — Mauve',      supplier:'Duchesse-Satin SA', req:'555 m',  ordered:'555 m',  received:'0 m',  status:'On Order'          },
+      { name:'Satin Duchess — Blush',      supplier:'Duchesse-Satin SA', req:'370 m',  ordered:'370 m',  received:'0 m',  status:'On Order'          },
+      { name:'Poly Lining',                supplier:'Poly-Tissu MA',     req:'760 m',  ordered:'760 m',  received:'0 m',  status:'On Order'          },
+      { name:'YKK Zip 60 cm (concealed)',  supplier:'YKK Morocco',       req:'800',    ordered:'800',    received:'0',    status:'On Order'           },
+      { name:'Label Set (brand+care+sz)',  supplier:'Etiquettes SA',     req:'800',    ordered:'0',      received:'0',    status:'Awaiting Delivery' },
+    ],
+    progress: [
+      { stage:'Fabric Cutting', done:0, total:800, colour:'All colours' },
+      { stage:'Sewing',         done:0, total:800, colour:'All colours' },
+      { stage:'Finishing / QC', done:0, total:800, colour:'All colours' },
+      { stage:'Packing',        done:0, total:800, colour:'All colours' },
+    ],
+    meetingNotes: [
+      { date:'05 Apr 2026', author:'Soufiane', text:'PO-44521-B received. Colourways confirmed: Dusty Rose, Mauve, Blush. Fabric ordered from Duchesse-Satin SA — ETA 20 Apr. PP approval for colourways required before cutting.' },
+    ],
+    cp: [
+      { milestone:'PP sample approval (colourways)', planned:'28 Apr 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Fabric delivery (all colours)',   planned:'20 Apr 2026', actual:'', status:'On Track', owner:'Ahmed'    },
+      { milestone:'Bulk cutting start',              planned:'30 Apr 2026', actual:'', status:'Upcoming', owner:'Karim'    },
+      { milestone:'Bulk sewing start',               planned:'10 May 2026', actual:'', status:'Upcoming', owner:'Karim'    },
+      { milestone:'QC inline inspection',            planned:'10 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Final inspection (AQL 2.5)',      planned:'20 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Export booking',                  planned:'24 Jun 2026', actual:'', status:'Upcoming', owner:'Fatima'   },
+      { milestone:'Ex-factory',                      planned:'30 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+    ],
   },
 ];
 
@@ -1196,16 +1365,18 @@ function openOrder(po) {
 
   document.getElementById('sec-orders').classList.remove('active');
   document.getElementById('sec-order-detail').classList.add('active');
-
   document.getElementById('tb-title').textContent = o.po;
   document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
   lucide.createIcons();
   document.getElementById('content').scrollTop = 0;
 
+  /* ── Header card ── */
   document.getElementById('od-header').innerHTML = `
     <div>
       <div class="md-id-badge">${o.po}</div>
-      <div class="md-model-name">${o.modelName} <span style="font-size:1rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400">(${o.model})</span></div>
+      <div class="md-model-name">${o.modelName}
+        <span style="font-size:1rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400">(${o.model})</span>
+      </div>
       <div class="md-meta-row">
         <div><div class="md-meta-label">Client</div><div class="md-meta-value">${o.client}</div></div>
         <div><div class="md-meta-label">Season</div><div class="md-meta-value">${o.season}</div></div>
@@ -1218,8 +1389,258 @@ function openOrder(po) {
     <div style="text-align:right;flex-shrink:0">
       <div class="md-cost-big">€${o.value.toLocaleString()}</div>
       <div class="md-cost-sub">${o.qty.toLocaleString()} units</div>
+    </div>`;
+
+  /* ── Export action bar ── */
+  const actions = `
+    <div class="od-actions">
+      <button class="btn-outline" onclick="exportOrderCP('${po}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CP Excel
+      </button>
+      <button class="btn-primary" onclick="printOrderCP()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        CP PDF
+      </button>
+    </div>`;
+
+  /* ── Style / Color / Size matrix ── */
+  const mx = o.matrix;
+  const sizeHeaders = mx.sizes.map(s =>
+    `<th>${s}</th>`).join('') + '<th>Total</th>';
+
+  const matrixRows = mx.rows.map((r, ri) => {
+    const rowTotal = r.values.reduce((a,b) => a+b, 0);
+    const cells = r.values.map((v, ci) =>
+      `<td><input class="qty-input" type="number" min="0"
+         data-po="${po}" data-row="${ri}" data-col="${ci}"
+         value="${v}" oninput="recalcMatrix('${po}')"></td>`
+    ).join('');
+    return `<tr>
+      <td><div class="colour-cell">
+        <div class="colour-swatch" style="background:${r.hex}"></div>
+        <span style="font-size:.82rem;font-weight:600">${r.colour}</span>
+      </div></td>
+      ${cells}
+      <td class="row-total" id="rt-${po}-${ri}">${rowTotal.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  const colTotals = mx.sizes.map((_, ci) =>
+    mx.rows.reduce((s, r) => s + r.values[ci], 0)
+  );
+  const grandTotal = colTotals.reduce((a,b) => a+b, 0);
+  const footCells = colTotals.map((t, ci) =>
+    `<td id="ct-${po}-${ci}">${t.toLocaleString()}</td>`).join('');
+
+  const matrixHtml = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Style · Colour / Size Matrix</span>
+        <span style="font-size:.78rem;font-weight:600;color:var(--muted)">
+          Grand total: <span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:1.1rem" id="gt-${po}">${grandTotal.toLocaleString()}</span> pcs
+        </span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="od-matrix">
+          <thead><tr><th style="text-align:left">Colour</th>${sizeHeaders}</tr></thead>
+          <tbody>${matrixRows}</tbody>
+          <tfoot><tr><td>Total</td>${footCells}<td id="gt2-${po}">${grandTotal.toLocaleString()}</td></tr></tfoot>
+        </table>
+      </div>
+    </div>`;
+
+  /* ── Materials status ── */
+  const MAT_CLS = { 'In Stock':'mat-instock','Awaiting Delivery':'mat-awaiting','Partial':'mat-partial','On Order':'mat-onorder' };
+  const matRows = o.materials.map(m => `
+    <tr class="tbl-row">
+      <td class="fw-600">${m.name}</td>
+      <td class="muted-cell">${m.supplier}</td>
+      <td style="text-align:right">${m.req}</td>
+      <td style="text-align:right">${m.ordered}</td>
+      <td style="text-align:right">${m.received}</td>
+      <td><span class="mat-status ${MAT_CLS[m.status]||'mat-onorder'}">${m.status}</span></td>
+    </tr>`).join('');
+
+  const matHtml = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Material Status</span></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Material</th><th>Supplier</th><th style="text-align:right">Required</th><th style="text-align:right">On Order</th><th style="text-align:right">Received</th><th>Status</th></tr></thead>
+          <tbody>${matRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  /* ── Production progress ── */
+  const progRows = o.progress.map(p => {
+    const pct = p.total > 0 ? Math.round((p.done / p.total) * 100) : 0;
+    const fillClass = pct === 100 ? 'done' : pct === 0 ? 'zero' : '';
+    return `<div>
+      <div class="prog-row-lbl">
+        <div>
+          <span class="prog-stage">${p.stage}</span>
+          <span style="font-size:.7rem;color:var(--muted2);margin-left:6px">${p.colour}</span>
+        </div>
+        <span class="prog-count">${p.done.toLocaleString()} / ${p.total.toLocaleString()} pcs &nbsp; <span style="color:var(--gold)">${pct}%</span></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill ${fillClass}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const progHtml = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Production Progress</span></div>
+      <div class="prog-section">${progRows}</div>
+    </div>`;
+
+  /* ── Meeting notes ── */
+  const noteCards = o.meetingNotes.map(n => `
+    <div class="note-card">
+      <div class="note-head">
+        <span class="note-author">${n.author}</span>
+        <span class="note-date">${n.date}</span>
+      </div>
+      <div class="note-text">${n.text}</div>
+    </div>`).join('');
+
+  const notesHtml = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Meeting Notes &mdash; ${o.meetingNotes.length} entries</span>
+      </div>
+      <div id="note-list-${po}">${noteCards}</div>
+      <div class="note-add-wrap">
+        <textarea class="note-add-input" id="note-input-${po}"
+          placeholder="Add a meeting note, decision, or client instruction…"></textarea>
+        <button class="btn-primary" style="font-size:.7rem;padding:7px 14px"
+          onclick="addMeetingNote('${po}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Note
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById('od-body').innerHTML = actions + matrixHtml + matHtml + progHtml + notesHtml;
+}
+
+/* ── Recalculate matrix totals ────────────────────────────────── */
+function recalcMatrix(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+  const nRows = o.matrix.rows.length;
+  const nCols = o.matrix.sizes.length;
+
+  let grand = 0;
+  /* row totals */
+  for (let ri = 0; ri < nRows; ri++) {
+    let rowSum = 0;
+    for (let ci = 0; ci < nCols; ci++) {
+      const inp = document.querySelector(`.qty-input[data-po="${po}"][data-row="${ri}"][data-col="${ci}"]`);
+      rowSum += inp ? (parseInt(inp.value) || 0) : 0;
+    }
+    const rt = document.getElementById(`rt-${po}-${ri}`);
+    if (rt) rt.textContent = rowSum.toLocaleString();
+    grand += rowSum;
+  }
+  /* column totals */
+  for (let ci = 0; ci < nCols; ci++) {
+    let colSum = 0;
+    for (let ri = 0; ri < nRows; ri++) {
+      const inp = document.querySelector(`.qty-input[data-po="${po}"][data-row="${ri}"][data-col="${ci}"]`);
+      colSum += inp ? (parseInt(inp.value) || 0) : 0;
+    }
+    const ct = document.getElementById(`ct-${po}-${ci}`);
+    if (ct) ct.textContent = colSum.toLocaleString();
+  }
+  /* grand total */
+  ['gt-'+po, 'gt2-'+po].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = grand.toLocaleString();
+  });
+}
+
+/* ── Add meeting note ─────────────────────────────────────────── */
+function addMeetingNote(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+  const inp = document.getElementById('note-input-' + po);
+  const text = inp ? inp.value.trim() : '';
+  if (!text) { showToast('Please type a note first.'); return; }
+
+  const today = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const user  = sessionStorage.getItem('erp_user') || 'User';
+  const note  = { date: today, author: user.charAt(0).toUpperCase() + user.slice(1), text };
+
+  o.meetingNotes.unshift(note);
+
+  const newCard = document.createElement('div');
+  newCard.className = 'note-card';
+  newCard.style.background = 'rgba(196,163,90,.04)';
+  newCard.innerHTML = `
+    <div class="note-head">
+      <span class="note-author">${note.author}</span>
+      <span class="note-date">${note.date}</span>
     </div>
-  `;
+    <div class="note-text">${note.text}</div>`;
+
+  const list = document.getElementById('note-list-' + po);
+  if (list) list.prepend(newCard);
+
+  inp.value = '';
+  showToast('Note added');
+}
+
+/* ── Export CP as Excel (CSV) ─────────────────────────────────── */
+function exportOrderCP(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o || !o.cp) return;
+
+  /* Sheet 1: Critical Path */
+  const cpHeader = ['Milestone','Planned Date','Actual Date','Status','Owner'];
+  const cpRows   = o.cp.map(r => [r.milestone, r.planned, r.actual||'', r.status, r.owner]);
+
+  /* Sheet 2: Size matrix (CSV doesn't support multi-sheet; combine with spacer) */
+  const mxHeader  = ['', ...o.matrix.sizes, 'Total'];
+  const mxRows    = o.matrix.rows.map(r => {
+    const inputs = document.querySelectorAll(`.qty-input[data-po="${po}"][data-row="${o.matrix.rows.indexOf(r)}"]`);
+    const vals   = inputs.length ? [...inputs].map(i => parseInt(i.value)||0) : r.values;
+    return [r.colour, ...vals, vals.reduce((a,b)=>a+b,0)];
+  });
+
+  const toCSV = rows => rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+
+  const csv = [
+    `"CRITICAL PATH — ${o.po}"`,
+    `"${o.modelName} · ${o.client} · ${o.season} · Delivery: ${o.delivery}"`,
+    '',
+    toCSV([cpHeader, ...cpRows]),
+    '',
+    '"STYLE / COLOUR / SIZE MATRIX"',
+    toCSV([mxHeader, ...mxRows]),
+    '',
+    '"MATERIAL STATUS"',
+    toCSV([
+      ['Material','Supplier','Required','On Order','Received','Status'],
+      ...o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]),
+    ]),
+  ].join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `CP-${po}-${new Date().toISOString().slice(0,10)}.csv`,
+  });
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Critical Path exported — CP-${po}.csv`);
+}
+
+/* ── Print CP as PDF ──────────────────────────────────────────── */
+function printOrderCP() {
+  window.print();
 }
 
 /* ── Close order detail ───────────────────────────────────────── */
