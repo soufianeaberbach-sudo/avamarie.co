@@ -700,7 +700,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   .defect-checks{grid-template-columns:1fr}
 }
 
-/* ─── CUTTING & SEWING ────────────────────────────────────────── */
+/* ─── CUTTING / SEWING / FINISHING / PACKING SHARED ──────────── */
 .cs-layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
 .cs-form-card{
   background:var(--white);border:1px solid var(--border);border-radius:8px;padding:22px;
@@ -779,6 +779,76 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 }
 .period-btn.active{
   background:var(--gold);border-color:var(--gold);color:#fff;
+}
+
+/* ─── FINISHING ───────────────────────────────────────────────── */
+.fail-high{color:#DC2626;font-weight:700}
+.fail-ok{color:#196741;font-weight:600}
+.aql-chip{
+  display:inline-block;background:#F0F4FF;border:1px solid #C7D4F5;border-radius:3px;
+  padding:1px 7px;font-size:.67rem;font-weight:700;color:#2455CC;letter-spacing:.04em;
+}
+.fin-warn{
+  display:none;align-items:flex-start;gap:9px;
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;
+  padding:10px 13px;margin-bottom:13px;font-size:.78rem;color:#B91C1C;line-height:1.4;
+}
+.fin-warn.show{display:flex}
+.fin-warn svg{flex-shrink:0;margin-top:1px;stroke:#DC2626}
+.passed-display{
+  height:36px;display:flex;align-items:center;padding:0 12px;
+  background:#F5FBF7;border:1.5px solid #BBE0C9;border-radius:5px;
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#196741;letter-spacing:.04em;
+}
+
+/* ─── PACKING ─────────────────────────────────────────────────── */
+.size-inputs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.size-inp-col{
+  display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;flex:1;
+}
+.size-inp-col span{
+  font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);
+}
+.size-inp-col input{
+  width:100%;height:36px;text-align:center;padding:0 6px;box-sizing:border-box;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text);outline:none;
+  transition:border-color .15s;
+}
+.size-inp-col input:focus{border-color:var(--gold);background:var(--white)}
+.ctn-total-row{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);
+  font-size:.75rem;color:var(--muted);font-weight:600;
+}
+.ctn-total-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);
+}
+.bulk-row{
+  display:flex;align-items:center;gap:8px;margin-top:10px;
+  padding-top:10px;border-top:1px solid var(--border);
+}
+.bulk-label{font-size:.72rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.bulk-n{
+  width:60px;height:32px;text-align:center;padding:0 6px;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--text);outline:none;
+  transition:border-color .15s;
+}
+.bulk-n:focus{border-color:var(--gold)}
+.btn-sm{
+  display:inline-flex;align-items:center;gap:5px;
+  background:transparent;color:var(--muted);border:1.5px solid var(--border);
+  border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:5px 10px;
+  transition:color .15s,border-color .15s;white-space:nowrap;
+}
+.btn-sm:hover{color:var(--text);border-color:var(--text)}
+.btn-sm svg{width:11px;height:11px;stroke-width:2;flex-shrink:0}
+.ctn-id{
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.04em;
+  color:var(--gold);
 }
 </style>
 </head>
@@ -1268,23 +1338,176 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── FINISHING ──────────────────────────────────────── -->
     <div id="sec-finishing" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="wind"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Finishing &amp; QC</div>
-        <div class="ph-desc">Steam pressing, final inspection, AQL quality control, and defect reporting.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="fin-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Log Finishing &amp; QC Session</div>
+
+          <!-- High-fail alert -->
+          <div id="fin-fail-alert" class="fin-warn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Failure rate exceeds 5% — batch may require re-inspection.
+          </div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="fin-po" onchange="onFinPoChange()">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="cs-field">
+            <label>Model</label>
+            <input type="text" id="fin-model" readonly placeholder="Auto-filled from order">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Date</label>
+              <input type="date" id="fin-date">
+            </div>
+            <div class="cs-field">
+              <label>Inspector</label>
+              <input type="text" id="fin-inspector" placeholder="e.g. Fatima R.">
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Pressing Count (pcs)</label>
+            <input type="number" id="fin-pressed" min="0" placeholder="0">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Inspected (pcs)</label>
+              <input type="number" id="fin-inspected" min="0" placeholder="0" oninput="onFinCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Failed (pcs)</label>
+              <input type="number" id="fin-failed" min="0" placeholder="0" oninput="onFinCalc()">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Passed (pcs)</label>
+              <div class="passed-display" id="fin-passed-display">—</div>
+            </div>
+            <div class="cs-field">
+              <label>AQL Level</label>
+              <select id="fin-aql">
+                <option value="1.0">AQL 1.0 — Critical</option>
+                <option value="2.5" selected>AQL 2.5 — Major</option>
+                <option value="4.0">AQL 4.0 — Minor</option>
+                <option value="6.5">AQL 6.5 — General</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="saveFinLog()">
+            <i data-lucide="check"></i> Save Entry
+          </button>
+        </div>
+
+        <!-- Log table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">QC Log</div>
+            <span id="fin-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="fin-log-table"></div>
+        </div>
+
       </div>
     </div>
 
     <!-- ── PACKING ────────────────────────────────────────── -->
     <div id="sec-packing" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="archive"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Packing</div>
-        <div class="ph-desc">Create cartons, assign size ratios, record weights, and print carton labels.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="pack-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Create Carton</div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="pack-po" onchange="onPackPoChange()">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Model</label>
+              <input type="text" id="pack-model" readonly placeholder="Auto-filled">
+            </div>
+            <div class="cs-field">
+              <label>Carton #</label>
+              <input type="text" id="pack-ctn-id" readonly placeholder="Auto-assigned">
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Date</label>
+            <input type="date" id="pack-date">
+          </div>
+
+          <div class="cs-field">
+            <label>Size Breakdown</label>
+            <div class="size-inputs" id="pack-sizes">
+              <span style="font-size:.78rem;color:var(--muted2)">Select a PO to load sizes.</span>
+            </div>
+            <div class="ctn-total-row">
+              <span>Total</span>
+              <span class="ctn-total-num" id="pack-total">0</span>
+              <span style="font-size:.72rem;color:var(--muted)">pcs</span>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Gross Weight (kg)</label>
+              <input type="number" id="pack-gross" min="0" step="0.1" placeholder="0.0">
+            </div>
+            <div class="cs-field">
+              <label>Net Weight (kg)</label>
+              <input type="number" id="pack-net" min="0" step="0.1" placeholder="0.0">
+            </div>
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center" onclick="saveCarton(1)">
+            <i data-lucide="check"></i> Save Carton
+          </button>
+
+          <!-- Bulk create -->
+          <div class="bulk-row">
+            <span class="bulk-label">Bulk create</span>
+            <input type="number" id="bulk-n" class="bulk-n" min="2" max="999" value="5" placeholder="N">
+            <span class="bulk-label">identical cartons</span>
+            <button class="btn-outline" style="margin-left:auto;padding:5px 12px;font-size:.7rem" onclick="bulkCreateCartons()">
+              <i data-lucide="layers"></i> Create
+            </button>
+          </div>
+        </div>
+
+        <!-- Carton table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Carton List</div>
+            <span id="pack-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="pack-log-table"></div>
+        </div>
+
       </div>
     </div>
 
@@ -3116,6 +3339,342 @@ function saveSewLog() {
   showToast('Sewing session saved.');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   FINISHING & QC
+   ══════════════════════════════════════════════════════════════ */
+
+const FINISHING_LOG = [
+  { id:'F001', date:'10 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:220, inspected:200, passed:194, failed:6,  aql:'2.5', inspector:'Fatima R.' },
+  { id:'F002', date:'11 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:180, inspected:175, passed:172, failed:3,  aql:'2.5', inspector:'Fatima R.' },
+  { id:'F003', date:'12 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:200, inspected:195, passed:188, failed:7,  aql:'4.0', inspector:'Nadia H.'  },
+];
+
+let finIdSeq = FINISHING_LOG.length + 1;
+
+function renderFinKPIs() {
+  const totalPressed = FINISHING_LOG.reduce((a,r)=>a+r.pressed,0);
+  const totalInsp    = FINISHING_LOG.reduce((a,r)=>a+r.inspected,0);
+  const totalPass    = FINISHING_LOG.reduce((a,r)=>a+r.passed,0);
+  const totalFail    = FINISHING_LOG.reduce((a,r)=>a+r.failed,0);
+  const passRate     = totalInsp ? (totalPass/totalInsp*100).toFixed(1) : '—';
+  document.getElementById('fin-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Pressed</div>
+      <div class="kpi-num">${totalPressed.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${FINISHING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">AQL Pass Rate</div>
+      <div class="kpi-num">${passRate}<span style="font-size:1.2rem">%</span></div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Failed</div>
+      <div class="kpi-num${totalFail?'':' muted'}">${totalFail}</div></div>`;
+}
+
+function renderFinTable() {
+  const el = document.getElementById('fin-log-table');
+  document.getElementById('fin-log-count').textContent = FINISHING_LOG.length + ' entries';
+  if (!FINISHING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...FINISHING_LOG].reverse().map(r => {
+    const rate = r.inspected ? (r.failed / r.inspected * 100).toFixed(1) : '0.0';
+    const hi   = parseFloat(rate) > 5;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.model}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.pressed.toLocaleString()}</td>
+      <td style="text-align:right">${r.inspected}</td>
+      <td style="text-align:right" class="fail-ok">${r.passed}</td>
+      <td style="text-align:right" class="${hi?'fail-high':r.failed?'':'muted'}">${r.failed}</td>
+      <td style="text-align:right" class="${hi?'fail-high':''}">${rate}%${hi?' ⚠':''}</td>
+      <td><span class="aql-chip">${r.aql}</span></td>
+      <td>${r.inspector}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>PO</th><th>Model</th>
+      <th style="text-align:right">Pressed</th>
+      <th style="text-align:right">Inspected</th>
+      <th style="text-align:right">Passed</th>
+      <th style="text-align:right">Failed</th>
+      <th style="text-align:right">Fail%</th>
+      <th>AQL</th><th>Inspector</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderFinishing() {
+  const sel = document.getElementById('fin-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('fin-date').value = new Date().toISOString().slice(0,10);
+  renderFinKPIs();
+  renderFinTable();
+}
+
+function onFinPoChange() {
+  const po  = document.getElementById('fin-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('fin-model').value = ord ? ord.model : '';
+}
+
+function onFinCalc() {
+  const inspected = parseInt(document.getElementById('fin-inspected').value) || 0;
+  const failed    = parseInt(document.getElementById('fin-failed').value)    || 0;
+  const passed    = Math.max(0, inspected - failed);
+  const dispEl    = document.getElementById('fin-passed-display');
+  const alertEl   = document.getElementById('fin-fail-alert');
+  dispEl.textContent = inspected ? passed : '—';
+  const rate = inspected ? failed / inspected * 100 : 0;
+  alertEl.classList.toggle('show', rate > 5);
+}
+
+function saveFinLog() {
+  const po        = document.getElementById('fin-po').value;
+  const model     = document.getElementById('fin-model').value;
+  const dateRaw   = document.getElementById('fin-date').value;
+  const inspector = document.getElementById('fin-inspector').value.trim();
+  const pressed   = parseInt(document.getElementById('fin-pressed').value)   || 0;
+  const inspected = parseInt(document.getElementById('fin-inspected').value) || 0;
+  const failed    = parseInt(document.getElementById('fin-failed').value)    || 0;
+  const aql       = document.getElementById('fin-aql').value;
+
+  if (!po)          { showToast('Select a PO number.'); return; }
+  if (!dateRaw)     { showToast('Select a date.'); return; }
+  if (!inspector)   { showToast('Enter the inspector name.'); return; }
+  if (inspected < 1){ showToast('Enter inspected quantity.'); return; }
+  if (failed > inspected){ showToast('Failed cannot exceed inspected.'); return; }
+
+  const passed    = Math.max(0, inspected - failed);
+  const dateStr   = new Date(dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id        = 'F' + String(finIdSeq++).padStart(3,'0');
+
+  FINISHING_LOG.push({ id, date:dateStr, po, model, pressed, inspected, passed, failed, aql, inspector });
+
+  /* Reset */
+  ['fin-pressed','fin-inspected','fin-failed','fin-inspector'].forEach(x=>{ document.getElementById(x).value=''; });
+  document.getElementById('fin-passed-display').textContent = '—';
+  document.getElementById('fin-fail-alert').classList.remove('show');
+
+  renderFinKPIs();
+  renderFinTable();
+  lucide.createIcons();
+  const rate = inspected ? (failed/inspected*100).toFixed(1) : 0;
+  showToast(rate > 5 ? `⚠ Entry saved — fail rate ${rate}%` : 'QC session saved.');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PACKING
+   ══════════════════════════════════════════════════════════════ */
+
+const CARTONS = [
+  { id:'CTN-0001', po:'ASOS-PO-44521-A', model:'AM-0045', date:'10 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.2, net:7.8 },
+  { id:'CTN-0002', po:'ASOS-PO-44521-A', model:'AM-0045', date:'10 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.1, net:7.7 },
+  { id:'CTN-0003', po:'ASOS-PO-44521-A', model:'AM-0045', date:'11 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.3, net:7.9 },
+  { id:'CTN-0004', po:'ASOS-PO-44521-A', model:'AM-0045', date:'11 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.0, net:7.6 },
+];
+
+let ctnSeq = CARTONS.length + 1;
+
+function nextCtnId() {
+  return 'CTN-' + String(ctnSeq).padStart(4,'0');
+}
+
+function renderPackKPIs() {
+  const totalCtns  = CARTONS.length;
+  const totalPcs   = CARTONS.reduce((a,c)=>a+c.total,0);
+  const avgGross   = totalCtns ? (CARTONS.reduce((a,c)=>a+c.gross,0)/totalCtns).toFixed(1) : '—';
+  const pos        = new Set(CARTONS.map(c=>c.po)).size;
+  document.getElementById('pack-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Cartons</div>
+      <div class="kpi-num">${totalCtns}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Packed</div>
+      <div class="kpi-num">${totalPcs.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Avg Gross (kg)</div>
+      <div class="kpi-num">${avgGross}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">POs Covered</div>
+      <div class="kpi-num">${pos}</div></div>`;
+}
+
+function renderPackTable() {
+  const el = document.getElementById('pack-log-table');
+  document.getElementById('pack-log-count').textContent = CARTONS.length + ' cartons';
+  if (!CARTONS.length) {
+    el.innerHTML = '<div class="log-empty">No cartons yet. Create one above.</div>';
+    return;
+  }
+  const rows = [...CARTONS].reverse().map(c => {
+    const sizeSummary = Object.entries(c.sizes)
+      .filter(([,v])=>v>0)
+      .map(([k,v])=>`${k}×${v}`)
+      .join(' / ');
+    return `<tr>
+      <td class="ctn-id">${c.id}</td>
+      <td>${c.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${c.po}</span></td>
+      <td>${c.model}</td>
+      <td style="font-size:.76rem;color:var(--muted)">${sizeSummary}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${c.total}</td>
+      <td style="text-align:right">${c.gross.toFixed(1)} kg</td>
+      <td style="text-align:right;color:var(--muted)">${c.net ? c.net.toFixed(1)+' kg' : '—'}</td>
+      <td>
+        <button class="btn-sm" onclick="printCartonLabel('${c.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Label
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Carton #</th><th>Date</th><th>PO</th><th>Model</th>
+      <th>Sizes</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross</th>
+      <th style="text-align:right">Net</th>
+      <th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderPacking() {
+  const sel = document.getElementById('pack-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('pack-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  renderPackKPIs();
+  renderPackTable();
+}
+
+function onPackPoChange() {
+  const po  = document.getElementById('pack-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('pack-model').value = ord ? ord.model : '';
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  const sizesWrap = document.getElementById('pack-sizes');
+  if (!ord || !ord.matrix || !ord.matrix.sizes) {
+    sizesWrap.innerHTML = '<span style="font-size:.78rem;color:var(--muted2)">No size data for this order.</span>';
+    document.getElementById('pack-total').textContent = '0';
+    return;
+  }
+  sizesWrap.innerHTML = ord.matrix.sizes.map(s=>`
+    <div class="size-inp-col">
+      <span>${s}</span>
+      <input type="number" min="0" value="0" id="psz-${s}" oninput="recalcPackTotal()">
+    </div>`).join('');
+  recalcPackTotal();
+}
+
+function recalcPackTotal() {
+  const inputs = document.querySelectorAll('#pack-sizes input[type=number]');
+  let total = 0;
+  inputs.forEach(i=>{ total += parseInt(i.value)||0; });
+  document.getElementById('pack-total').textContent = total;
+}
+
+function collectPackForm() {
+  const po    = document.getElementById('pack-po').value;
+  const model = document.getElementById('pack-model').value;
+  const dateRaw = document.getElementById('pack-date').value;
+  const gross = parseFloat(document.getElementById('pack-gross').value) || 0;
+  const net   = parseFloat(document.getElementById('pack-net').value)   || 0;
+
+  if (!po)      { showToast('Select a PO number.'); return null; }
+  if (!dateRaw) { showToast('Select a date.'); return null; }
+  if (!gross)   { showToast('Enter gross weight.'); return null; }
+
+  const sizeInputs = document.querySelectorAll('#pack-sizes input[type=number]');
+  const sizes = {};
+  let total = 0;
+  sizeInputs.forEach(inp => {
+    const sz = inp.id.replace('psz-','');
+    const v  = parseInt(inp.value)||0;
+    sizes[sz] = v;
+    total += v;
+  });
+  if (!total) { showToast('Enter at least one size quantity.'); return null; }
+
+  const dateStr = new Date(dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  return { po, model, dateStr, sizes, total, gross, net };
+}
+
+function saveCarton(n) {
+  const form = collectPackForm();
+  if (!form) return;
+  for (let i=0; i<n; i++) {
+    const id = 'CTN-' + String(ctnSeq++).padStart(4,'0');
+    CARTONS.push({ id, po:form.po, model:form.model, date:form.dateStr,
+                   sizes:Object.assign({},form.sizes), total:form.total,
+                   gross:form.gross, net:form.net });
+  }
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  renderPackKPIs();
+  renderPackTable();
+  lucide.createIcons();
+  showToast(n > 1 ? `${n} cartons created.` : 'Carton saved.');
+}
+
+function bulkCreateCartons() {
+  const n = parseInt(document.getElementById('bulk-n').value);
+  if (!n || n < 2) { showToast('Enter a number ≥ 2 for bulk create.'); return; }
+  saveCarton(n);
+}
+
+function printCartonLabel(id) {
+  const c = CARTONS.find(x=>x.id===id);
+  if (!c) return;
+  const sizeLine = Object.entries(c.sizes)
+    .filter(([,v])=>v>0)
+    .map(([k,v])=>`<td style="padding:4px 14px;text-align:center"><b>${k}</b><br>${v} pcs</td>`)
+    .join('');
+  const win = window.open('','_blank','width=420,height=560');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+    <title>Carton Label — ${c.id}</title>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Arial',sans-serif;padding:24px;border:3px solid #000;width:400px;color:#000}
+      .brand{font-size:1.4rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;text-align:center;margin-bottom:2px}
+      .sub{font-size:.65rem;text-align:center;color:#555;margin-bottom:14px;letter-spacing:.06em}
+      hr{border:none;border-top:1px solid #000;margin:10px 0}
+      .row{display:flex;justify-content:space-between;margin:6px 0;font-size:.82rem}
+      .row b{font-size:.68rem;text-transform:uppercase;color:#666;display:block;margin-bottom:1px}
+      .sizes-tbl{width:100%;border-collapse:collapse;margin:10px 0;text-align:center;font-size:.82rem}
+      .sizes-tbl td{border:1px solid #ccc;padding:6px 10px}
+      .total{text-align:center;font-size:1.6rem;font-weight:900;margin:8px 0}
+      .footer{font-size:.6rem;color:#888;text-align:center;margin-top:10px}
+    </style>
+  </head><body>
+    <div class="brand">AVA MARIE</div>
+    <div class="sub">Tangier, Morocco &mdash; Export Quality</div>
+    <hr>
+    <div class="row"><div><b>Carton #</b>${c.id}</div><div style="text-align:right"><b>Date</b>${c.date}</div></div>
+    <div class="row"><div><b>PO Number</b>${c.po}</div><div style="text-align:right"><b>Model</b>${c.model}</div></div>
+    <hr>
+    <table class="sizes-tbl"><tr>${sizeLine}</tr></table>
+    <div class="total">${c.total} PCS</div>
+    <hr>
+    <div class="row"><div><b>Gross Weight</b>${c.gross.toFixed(1)} kg</div><div style="text-align:right"><b>Net Weight</b>${c.net ? c.net.toFixed(1)+' kg' : '—'}</div></div>
+    <div class="footer">Printed ${new Date().toLocaleDateString('en-GB')}</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 300);
+}
+
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
@@ -3126,6 +3685,8 @@ document.addEventListener('DOMContentLoaded', function () {
   renderGantt();          // initial render
   renderCutting();        // initial render
   renderSewing();         // initial render
+  renderFinishing();      // initial render
+  renderPacking();        // initial render
 });
 </script>
 </body>
