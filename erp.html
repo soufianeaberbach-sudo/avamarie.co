@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ava Marie — ERP</title>
+<link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ────────────────────────────────────────────── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+:root{
+  --gold:#C4A35A;
+  --gold-bg:rgba(196,163,90,.1);
+  --gold-border:rgba(196,163,90,.25);
+  --sidebar:#1A1A1A;
+  --sidebar-w:255px;
+  --topbar-h:60px;
+  --white:#fff;
+  --bg:#F5F3EF;
+  --card:#fff;
+  --border:#E6E2DC;
+  --text:#1A1714;
+  --muted:#7A756A;
+  --muted2:#B0AB9F;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg)}
+
+/* ─── LAYOUT ──────────────────────────────────────────────────── */
+#sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+  background:var(--sidebar);z-index:200;
+  display:flex;flex-direction:column;
+  transition:transform .28s var(--ease);
+}
+#main{
+  margin-left:var(--sidebar-w);height:100vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:margin .28s var(--ease);
+}
+#topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  background:var(--white);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;
+}
+#content{flex:1;overflow-y:auto;padding:28px 30px;background:var(--bg)}
+
+/* ─── SIDEBAR LOGO ────────────────────────────────────────────── */
+.sb-logo{
+  padding:20px 20px 16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.sb-logo-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.65rem;letter-spacing:.18em;color:#fff;line-height:1;
+}
+.sb-logo-text span{color:var(--gold)}
+.sb-logo-sub{
+  font-size:.58rem;font-weight:600;letter-spacing:.32em;
+  text-transform:uppercase;color:rgba(255,255,255,.22);margin-top:4px;
+}
+
+/* ─── SIDEBAR NAV ─────────────────────────────────────────────── */
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 16px 9px 20px;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;
+  color:rgba(255,255,255,.42);background:none;
+  border:none;border-left:3px solid transparent;
+  cursor:pointer;text-align:left;
+  transition:color .15s,background .15s,border-color .15s;
+}
+.nav-item:hover{color:rgba(255,255,255,.72);background:rgba(255,255,255,.04)}
+.nav-item.active{
+  color:var(--gold);background:var(--gold-bg);
+  border-left-color:var(--gold);font-weight:600;
+}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;stroke-width:1.8}
+.nav-sep{
+  height:1px;background:rgba(255,255,255,.07);
+  margin:6px 0;
+}
+
+/* ─── SIDEBAR USER ────────────────────────────────────────────── */
+.sb-user{
+  display:flex;align-items:center;gap:11px;
+  padding:14px 20px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.sb-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#C4A35A 0%,#9A7A30 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:800;color:#fff;
+}
+.sb-uname{font-size:.8rem;font-weight:600;color:rgba(255,255,255,.78);line-height:1.25}
+.sb-urole{
+  font-size:.6rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);opacity:.75;margin-top:1px;
+}
+
+/* ─── TOP BAR ─────────────────────────────────────────────────── */
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-icon{display:flex;color:var(--gold)}
+.tb-icon svg{width:18px;height:18px;stroke-width:1.8}
+#tb-title{
+  font-family:'DM Sans',sans-serif;font-size:.92rem;
+  font-weight:600;color:var(--text);letter-spacing:.01em;
+}
+.tb-right{display:flex;align-items:center;gap:14px}
+#tb-date{font-size:.75rem;font-weight:500;color:var(--muted)}
+.tb-btn{
+  background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px;border-radius:5px;color:var(--muted);
+  transition:color .15s,background .15s;
+}
+.tb-btn:hover{color:var(--text);background:#EDEBE7}
+.tb-btn svg{width:18px;height:18px;stroke-width:1.8}
+.tb-bell-wrap{position:relative}
+.bell-dot{
+  position:absolute;top:4px;right:4px;
+  width:7px;height:7px;border-radius:50%;
+  background:#E05050;border:1.5px solid var(--white);
+}
+.tb-ham{display:none}
+
+/* ─── SECTIONS ────────────────────────────────────────────────── */
+.sec{display:none}
+.sec.active{display:block}
+
+/* ─── PLACEHOLDER ─────────────────────────────────────────────── */
+.ph{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:65vh;gap:18px;text-align:center;
+}
+.ph-ring{
+  width:76px;height:76px;border-radius:50%;
+  background:var(--gold-bg);border:1px solid var(--gold-border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold);
+}
+.ph-ring svg{width:30px;height:30px;stroke-width:1.5}
+.ph-name{
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem;font-weight:600;color:var(--text);letter-spacing:.01em;
+}
+.ph-desc{
+  font-size:.82rem;color:var(--muted);
+  max-width:300px;line-height:1.75;
+}
+.ph-tag{
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-border);
+  background:var(--gold-bg);padding:4px 14px;border-radius:20px;
+}
+.gold-line{
+  width:32px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* ─── OVERLAY (mobile) ────────────────────────────────────────── */
+#sb-overlay{
+  display:none;position:fixed;inset:0;z-index:190;
+  background:rgba(0,0,0,.45);
+}
+
+/* ─── TOAST ───────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999}
+.toast-inner{
+  background:var(--text);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:10px 20px;border-radius:4px;
+  border-left:3px solid var(--gold);
+  box-shadow:0 4px 20px rgba(0,0,0,.18);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .22s,transform .22s;
+  pointer-events:none;
+}
+.toast-inner.show{opacity:1;transform:translateY(0)}
+
+/* ─── CARDS ───────────────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px}
+
+/* ─── KPI GRID ────────────────────────────────────────────────── */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  margin-bottom:18px;
+}
+.kpi-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:20px 22px 18px;position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--border);transition:background .2s;
+}
+.kpi-card:hover::after{background:var(--gold)}
+.kpi-eyebrow{
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted2);margin-bottom:8px;
+}
+.kpi-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;line-height:1;letter-spacing:.02em;color:var(--text);
+}
+.kpi-num.gold{color:var(--gold)}
+.kpi-num.muted{color:var(--muted2)}
+.kpi-sub{
+  font-size:.7rem;font-weight:500;color:var(--muted);margin-top:4px;
+}
+
+/* ─── FILTER BAR ──────────────────────────────────────────────── */
+.filter-bar{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:14px 16px;margin-bottom:12px;
+}
+.f-input,.f-select{
+  height:36px;padding:0 12px;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.f-input{flex:1;min-width:200px}
+.f-input::placeholder{color:var(--muted2)}
+.f-input:focus,.f-select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(196,163,90,.12);
+  background:var(--white);
+}
+.f-select{cursor:pointer;padding-right:28px;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A756A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+
+/* ─── TOOLBAR ─────────────────────────────────────────────────── */
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.toolbar-count{
+  font-size:.78rem;font-weight:600;color:var(--muted);
+}
+
+/* ─── BUTTONS ─────────────────────────────────────────────────── */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold);color:#fff;border:none;border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+  padding:8px 16px;transition:background .15s,transform .1s;
+}
+.btn-primary:hover{background:#A88430}
+.btn-primary:active{transform:scale(.97)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;color:var(--muted);
+  border:1.5px solid var(--border);border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  padding:7px 14px;transition:color .15s,border-color .15s,background .15s;
+}
+.btn-outline:hover{color:var(--text);border-color:var(--text);background:var(--bg)}
+.btn-primary svg,.btn-outline svg{width:13px;height:13px;stroke-width:2}
+
+/* ─── TABLE ───────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:#FAFAF8;border-bottom:1px solid var(--border)}
+.tbl th{
+  padding:10px 14px;
+  font-family:'DM Sans',sans-serif;font-size:.64rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;text-align:left;
+}
+.tbl th:first-child{padding-left:20px}
+.tbl th:last-child{padding-right:20px}
+.tbl td{
+  padding:12px 14px;border-bottom:1px solid #F0EDE8;
+  font-size:.82rem;color:var(--text);
+  vertical-align:middle;white-space:nowrap;
+}
+.tbl td:first-child{padding-left:20px}
+.tbl td:last-child{padding-right:20px}
+.tbl-row{cursor:pointer;transition:background .12s}
+.tbl-row:hover td{background:#FFFDF7}
+.tbl-row:last-child td{border-bottom:none}
+.model-id{
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;
+  letter-spacing:.05em;color:var(--gold);
+}
+.cost-cell{
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;
+  letter-spacing:.03em;text-align:right;
+}
+.ref-cell{font-family:'Courier New',monospace;font-size:.75rem;color:var(--muted)}
+.fw-600{font-weight:600}
+.muted-cell{color:var(--muted);font-size:.78rem}
+
+/* ─── STATUS BADGES ───────────────────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;
+  font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;
+}
+.badge-draft    {background:#F0EDE8;color:#7A756A}
+.badge-sample   {background:#EEF2FF;color:#2A55CC}
+.badge-confirmed{background:#E8F5EF;color:#0D7A4E}
+.badge-production{background:rgba(196,163,90,.14);color:#8B6514}
+.badge-completed{background:#EDFAF2;color:#0A6634}
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────── */
+.tbl-empty{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 20px;gap:10px;color:var(--muted);
+}
+.tbl-empty svg{width:28px;height:28px;stroke-width:1.4;color:var(--muted2)}
+.tbl-empty p{font-size:.82rem}
+
+/* ─── MODEL DETAIL ────────────────────────────────────────────── */
+.md-back{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:none;cursor:pointer;padding:0;margin-bottom:18px;
+  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;
+  color:var(--muted);transition:color .15s;
+}
+.md-back:hover{color:var(--text)}
+.md-back svg{width:14px;height:14px;stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.md-header-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:22px 26px;margin-bottom:16px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+.md-id-badge{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1px}
+.md-model-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2}
+.md-meta-row{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.md-meta-label{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2)}
+.md-meta-value{font-size:.82rem;font-weight:600;color:var(--text)}
+.md-cost-big{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:.03em;color:var(--gold);line-height:1}
+.md-cost-sub{font-size:.68rem;color:var(--muted);text-align:right;margin-top:3px}
+
+/* ─── MODEL TABS ──────────────────────────────────────────────── */
+.md-tabs{
+  display:flex;border-bottom:2px solid var(--border);margin-bottom:18px;overflow-x:auto;scrollbar-width:none;
+}
+.md-tabs::-webkit-scrollbar{display:none}
+.md-tab{
+  display:flex;align-items:center;gap:5px;padding:9px 14px;white-space:nowrap;
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;
+  cursor:pointer;transition:color .15s;
+}
+.md-tab:hover{color:var(--text)}
+.md-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.md-pane{display:none}
+.md-pane.active{display:block}
+
+/* ─── SECTION CARD ────────────────────────────────────────────── */
+.sc{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.sc-head{
+  padding:13px 20px 11px;border-bottom:1px solid #F0EDE8;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.sc-title{font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2)}
+
+/* ─── REVISION TIMELINE ───────────────────────────────────────── */
+.rev-list{padding:20px 24px;display:flex;flex-direction:column}
+.rev-item{display:flex;position:relative}
+.rev-item:not(:last-child)::before{
+  content:'';position:absolute;left:17px;top:28px;bottom:0;width:2px;background:#E6E2DC;
+}
+.rev-dot-col{width:36px;flex-shrink:0;display:flex;justify-content:center;padding-top:3px;z-index:1}
+.rev-dot{width:14px;height:14px;border-radius:50%;border:2px solid #DEDAD4;background:var(--white)}
+.rev-dot.latest{
+  width:20px;height:20px;border-color:var(--gold);background:var(--gold);
+  box-shadow:0 0 0 4px rgba(196,163,90,.18);margin-top:-3px;
+}
+.rev-body{flex:1;padding:0 8px 28px 10px}
+.rev-hrow{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.rev-num{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;color:var(--gold)}
+.rev-latest-chip{
+  font-size:.55rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  background:rgba(196,163,90,.12);color:var(--gold);border:1px solid rgba(196,163,90,.3);
+  padding:2px 8px;border-radius:20px;
+}
+.rev-meta{font-size:.72rem;color:var(--muted)}
+.rev-summary{font-size:.82rem;color:var(--text);line-height:1.65;margin-bottom:7px}
+.rev-changes{margin:0 0 10px;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.rev-changes li{font-size:.75rem;color:var(--muted);display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.rev-changes li::before{content:'';width:4px;height:4px;border-radius:50%;background:#DEDAD4;margin-top:6px;flex-shrink:0}
+.rev-btns{display:flex;gap:7px}
+
+/* ─── SAMPLE CARDS ────────────────────────────────────────────── */
+.sample-warn{
+  background:#FFFBEF;border:1px solid rgba(196,163,90,.3);border-left:3px solid var(--gold);
+  border-radius:6px;padding:12px 16px;margin-bottom:16px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.sample-warn-icon{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--gold)}
+.sample-warn p{font-size:.79rem;color:#7A5E00;line-height:1.6}
+.sample-warn strong{font-weight:700}
+.sample-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.sample-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px 20px;border-top:3px solid var(--border)}
+.sample-card.s-rejected  {border-top-color:#D94F4F}
+.sample-card.s-approved  {border-top-color:#22A06B}
+.sample-card.s-changes   {border-top-color:#E89B2F}
+.sample-card.s-pending   {border-top-color:#2A55CC}
+.sample-card.s-noprod    {border-top-color:#DEDAD4}
+.sample-chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:8px;flex-wrap:wrap}
+.sample-type-lbl{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text)}
+.sbadge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.58rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  padding:2px 9px;border-radius:20px;white-space:nowrap;
+}
+.sbadge .sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sbadge.sb-rejected  {background:#FDEAEA;color:#C0392B} .sbadge.sb-rejected .sdot{background:#E05555}
+.sbadge.sb-approved  {background:#E8F5EF;color:#0D7A4E} .sbadge.sb-approved .sdot{background:#28A065}
+.sbadge.sb-changes   {background:#FFF3E0;color:#C47000} .sbadge.sb-changes .sdot{background:#E89B2F}
+.sbadge.sb-pending   {background:#EEF2FF;color:#2A55CC} .sbadge.sb-pending .sdot{background:#4A7BE8}
+.sbadge.sb-noprod    {background:#F4F2EE;color:var(--muted)} .sbadge.sb-noprod .sdot{background:#DEDAD4}
+.sample-datemeta{font-size:.72rem;color:var(--muted);margin-bottom:10px}
+.sample-fb-lbl{font-size:.58rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-bottom:5px}
+.sample-fb{
+  width:100%;min-height:68px;resize:vertical;
+  background:#FAFAF8;border:1.5px solid var(--border);border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--text);
+  line-height:1.6;padding:8px 10px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.sample-fb:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,163,90,.1);background:var(--white)}
+.sample-fb::placeholder{color:var(--muted2)}
+
+/* ─── LINKED ORDERS ───────────────────────────────────────────── */
+.lo-summary{display:flex;gap:28px;padding:15px 22px;border-bottom:1px solid #F0EDE8;flex-wrap:wrap}
+.lo-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.04em;color:var(--text)}
+.lo-stat-val.gold{color:var(--gold)}
+.lo-stat-lbl{font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+
+/* ─── AUDIT LOG ───────────────────────────────────────────────── */
+.audit-entry{
+  display:flex;align-items:flex-start;gap:13px;
+  padding:12px 20px;border-bottom:1px solid #F7F5F2;
+}
+.audit-entry:last-child{border-bottom:none}
+.audit-av{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(196,163,90,.2),rgba(196,163,90,.06));
+  border:1px solid rgba(196,163,90,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;color:var(--gold);
+}
+.audit-badge{
+  display:inline-flex;font-size:.55rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;padding:2px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;
+}
+.audit-badge.ab-created     {background:#E8F5EF;color:#0D7A4E}
+.audit-badge.ab-updated     {background:#EEF2FF;color:#2A55CC}
+.audit-badge.ab-uploaded    {background:#F5F0FF;color:#6B35B0}
+.audit-badge.ab-approved    {background:#EDFAF2;color:#0A6634}
+.audit-badge.ab-rejected    {background:#FDEAEA;color:#C0392B}
+.audit-badge.ab-statuschange{background:rgba(196,163,90,.14);color:#8B6514}
+.audit-detail{font-size:.8rem;color:var(--text);line-height:1.5}
+.audit-ts{font-size:.68rem;color:var(--muted2);margin-top:2px}
+.audit-arow{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:1024px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  #sb-overlay.show{display:block}
+  .tb-ham{display:flex}
+  #tb-date{display:none}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .f-input{min-width:unset}
+  .sample-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  #content{padding:18px 14px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi-num{font-size:2.2rem}
+  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+  .md-header-card{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ SIDEBAR ══════════════════════════ -->
+<nav id="sidebar">
+
+  <div class="sb-logo">
+    <div class="sb-logo-text">AVA <span>MARIE</span></div>
+    <div class="sb-logo-sub">ERP System</div>
+  </div>
+
+  <div class="sb-nav">
+
+    <button class="nav-item" data-sec="dashboard" onclick="nav(this)">
+      <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
+    </button>
+    <button class="nav-item active" data-sec="models" onclick="nav(this)">
+      <i data-lucide="scissors"></i><span>Models</span>
+    </button>
+    <button class="nav-item" data-sec="orders" onclick="nav(this)">
+      <i data-lucide="package"></i><span>Orders</span>
+    </button>
+    <button class="nav-item" data-sec="planning" onclick="nav(this)">
+      <i data-lucide="calendar-range"></i><span>Planning</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" data-sec="cutting" onclick="nav(this)">
+      <i data-lucide="ruler"></i><span>Cutting</span>
+    </button>
+    <button class="nav-item" data-sec="sewing" onclick="nav(this)">
+      <i data-lucide="cpu"></i><span>Sewing</span>
+    </button>
+    <button class="nav-item" data-sec="finishing" onclick="nav(this)">
+      <i data-lucide="wind"></i><span>Finishing</span>
+    </button>
+    <button class="nav-item" data-sec="packing" onclick="nav(this)">
+      <i data-lucide="archive"></i><span>Packing</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" data-sec="materials" onclick="nav(this)">
+      <i data-lucide="truck"></i><span>Materials</span>
+    </button>
+    <button class="nav-item" data-sec="settings" onclick="nav(this)">
+      <i data-lucide="settings"></i><span>Settings</span>
+    </button>
+
+    <div class="nav-sep"></div>
+
+    <button class="nav-item" onclick="logout()">
+      <i data-lucide="log-out"></i><span>Logout</span>
+    </button>
+
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-avatar">S</div>
+    <div>
+      <div class="sb-uname">Soufiane</div>
+      <div class="sb-urole">Admin</div>
+    </div>
+  </div>
+
+</nav>
+
+<!-- ═══════════════════════════ OVERLAY ══════════════════════════ -->
+<div id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════ MAIN ═════════════════════════════ -->
+<div id="main">
+
+  <!-- TOP BAR -->
+  <header id="topbar">
+    <div class="tb-left">
+      <button class="tb-btn tb-ham" onclick="openSidebar()" aria-label="Menu">
+        <i data-lucide="menu"></i>
+      </button>
+      <div class="tb-icon" id="tb-icon"><i data-lucide="scissors"></i></div>
+      <span id="tb-title">Models</span>
+    </div>
+    <div class="tb-right">
+      <span id="tb-date"></span>
+      <div class="tb-bell-wrap">
+        <button class="tb-btn" aria-label="Notifications">
+          <i data-lucide="bell"></i>
+        </button>
+        <span class="bell-dot"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main id="content">
+
+    <!-- ── DASHBOARD ─────────────────────────────────────── -->
+    <div id="sec-dashboard" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="layout-dashboard"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Dashboard</div>
+        <div class="ph-desc">KPI overview, production alerts, and daily activity feed.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── MODELS ─────────────────────────────────────────── -->
+    <div id="sec-models" class="sec active">
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Models</div>
+          <div class="kpi-num">5</div>
+          <div class="kpi-sub">All garment styles</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Production</div>
+          <div class="kpi-num gold">1</div>
+          <div class="kpi-sub">Active on factory floor</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Development</div>
+          <div class="kpi-num">2</div>
+          <div class="kpi-sub">Sample &amp; Confirmed</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Drafts</div>
+          <div class="kpi-num muted">1</div>
+          <div class="kpi-sub">Awaiting tech pack</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="card filter-bar">
+        <input class="f-input" type="text" id="m-search"
+          placeholder="Search by model #, name, or client ref…"
+          oninput="filterModels()">
+        <select class="f-select" id="m-client" onchange="filterModels()">
+          <option value="">All Clients</option>
+          <option>ASOS</option>
+          <option>PrettyLittleThing</option>
+          <option>River Island</option>
+        </select>
+        <select class="f-select" id="m-status" onchange="filterModels()">
+          <option value="">All Statuses</option>
+          <option>Draft</option>
+          <option>Sample</option>
+          <option>Confirmed</option>
+          <option>In Production</option>
+          <option>Completed</option>
+        </select>
+        <select class="f-select" id="m-cat" onchange="filterModels()">
+          <option value="">All Categories</option>
+          <option>Robe</option>
+          <option>Top</option>
+          <option>Pantalon</option>
+          <option>Jupe</option>
+          <option>Veste</option>
+        </select>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-count" id="m-count">5 models</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="exportModelsCSV()">
+            <i data-lucide="download"></i> Export CSV
+          </button>
+          <button class="btn-primary" onclick="showToast('New Model form — coming next')">
+            <i data-lucide="plus"></i> New Model
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="m-table">
+          <thead>
+            <tr>
+              <th>Model #</th>
+              <th>Name</th>
+              <th>Client</th>
+              <th>Client Ref</th>
+              <th>Category</th>
+              <th style="text-align:center">Rev</th>
+              <th>Status</th>
+              <th style="text-align:right">Cost / pc</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+        <div id="m-empty" class="tbl-empty" style="display:none">
+          <i data-lucide="search-x"></i>
+          <p>No models match your filters.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ORDERS ─────────────────────────────────────────── -->
+    <div id="sec-orders" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="package"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Orders</div>
+        <div class="ph-desc">Track client purchase orders, quantities by size and colour, and deadlines.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── PLANNING ───────────────────────────────────────── -->
+    <div id="sec-planning" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="calendar-range"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Planning</div>
+        <div class="ph-desc">Visual Gantt calendar — assign models to production lines across 20 lines.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── CUTTING ────────────────────────────────────────── -->
+    <div id="sec-cutting" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="ruler"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Cutting</div>
+        <div class="ph-desc">Log cutting sessions — quantities, fabric consumption, waste percentage, and bundle tickets.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── SEWING ─────────────────────────────────────────── -->
+    <div id="sec-sewing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="cpu"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Sewing</div>
+        <div class="ph-desc">Daily sewing output per line, AM/PM periods, defect tracking, and cumulative progress.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── FINISHING ──────────────────────────────────────── -->
+    <div id="sec-finishing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="wind"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Finishing &amp; QC</div>
+        <div class="ph-desc">Steam pressing, final inspection, AQL quality control, and defect reporting.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── PACKING ────────────────────────────────────────── -->
+    <div id="sec-packing" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="archive"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Packing</div>
+        <div class="ph-desc">Create cartons, assign size ratios, record weights, and print carton labels.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── MATERIALS ──────────────────────────────────────── -->
+    <div id="sec-materials" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="truck"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Materials</div>
+        <div class="ph-desc">Requirements by order, incoming shipments, and outgoing dispatch management.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ───────────────────────────────────────── -->
+    <div id="sec-settings" class="sec">
+      <div class="ph">
+        <div class="ph-ring"><i data-lucide="settings"></i></div>
+        <div class="gold-line"></div>
+        <div class="ph-name">Settings</div>
+        <div class="ph-desc">Company info, production line configuration, users, and roles.</div>
+        <div class="ph-tag">Coming Next</div>
+      </div>
+    </div>
+
+    <!-- ── MODEL DETAIL ──────────────────────────────────────── -->
+    <div id="sec-model-detail" class="sec">
+
+      <button class="md-back" onclick="closeModel()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Models
+      </button>
+
+      <!-- Header card (filled by JS) -->
+      <div class="md-header-card" id="md-header"></div>
+
+      <!-- Tab bar -->
+      <div class="md-tabs" id="md-tab-bar">
+        <button class="md-tab active" data-pane="md-overview"   onclick="setMdTab(this)">Overview</button>
+        <button class="md-tab"        data-pane="md-bom"        onclick="setMdTab(this)">BOM</button>
+        <button class="md-tab"        data-pane="md-gamme"      onclick="setMdTab(this)">Gamme</button>
+        <button class="md-tab"        data-pane="md-pom"        onclick="setMdTab(this)">POM</button>
+        <button class="md-tab"        data-pane="md-revisions"  onclick="setMdTab(this)">Revisions</button>
+        <button class="md-tab"        data-pane="md-samples"    onclick="setMdTab(this)">Samples</button>
+        <button class="md-tab"        data-pane="md-orders"     onclick="setMdTab(this)">Linked Orders</button>
+        <button class="md-tab"        data-pane="md-audit"      onclick="setMdTab(this)">Audit</button>
+      </div>
+
+      <!-- Panes (all filled by JS) -->
+      <div id="md-overview"  class="md-pane active"></div>
+      <div id="md-bom"       class="md-pane"></div>
+      <div id="md-gamme"     class="md-pane"></div>
+      <div id="md-pom"       class="md-pane"></div>
+      <div id="md-revisions" class="md-pane"></div>
+      <div id="md-samples"   class="md-pane"></div>
+      <div id="md-orders"    class="md-pane"></div>
+      <div id="md-audit"     class="md-pane"></div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div id="toast-inner" class="toast-inner"></div></div>
+
+<!-- ═══════════════════════════ SCRIPTS ══════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+/* ── Auth guard ───────────────────────────────────────────────── */
+if (!sessionStorage.getItem('erp_auth')) {
+  window.location.replace('login.html');
+}
+
+/* ── Section meta ─────────────────────────────────────────────── */
+const SECTION_META = {
+  dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
+  models:    { title: 'Models',           icon: 'scissors'         },
+  orders:    { title: 'Orders',           icon: 'package'          },
+  planning:  { title: 'Planning',         icon: 'calendar-range'   },
+  cutting:   { title: 'Cutting',          icon: 'ruler'            },
+  sewing:    { title: 'Sewing',           icon: 'cpu'              },
+  finishing: { title: 'Finishing & QC',   icon: 'wind'             },
+  packing:   { title: 'Packing',          icon: 'archive'          },
+  materials: { title: 'Materials',        icon: 'truck'            },
+  settings:  { title: 'Settings',        icon: 'settings'         },
+};
+
+let currentSec = 'models';
+
+/* ── Navigate ─────────────────────────────────────────────────── */
+function nav(btn) {
+  const sec = btn.dataset.sec;
+  if (!sec) return;
+
+  // Sections
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('sec-' + sec);
+  if (target) target.classList.add('active');
+
+  // Nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Topbar
+  const meta = SECTION_META[sec] || { title: sec, icon: 'circle' };
+  document.getElementById('tb-title').textContent = meta.title;
+  document.getElementById('tb-icon').innerHTML = `<i data-lucide="${meta.icon}"></i>`;
+
+  currentSec = sec;
+  lucide.createIcons();   // re-render any new icons
+  closeSidebar();         // close on mobile
+}
+
+/* ── Logout ───────────────────────────────────────────────────── */
+function logout() {
+  sessionStorage.removeItem('erp_auth');
+  sessionStorage.removeItem('erp_user');
+  window.location.href = 'login.html';
+}
+
+/* ── Mobile sidebar ───────────────────────────────────────────── */
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+/* ── Date ─────────────────────────────────────────────────────── */
+function updateDate() {
+  const d = new Date();
+  const s = d.toLocaleDateString('en-GB', {
+    weekday:'short', day:'numeric', month:'short', year:'numeric'
+  });
+  document.getElementById('tb-date').textContent = s;
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const el = document.getElementById('toast-inner');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── Models data ──────────────────────────────────────────────── */
+const MODELS = [
+  {
+    id:'AM-0045', name:'Robe Satin Longue',
+    client:'ASOS', ref:'ASOS-ST-44521',
+    cat:'Robe', rev:4, status:'In Production',
+    cost:19.29, updated:'28 Mar 2026', updatedBy:'Soufiane',
+    desc:'Long satin duchess dress with fitted silhouette. Invisible zip at centre back. Full poly lining on bodice.'
+  },
+  {
+    id:'AM-0052', name:'Crop Top Jersey',
+    client:'PrettyLittleThing', ref:'PLT-CR-8821',
+    cat:'Top', rev:2, status:'Sample',
+    cost:8.00, updated:'02 Apr 2026', updatedBy:'Karim',
+    desc:'Fitted jersey crop top with elasticated hem. Round neckline, short puff sleeves. 95% poly, 5% elastane.'
+  },
+  {
+    id:'AM-0039', name:'Wide Leg Linen Trousers',
+    client:'River Island', ref:'RI-PL-3301',
+    cat:'Pantalon', rev:1, status:'Completed',
+    cost:11.22, updated:'15 Jan 2026', updatedBy:'Ahmed',
+    desc:'Relaxed wide-leg trouser in linen-viscose blend. Side pockets, concealed hook bar waist, turn-up hem.'
+  },
+  {
+    id:'AM-0060', name:'Pleated Midi Skirt',
+    client:'ASOS', ref:'ASOS-JP-9933',
+    cat:'Jupe', rev:1, status:'Draft',
+    cost:null, updated:'05 Apr 2026', updatedBy:'Fatima',
+    desc:'Knife-pleated midi skirt, satin finish. Elasticated back waistband. Pending fabric and costing sign-off.'
+  },
+  {
+    id:'AM-0061', name:'Wrap Blouse Viscose',
+    client:'PrettyLittleThing', ref:'PLT-WB-1105',
+    cat:'Top', rev:3, status:'Confirmed',
+    cost:10.12, updated:'19 Mar 2026', updatedBy:'Soufiane',
+    desc:'Wrap-front blouse in 100% viscose challis. Long sleeves with button cuff, self-tie belt, V neckline.'
+  },
+];
+
+const STATUS_CLASS = {
+  'Draft':'badge-draft','Sample':'badge-sample',
+  'Confirmed':'badge-confirmed','In Production':'badge-production',
+  'Completed':'badge-completed',
+};
+
+/* ── Render models table ──────────────────────────────────────── */
+function renderModels(data) {
+  const tbody = document.getElementById('m-tbody');
+  const empty = document.getElementById('m-empty');
+  const count = document.getElementById('m-count');
+
+  count.textContent = `${data.length} model${data.length !== 1 ? 's' : ''}`;
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    lucide.createIcons();
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(m => `
+    <tr class="tbl-row" onclick="openModel('${m.id}')">
+      <td><span class="model-id">${m.id}</span></td>
+      <td class="fw-600">${m.name}</td>
+      <td>${m.client}</td>
+      <td class="ref-cell">${m.ref}</td>
+      <td>${m.cat}</td>
+      <td style="text-align:center" class="fw-600">${m.rev}</td>
+      <td><span class="badge ${STATUS_CLASS[m.status]||''}">${m.status}</span></td>
+      <td class="cost-cell">${m.cost !== null ? '€'+m.cost.toFixed(2) : '<span style="color:var(--muted2)">—</span>'}</td>
+      <td class="muted-cell">${m.updated}</td>
+    </tr>
+  `).join('');
+}
+
+/* ── Filter ───────────────────────────────────────────────────── */
+function filterModels() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const result = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)  &&
+             !m.client.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  renderModels(result);
+}
+
+/* ── Export CSV ───────────────────────────────────────────────── */
+function exportModelsCSV() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const data = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  const header = ['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc (EUR)','Updated'];
+  const rows   = data.map(m => [
+    m.id, m.name, m.client, m.ref, m.cat, m.rev, m.status,
+    m.cost !== null ? m.cost.toFixed(2) : '', m.updated,
+  ]);
+  const csv = [header,...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'),{href:url, download:`ava-marie-models-${new Date().toISOString().slice(0,10)}.csv`});
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${data.length} model${data.length!==1?'s':''} to CSV`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODEL DETAIL — data & render
+   ══════════════════════════════════════════════════════════════ */
+
+const MD = {
+  'AM-0045': {
+
+    /* ── Tab 5 · Revisions ─────────────────────────────────── */
+    revisions: [
+      {
+        rev: 1, date: '15 Jan 2026', author: 'Fatima', latest: false,
+        summary: 'Initial tech pack received. Fabric spec confirmed as 100% poly satin duchess. Basic silhouette drafted and costed.',
+        changes: ['Tech pack uploaded — AM-0045-TP-r1.pdf', 'Fabric confirmed: satin duchess 100% poly', 'Initial SMV estimate: 22.4 min', 'BOM drafted — 8 components'],
+      },
+      {
+        rev: 2, date: '04 Feb 2026', author: 'Soufiane', latest: false,
+        summary: 'Neckline adjusted from square to subtle V following proto session. Sleeve length extended +2 cm per fit notes.',
+        changes: ['Neckline: square → subtle V (−1.5 cm depth)', 'Sleeve length +2 cm', 'SMV revised to 24.2 min', 'BOM updated — fabric consumption +0.06 m'],
+      },
+      {
+        rev: 3, date: '18 Feb 2026', author: 'Karim', latest: false,
+        summary: 'Back vent removed at client request. Zip upgraded from generic to YKK concealed 60 cm for cleaner finish.',
+        changes: ['Back vent removed', 'Zip: generic invisible → YKK concealed 60 cm', 'BOM updated — zip unit cost +€0.18', 'Seam allowance at CB zip increased to 1.5 cm'],
+      },
+      {
+        rev: 4, date: '28 Mar 2026', author: 'Soufiane', latest: true,
+        summary: 'Size grading finalised across XS–XL. PP sample approved by ASOS buyer. Production go-ahead issued.',
+        changes: ['Size grading finalised XS–XL (base M)', 'PP sample approved — ASOS ref PPAM0045-04', 'Final SMV locked: 24.6 min', 'Status changed → In Production'],
+      },
+    ],
+
+    /* ── Tab 6 · Samples ───────────────────────────────────── */
+    samples: [
+      {
+        type: 'Proto', cssClass: 's-rejected', badgeClass: 'sb-rejected', statusLabel: 'Rejected',
+        rev: 1, date: '28 Jan 2026',
+        feedback: 'Bust ease 4 cm too tight in size M. Zip placket visible — top-stitching not concealed. Neckline sits 1.5 cm too low. Full recut required before next submission.',
+      },
+      {
+        type: 'Fit Sample', cssClass: 's-changes', badgeClass: 'sb-changes', statusLabel: 'Approved with Changes',
+        rev: 2, date: '20 Feb 2026',
+        feedback: 'Good improvement overall. Approved conditional on: neckline raised 1 cm, sleeve shortened 1.5 cm, seam allowance at CB zip increased to 1.5 cm. Resubmit corrected size set.',
+      },
+      {
+        type: 'Size Set', cssClass: 's-pending', badgeClass: 'sb-pending', statusLabel: 'Pending',
+        rev: 3, date: '10 Mar 2026',
+        feedback: 'Submitted to ASOS buyer 10 Mar 2026. All sizes graded from approved Fit Sample (base M). Awaiting client sign-off — chased 24 Mar, response pending.',
+      },
+      {
+        type: 'PP Sample', cssClass: 's-noprod', badgeClass: 'sb-noprod', statusLabel: 'Not Produced',
+        rev: 4, date: null,
+        feedback: '',
+      },
+      {
+        type: 'TOP Sample', cssClass: 's-noprod', badgeClass: 'sb-noprod', statusLabel: 'Not Produced',
+        rev: 4, date: null,
+        feedback: '',
+      },
+    ],
+  },
+};
+
+/* ── Open model detail ────────────────────────────────────────── */
+function openModel(id) {
+  const m = MODELS.find(x => x.id === id);
+  if (!m) return;
+
+  /* hide models list, show detail */
+  document.getElementById('sec-models').classList.remove('active');
+  const det = document.getElementById('sec-model-detail');
+  det.classList.add('active');
+
+  /* reset to first tab */
+  document.querySelectorAll('.md-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.md-tab[data-pane="md-overview"]').classList.add('active');
+  document.querySelectorAll('.md-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('md-overview').classList.add('active');
+
+  /* topbar */
+  document.getElementById('tb-title').textContent = m.id + ' — ' + m.name;
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  lucide.createIcons();
+
+  /* scroll top */
+  document.getElementById('content').scrollTop = 0;
+
+  /* header card */
+  const sm = STATUS_CLASS[m.status] || '';
+  document.getElementById('md-header').innerHTML = `
+    <div>
+      <div class="md-id-badge">${m.id}</div>
+      <div class="md-model-name">${m.name}</div>
+      <div class="md-meta-row">
+        <div><div class="md-meta-label">Client</div><div class="md-meta-value">${m.client}</div></div>
+        <div><div class="md-meta-label">Client Ref</div><div class="md-meta-value" style="font-family:'Courier New',monospace;font-size:.78rem">${m.ref}</div></div>
+        <div><div class="md-meta-label">Category</div><div class="md-meta-value">${m.cat}</div></div>
+        <div><div class="md-meta-label">Revision</div><div class="md-meta-value">Rev.${m.rev}</div></div>
+        <div><div class="md-meta-label">Status</div><div class="md-meta-value"><span class="badge ${sm}">${m.status}</span></div></div>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="md-cost-big">${m.cost !== null ? '€' + m.cost.toFixed(2) : '—'}</div>
+      <div class="md-cost-sub">cost / piece</div>
+    </div>
+  `;
+
+  /* render all panes */
+  renderMdOverview(m);
+  renderMdBom(m);
+  renderMdGamme(m);
+  renderMdPom(m);
+  renderMdRevisions(id);
+  renderMdSamples(id);
+  renderMdOrders(id);
+  renderMdAudit(id);
+  lucide.createIcons();
+}
+
+/* ── Close model detail ───────────────────────────────────────── */
+function closeModel() {
+  document.getElementById('sec-model-detail').classList.remove('active');
+  document.getElementById('sec-models').classList.add('active');
+  document.getElementById('tb-title').textContent = 'Models';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  lucide.createIcons();
+}
+
+/* ── Tab switcher ─────────────────────────────────────────────── */
+function setMdTab(btn) {
+  document.querySelectorAll('.md-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = btn.dataset.pane;
+  document.querySelectorAll('.md-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById(pane).classList.add('active');
+}
+
+/* ── Helper: empty pane ───────────────────────────────────────── */
+function emptyPane(msg) {
+  return `<div class="sc" style="padding:52px 0;text-align:center">
+    <p style="font-size:.82rem;color:var(--muted)">${msg}</p>
+  </div>`;
+}
+
+/* ── Tab 1 · Overview ─────────────────────────────────────────── */
+function renderMdOverview(m) {
+  document.getElementById('md-overview').innerHTML = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Description</span></div>
+      <div style="padding:18px 22px;font-size:.85rem;color:var(--text);line-height:1.8">${m.desc}</div>
+    </div>
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Quick Facts</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        ${[
+          ['Current Revision', 'Rev.' + m.rev],
+          ['Last Updated', m.updated],
+          ['Updated By', m.updatedBy],
+          ['Cost / Piece', m.cost !== null ? '€' + m.cost.toFixed(2) : '—'],
+        ].map(([l,v]) => `
+          <div style="padding:16px 22px;border-right:1px solid #F0EDE8">
+            <div style="font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">${l}</div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--text)">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* ── Tab 2 · BOM ──────────────────────────────────────────────── */
+function renderMdBom(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-bom').innerHTML = emptyPane('No BOM data available for this model.'); return; }
+  const rows = [
+    ['Main Fabric',  'Satin duchess 100% poly, ivory',   'Duchesse-Satin SA', 'm',   '1.85', '3.20',  '5.92'],
+    ['Lining',       'Poly lining, ivory',                'Poly-Tissu MA',     'm',   '0.95', '0.85',  '0.81'],
+    ['Zip',          'YKK concealed 60 cm',               'YKK Morocco',       'pcs', '1',    '0.63',  '0.63'],
+    ['Hook & Bar',   'Waist hook & bar, nickel',          'Métal Plus',        'pcs', '1',    '0.08',  '0.08'],
+    ['Label Set',    'Brand + care + size labels',        'Etiquettes SA',     'set', '1',    '0.22',  '0.22'],
+    ['Polybag',      '50 × 70 cm, self-seal',             'PackPro',           'pcs', '1',    '0.12',  '0.12'],
+    ['Hanger',       'Velvet non-slip',                   'HangMa',            'pcs', '1',    '0.18',  '0.18'],
+  ];
+  const total = rows.reduce((s, r) => s + parseFloat(r[6]), 0);
+  document.getElementById('md-bom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Bill of Materials — Rev.4 · ${rows.length} components</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">€${total.toFixed(2)} / pc</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Component</th><th>Description</th><th>Supplier</th><th style="text-align:center">Unit</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit €</th><th style="text-align:right">Total €</th></tr></thead>
+          <tbody>${rows.map(r => `<tr class="tbl-row"><td class="fw-600">${r[0]}</td><td class="muted-cell">${r[1]}</td><td>${r[2]}</td><td style="text-align:center">${r[3]}</td><td style="text-align:right">${r[4]}</td><td style="text-align:right">€${r[5]}</td><td class="cost-cell">€${r[6]}</td></tr>`).join('')}
+          <tr style="background:#FFFDF7"><td colspan="6" style="padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Materials Total</td><td class="cost-cell" style="padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">€${total.toFixed(2)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 3 · Gamme ────────────────────────────────────────────── */
+function renderMdGamme(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-gamme').innerHTML = emptyPane('No Gamme Opératoire available.'); return; }
+  const ops = [
+    ['010','Mark & Bundle','Manual','★','2.5'],
+    ['020','Shoulder seams (× 2)','Overlock 5-thread','★★','1.8'],
+    ['030','Side seams + lining side seams','Overlock 5-thread','★★','2.2'],
+    ['040','Lining attachment at neckline','Lockstitch','★★★','4.5'],
+    ['050','CB zip insertion (YKK 60 cm)','Lockstitch','★★★★','6.2'],
+    ['060','Hem — shell + lining','Blind-stitch + Overlock','★★★','3.8'],
+    ['070','Final steam press','Steam press','★★','2.1'],
+    ['080','QC inspection + tagging','Manual','★★','1.5'],
+  ];
+  const totalSMV = ops.reduce((s, r) => s + parseFloat(r[4]), 0);
+  document.getElementById('md-gamme').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Gamme Opératoire — Rev.4 · ${ops.length} operations</span>
+        <span style="font-size:.8rem;font-weight:600;color:var(--text)">Total SMV: <span style="color:var(--gold)">${totalSMV.toFixed(1)} min</span></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Op #</th><th>Operation</th><th>Machine</th><th style="text-align:center">Level</th><th style="text-align:right">SMV (min)</th></tr></thead>
+          <tbody>${ops.map(r => `<tr class="tbl-row"><td class="ref-cell">${r[0]}</td><td class="fw-600">${r[1]}</td><td class="muted-cell">${r[2]}</td><td style="text-align:center;letter-spacing:2px;color:var(--gold)">${r[3]}</td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--text)">${r[4]}</td></tr>`).join('')}
+          <tr style="background:#FFFDF7"><td colspan="4" style="padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Total SMV</td><td style="text-align:right;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${totalSMV.toFixed(1)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 4 · POM ──────────────────────────────────────────────── */
+function renderMdPom(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-pom').innerHTML = emptyPane('No POM data available.'); return; }
+  const pts = [
+    ['Bust (at underarm)','88','92','96','100','106'],
+    ['Waist','72','76','80','84','90'],
+    ['Hip (at 18 cm below waist)','94','98','102','106','112'],
+    ['Centre front length','120','121','122','123','124'],
+    ['Shoulder width','37','38','39','40','41'],
+    ['Sleeve length (CB to cuff)','62','62.5','63','63.5','64'],
+    ['Hem circumference','140','144','148','152','158'],
+  ];
+  document.getElementById('md-pom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Points of Measure — Rev.4 · All measurements in cm · Tolerance ± 1 cm</span></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Point of Measure</th>${['XS','S','M','L','XL'].map(s=>`<th style="text-align:center">${s}</th>`).join('')}</tr></thead>
+          <tbody>${pts.map(r=>`<tr class="tbl-row"><td class="fw-600">${r[0]}</td>${r.slice(1).map(v=>`<td style="text-align:center">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 5 · Revisions ────────────────────────────────────────── */
+function renderMdRevisions(id) {
+  const d = MD[id];
+  if (!d) { document.getElementById('md-revisions').innerHTML = emptyPane('No revision history recorded.'); return; }
+
+  /* reverse so latest is on top */
+  const revs = [...d.revisions].reverse();
+
+  const items = revs.map((r, i) => {
+    const isLast = i === revs.length - 1;
+    return `
+      <div class="rev-item"${isLast ? '' : ' style="padding-bottom:0"'}>
+        ${!isLast ? `<div style="position:absolute;left:17px;top:28px;bottom:0;width:2px;background:#E6E2DC;z-index:0"></div>` : ''}
+        <div class="rev-dot-col">
+          <div class="rev-dot${r.latest ? ' latest' : ''}"></div>
+        </div>
+        <div class="rev-body">
+          <div class="rev-hrow">
+            <span class="rev-num">Rev.${r.rev}</span>
+            ${r.latest ? '<span class="rev-latest-chip">Latest</span>' : ''}
+            <span class="rev-meta">${r.date} &nbsp;·&nbsp; ${r.author}</span>
+          </div>
+          <p class="rev-summary">${r.summary}</p>
+          <ul class="rev-changes">
+            ${r.changes.map(c => `<li>${c}</li>`).join('')}
+          </ul>
+          <div class="rev-btns">
+            <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+              onclick="showToast('Rev.${r.rev} tech pack viewer — coming next')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/><circle cx="12" cy="12" r="3"/></svg>
+              View
+            </button>
+            ${!r.latest ? `
+            <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+              onclick="showToast('Compare Rev.${r.rev} vs Rev.${revs[0].rev} — coming next')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+              Compare
+            </button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('md-revisions').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Revision History &mdash; ${d.revisions.length} revisions</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+          onclick="showToast('New revision form — coming next')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Revision
+        </button>
+      </div>
+      <div class="rev-list" style="position:relative">${items}</div>
+    </div>`;
+}
+
+/* ── Tab 6 · Samples ──────────────────────────────────────────── */
+function renderMdSamples(id) {
+  const d = MD[id];
+  if (!d) { document.getElementById('md-samples').innerHTML = emptyPane('No sample records found.'); return; }
+
+  const hasPPWarning = d.samples.some(s => s.type === 'PP Sample' && s.statusLabel === 'Not Produced');
+
+  const warning = hasPPWarning ? `
+    <div class="sample-warn">
+      <svg class="sample-warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <p><strong>PP Sample not yet produced.</strong> Production approval is blocked until the Pre-Production sample is submitted, reviewed, and signed off by the client buyer. No bulk cutting should begin before PP approval is on file.</p>
+    </div>` : '';
+
+  const cards = d.samples.map(s => {
+    const dateStr = s.date
+      ? `<div class="sample-datemeta">Submitted ${s.date} &nbsp;·&nbsp; Rev.${s.rev}</div>`
+      : `<div class="sample-datemeta" style="color:var(--muted2)">Not yet produced &nbsp;·&nbsp; Rev.${s.rev}</div>`;
+
+    const fbBlock = s.statusLabel === 'Not Produced' ? `
+      <div class="sample-fb-lbl">Notes</div>
+      <textarea class="sample-fb" placeholder="No sample produced yet. Add notes here…" rows="3"></textarea>` : `
+      <div class="sample-fb-lbl">Client Feedback</div>
+      <textarea class="sample-fb" rows="3">${s.feedback}</textarea>`;
+
+    return `
+      <div class="sample-card ${s.cssClass}">
+        <div class="sample-chead">
+          <span class="sample-type-lbl">${s.type}</span>
+          <span class="sbadge ${s.badgeClass}">
+            <span class="sdot"></span>${s.statusLabel}
+          </span>
+        </div>
+        ${dateStr}
+        ${fbBlock}
+      </div>`;
+  }).join('');
+
+  document.getElementById('md-samples').innerHTML = `
+    ${warning}
+    <div class="sample-grid">${cards}</div>`;
+}
+
+/* ── Tab 7 · Linked Orders (placeholder) ──────────────────────── */
+function renderMdOrders(id) {
+  document.getElementById('md-orders').innerHTML = emptyPane('Linked Orders — coming next');
+}
+
+/* ── Tab 8 · Audit (placeholder) ─────────────────────────────── */
+function renderMdAudit(id) {
+  document.getElementById('md-audit').innerHTML = emptyPane('Audit Log — coming next');
+}
+
+/* ── Init ─────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+  lucide.createIcons();
+  updateDate();
+  setInterval(updateDate, 60000);
+  renderModels(MODELS);   // initial render
+});
+</script>
+</body>
+</html>
