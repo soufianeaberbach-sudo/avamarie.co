@@ -850,6 +850,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.04em;
   color:var(--gold);
 }
+
+/* ─── MATERIALS ───────────────────────────────────────────────── */
+.mat-tabs{
+  display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;gap:0;
+}
+.mat-tab{
+  padding:10px 22px;background:none;border:none;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  cursor:pointer;transition:color .15s,border-color .15s;
+}
+.mat-tab:hover{color:var(--text)}
+.mat-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.mat-pane{display:none}
+.mat-pane.active{display:block}
+/* Status chips */
+.chip{
+  display:inline-block;border-radius:4px;padding:2px 8px;
+  font-size:.67rem;font-weight:700;letter-spacing:.04em;white-space:nowrap;
+}
+.chip-green{background:#E8F5EF;color:#0D7A4E}
+.chip-amber{background:#FFF3E0;color:#C47000}
+.chip-blue {background:#EEF2FF;color:#2A55CC}
+.chip-red  {background:#FEF2F2;color:#B91C1C}
+.chip-grey {background:#F4F2EE;color:var(--muted)}
+/* Slide-in form */
+.mat-form-wrap{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:20px 22px;margin-bottom:16px;display:none;
+}
+.mat-form-wrap.open{display:block}
+.mat-form-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;
+}
+.mat-hdr{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+}
+.mat-po-filter{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+@media(max-width:900px){
+  .mat-form-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
@@ -1513,13 +1555,125 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── MATERIALS ──────────────────────────────────────── -->
     <div id="sec-materials" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="truck"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Materials</div>
-        <div class="ph-desc">Requirements by order, incoming shipments, and outgoing dispatch management.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="mat-kpis"></div>
+
+      <!-- Tab bar -->
+      <div class="mat-tabs">
+        <button class="mat-tab active" onclick="setMatTab(this,'mat-req')">Requirements</button>
+        <button class="mat-tab" onclick="setMatTab(this,'mat-inc')">
+          <i data-lucide="arrow-down-circle" style="width:12px;height:12px;vertical-align:middle;margin-right:4px"></i>Incoming
+        </button>
+        <button class="mat-tab" onclick="setMatTab(this,'mat-out')">
+          <i data-lucide="arrow-up-circle" style="width:12px;height:12px;vertical-align:middle;margin-right:4px"></i>Outgoing
+        </button>
       </div>
+
+      <!-- ── Requirements ─────────────────────────────────── -->
+      <div id="mat-req" class="mat-pane active">
+        <div class="mat-po-filter">
+          <select id="req-po-filter" class="f-select" style="width:280px" onchange="renderReqTable()">
+            <option value="">All POs</option>
+          </select>
+        </div>
+        <div class="cs-log-card">
+          <div id="req-table"></div>
+        </div>
+      </div>
+
+      <!-- ── Incoming ──────────────────────────────────────── -->
+      <div id="mat-inc" class="mat-pane">
+        <div class="mat-hdr">
+          <span id="inc-count" class="toolbar-count"></span>
+          <button class="btn-outline" onclick="toggleIncForm()">
+            <i data-lucide="plus"></i> Add Shipment
+          </button>
+        </div>
+
+        <div id="inc-form-wrap" class="mat-form-wrap">
+          <div class="cs-card-title">New Incoming Shipment</div>
+          <div class="mat-form-grid">
+            <div class="cs-field">
+              <label>PO Number</label>
+              <select id="inc-po"><option value="">Select…</option></select>
+            </div>
+            <div class="cs-field">
+              <label>Supplier</label>
+              <input type="text" id="inc-supplier" placeholder="e.g. Duchesse-Satin SA">
+            </div>
+            <div class="cs-field">
+              <label>Material</label>
+              <input type="text" id="inc-material" placeholder="e.g. Satin Duchess — Ivory">
+            </div>
+            <div class="cs-field">
+              <label>Quantity</label>
+              <input type="text" id="inc-qty" placeholder="e.g. 500 m">
+            </div>
+            <div class="cs-field">
+              <label>ETA</label>
+              <input type="date" id="inc-eta">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="saveIncoming()"><i data-lucide="check"></i> Save</button>
+            <button class="btn-outline" onclick="toggleIncForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="cs-log-card"><div id="inc-table"></div></div>
+      </div>
+
+      <!-- ── Outgoing ───────────────────────────────────────── -->
+      <div id="mat-out" class="mat-pane">
+        <div class="mat-hdr">
+          <span id="out-count" class="toolbar-count"></span>
+          <button class="btn-outline" onclick="toggleOutForm()">
+            <i data-lucide="plus"></i> New Shipment
+          </button>
+        </div>
+
+        <div id="out-form-wrap" class="mat-form-wrap">
+          <div class="cs-card-title">New Outgoing Shipment</div>
+          <div class="mat-form-grid">
+            <div class="cs-field">
+              <label>PO Number</label>
+              <select id="out-po" onchange="onOutPoChange()"><option value="">Select…</option></select>
+            </div>
+            <div class="cs-field">
+              <label>Shipment Ref</label>
+              <input type="text" id="out-ref" placeholder="e.g. SHP-ASOS-0042">
+            </div>
+            <div class="cs-field">
+              <label>Destination</label>
+              <input type="text" id="out-dest" placeholder="City, Country">
+            </div>
+            <div class="cs-field">
+              <label>Dispatch Date</label>
+              <input type="date" id="out-dispatch">
+            </div>
+            <div class="cs-field">
+              <label>ETD (Port)</label>
+              <input type="date" id="out-etd">
+            </div>
+            <div class="cs-field">
+              <label>ETA (Client)</label>
+              <input type="date" id="out-eta">
+            </div>
+            <div class="cs-field">
+              <label>Unit Price (€)</label>
+              <input type="number" id="out-uprice" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="saveOutgoing()"><i data-lucide="check"></i> Save</button>
+            <button class="btn-outline" onclick="toggleOutForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="cs-log-card"><div id="out-table"></div></div>
+      </div>
+
     </div>
 
     <!-- ── SETTINGS ───────────────────────────────────────── -->
@@ -3675,18 +3829,111 @@ function printCartonLabel(id) {
 }
 
 
+/* ══════════════════════════════════════════════════════════════
+   MATERIALS
+   ══════════════════════════════════════════════════════════════ */
+
+function setMatTab(btn, paneId) {
+  document.querySelectorAll('.mat-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mat-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.add('active');
+  lucide.createIcons();
+}
+
+function parseMtrlNum(str) {
+  return parseFloat((str || '').replace(/[^\d.]/g, '')) || 0;
+}
+
+function renderMatKPIs() {
+  const all      = ORDERS.flatMap(o => o.materials || []);
+  const inStock  = all.filter(m => m.status === 'In Stock').length;
+  const pending  = all.filter(m => m.status !== 'In Stock').length;
+  document.getElementById('mat-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Material Lines</div>
+      <div class="kpi-num">${all.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">In Stock</div>
+      <div class="kpi-num" style="color:#196741">${inStock}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Pending / On Order</div>
+      <div class="kpi-num${pending ? ' gold' : ''}">${pending}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Active POs</div>
+      <div class="kpi-num">${ORDERS.length}</div></div>`;
+}
+
+function renderReqTable() {
+  const filter = document.getElementById('req-po-filter').value;
+  const orders = filter ? ORDERS.filter(o => o.po === filter) : ORDERS;
+  const sc = {
+    'In Stock':          'chip-green',
+    'Awaiting Delivery': 'chip-amber',
+    'Partial':           'chip-blue',
+    'On Order':          'chip-grey',
+  };
+  const rows = orders.flatMap(o => (o.materials || []).map(m => {
+    const reqN  = parseMtrlNum(m.req);
+    const recvN = parseMtrlNum(m.received);
+    const unit  = ((m.req || '').match(/[a-zA-Z]+/) || [''])[0];
+    const bal   = reqN - recvN;
+    const balCell = bal > 0
+      ? `<span style="color:#DC2626;font-weight:600">−${bal.toLocaleString()}${unit ? ' ' + unit : ''}</span>`
+      : `<span style="color:#196741;font-weight:600">✓</span>`;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${o.po}</span></td>
+      <td>${m.name}</td>
+      <td style="color:var(--muted)">${m.supplier}</td>
+      <td style="text-align:right">${m.req}</td>
+      <td style="text-align:right">${m.ordered}</td>
+      <td style="text-align:right">${m.received}</td>
+      <td style="text-align:right">${balCell}</td>
+      <td><span class="chip ${sc[m.status] || 'chip-grey'}">${m.status}</span></td>
+    </tr>`;
+  })).join('');
+
+  document.getElementById('req-table').innerHTML = rows
+    ? `<table class="tbl">
+        <thead><tr>
+          <th>PO</th><th>Material</th><th>Supplier</th>
+          <th style="text-align:right">Required</th>
+          <th style="text-align:right">Ordered</th>
+          <th style="text-align:right">Received</th>
+          <th style="text-align:right">Balance</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`
+    : '<div class="log-empty">No materials data found.</div>';
+}
+
+function renderMaterials() {
+  const opts = ORDERS.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('req-po-filter').innerHTML =
+    '<option value="">All POs</option>' + opts;
+  renderMatKPIs();
+  renderReqTable();
+}
+
+/* Stubs — Incoming/Outgoing tabs wired up in HTML but not yet built */
+function toggleIncForm()  {}
+function saveIncoming()   {}
+function confirmReceipt() {}
+function toggleOutForm()  {}
+function saveOutgoing()   {}
+function onOutPoChange()  {}
+
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
   updateDate();
   setInterval(updateDate, 60000);
-  renderModels(MODELS);   // initial render
-  renderOrders(ORDERS);   // initial render
-  renderGantt();          // initial render
-  renderCutting();        // initial render
-  renderSewing();         // initial render
-  renderFinishing();      // initial render
-  renderPacking();        // initial render
+  renderModels(MODELS);
+  renderOrders(ORDERS);
+  renderGantt();
+  renderCutting();
+  renderSewing();
+  renderFinishing();
+  renderPacking();
+  renderMaterials();
 });
 </script>
 </body>
