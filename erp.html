@@ -3904,21 +3904,343 @@ function renderReqTable() {
     : '<div class="log-empty">No materials data found.</div>';
 }
 
-function renderMaterials() {
-  const opts = ORDERS.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
-  document.getElementById('req-po-filter').innerHTML =
-    '<option value="">All POs</option>' + opts;
-  renderMatKPIs();
-  renderReqTable();
+/* ── Incoming data ─────────────────────────────────────────────── */
+const INCOMING = [
+  { id:'INC-001', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Ivory',      qty:'1,850 m', eta:'20 Mar 2026', recvDate:'20 Mar 2026', status:'Confirmed' },
+  { id:'INC-002', po:'ASOS-PO-44521-A', supplier:'Poly-Tissu MA',     material:'Poly Lining',                qty:'2,280 m', eta:'22 Mar 2026', recvDate:'22 Mar 2026', status:'Confirmed' },
+  { id:'INC-003', po:'ASOS-PO-44521-A', supplier:'YKK Morocco',       material:'YKK Zip 60 cm (concealed)',  qty:'1,200',   eta:'05 Apr 2026', recvDate:'05 Apr 2026', status:'Partial'   },
+  { id:'INC-004', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Black',      qty:'666 m',   eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-005', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Navy',       qty:'592 m',   eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-006', po:'ASOS-PO-44521-A', supplier:'Etiquettes SA',     material:'Label Set (brand+care+sz)', qty:'2,400',   eta:'25 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-007', po:'ASOS-PO-44521-B', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Dusty Rose', qty:'296 m',  eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-008', po:'ASOS-PO-44521-B', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Mauve',      qty:'555 m',  eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+];
+let incIdSeq = INCOMING.length + 1;
+
+/* ── Outgoing data ─────────────────────────────────────────────── */
+const OUTGOING = [
+  {
+    id:'OUT-001', ref:'SHP-ASOS-0041',
+    po:'ASOS-PO-44521-A', model:'AM-0045', modelName:'Robe Satin Longue',
+    client:'ASOS',
+    dest:'ASOS Fulfilment Centre, Hemel Hempstead HP2 7EZ, UK',
+    shipper:'Ava Marie, Zone Industrielle, Tangier, Morocco',
+    dispatchDate:'11 Apr 2026', etd:'14 Apr 2026', etaClient:'19 Apr 2026',
+    status:'Dispatched', unitPrice:19.29,
+  },
+];
+let outIdSeq = OUTGOING.length + 1;
+
+/* ── Incoming ─────────────────────────────────────────────────── */
+function incChip(s) {
+  const m = { 'Confirmed':'chip-green', 'Partial':'chip-blue', 'Expected':'chip-amber' };
+  return `<span class="chip ${m[s]||'chip-grey'}">${s}</span>`;
 }
 
-/* Stubs — Incoming/Outgoing tabs wired up in HTML but not yet built */
-function toggleIncForm()  {}
-function saveIncoming()   {}
-function confirmReceipt() {}
-function toggleOutForm()  {}
-function saveOutgoing()   {}
-function onOutPoChange()  {}
+function renderIncTable() {
+  const el = document.getElementById('inc-table');
+  document.getElementById('inc-count').textContent = INCOMING.length + ' shipments';
+  const rows = [...INCOMING].reverse().map(r => `<tr>
+    <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+    <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+    <td>${r.supplier}</td>
+    <td>${r.material}</td>
+    <td style="text-align:right">${r.qty}</td>
+    <td>${r.eta}</td>
+    <td>${r.recvDate || '<span style="color:var(--muted2)">—</span>'}</td>
+    <td>${incChip(r.status)}</td>
+    <td>${r.status === 'Expected'
+      ? `<button class="btn-sm" onclick="confirmReceipt('${r.id}')"><i data-lucide="check"></i> Confirm</button>`
+      : '<span style="color:var(--muted2);font-size:.75rem">—</span>'
+    }</td>
+  </tr>`).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>PO</th><th>Supplier</th><th>Material</th>
+      <th style="text-align:right">Qty</th><th>ETA</th><th>Received</th>
+      <th>Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  lucide.createIcons();
+}
+
+function confirmReceipt(id) {
+  const r = INCOMING.find(x => x.id === id);
+  if (!r) return;
+  r.status   = 'Confirmed';
+  r.recvDate = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  renderIncTable();
+  renderMatKPIs();
+  showToast(`${r.id} marked as received.`);
+}
+
+function toggleIncForm() {
+  const el = document.getElementById('inc-form-wrap');
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) lucide.createIcons();
+}
+
+function saveIncoming() {
+  const po       = document.getElementById('inc-po').value;
+  const supplier = document.getElementById('inc-supplier').value.trim();
+  const material = document.getElementById('inc-material').value.trim();
+  const qty      = document.getElementById('inc-qty').value.trim();
+  const etaRaw   = document.getElementById('inc-eta').value;
+  if (!po || !supplier || !material || !qty || !etaRaw) { showToast('Fill all fields.'); return; }
+  const eta = new Date(etaRaw).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const id  = 'INC-' + String(incIdSeq++).padStart(3, '0');
+  INCOMING.push({ id, po, supplier, material, qty, eta, recvDate:'', status:'Expected' });
+  ['inc-supplier','inc-material','inc-qty','inc-eta'].forEach(x => { document.getElementById(x).value = ''; });
+  document.getElementById('inc-po').value = '';
+  toggleIncForm();
+  renderIncTable();
+  renderMatKPIs();
+  showToast('Incoming shipment added.');
+}
+
+/* ── Outgoing ─────────────────────────────────────────────────── */
+function outChip(s) {
+  const m = { 'Dispatched':'chip-blue', 'Delivered':'chip-green', 'Preparing':'chip-amber' };
+  return `<span class="chip ${m[s]||'chip-grey'}">${s}</span>`;
+}
+
+function renderOutTable() {
+  const el = document.getElementById('out-table');
+  document.getElementById('out-count').textContent = OUTGOING.length + ' shipments';
+  if (!OUTGOING.length) {
+    el.innerHTML = '<div class="log-empty">No outgoing shipments yet.</div>';
+    return;
+  }
+  const rows = [...OUTGOING].reverse().map(r => {
+    const ctns     = CARTONS.filter(c => c.po === r.po);
+    const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+    const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(1);
+    return `<tr>
+      <td class="ctn-id" style="font-size:.9rem">${r.ref}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.client}</td>
+      <td style="font-size:.76rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.dest}</td>
+      <td style="text-align:right">${ctns.length}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${totPcs.toLocaleString()}</td>
+      <td style="text-align:right;color:var(--muted)">${totGross} kg</td>
+      <td>${r.dispatchDate}</td>
+      <td>${outChip(r.status)}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn-sm" onclick="printPackingList('${r.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Packing List
+          </button>
+          <button class="btn-sm" onclick="printInvoice('${r.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Invoice
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Ref</th><th>PO</th><th>Client</th><th>Destination</th>
+      <th style="text-align:right">Ctns</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross</th>
+      <th>Dispatched</th><th>Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function toggleOutForm() {
+  const el = document.getElementById('out-form-wrap');
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) lucide.createIcons();
+}
+
+function onOutPoChange() {
+  const po  = document.getElementById('out-po').value;
+  const ord = ORDERS.find(o => o.po === po);
+  if (ord) document.getElementById('out-dest').value = ord.client + ' — UK';
+}
+
+function saveOutgoing() {
+  const po      = document.getElementById('out-po').value;
+  const ref     = document.getElementById('out-ref').value.trim();
+  const dest    = document.getElementById('out-dest').value.trim();
+  const dispRaw = document.getElementById('out-dispatch').value;
+  const etdRaw  = document.getElementById('out-etd').value;
+  const etaRaw  = document.getElementById('out-eta').value;
+  const uprice  = parseFloat(document.getElementById('out-uprice').value) || 0;
+  if (!po || !ref || !dest || !dispRaw) { showToast('Fill all required fields.'); return; }
+  const ord = ORDERS.find(o => o.po === po);
+  const fmt = v => v ? new Date(v).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+  const id  = 'OUT-' + String(outIdSeq++).padStart(3, '0');
+  OUTGOING.push({
+    id, ref, po,
+    model:     ord ? ord.model     : '',
+    modelName: ord ? ord.modelName : '',
+    client:    ord ? ord.client    : '',
+    dest, shipper:'Ava Marie, Zone Industrielle, Tangier, Morocco',
+    dispatchDate: fmt(dispRaw), etd: fmt(etdRaw), etaClient: fmt(etaRaw),
+    status:'Preparing', unitPrice:uprice,
+  });
+  toggleOutForm();
+  renderOutTable();
+  showToast('Outgoing shipment created.');
+}
+
+/* ── Print: Packing List ─────────────────────────────────────── */
+function printPackingList(id) {
+  const shp = OUTGOING.find(x => x.id === id);
+  if (!shp) return;
+  const ctns     = CARTONS.filter(c => c.po === shp.po);
+  const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+  const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(2);
+  const totNet   = ctns.reduce((a, c) => a + (c.net || 0), 0).toFixed(2);
+  const ctnRows  = ctns.map((c, i) => {
+    const sizes = Object.entries(c.sizes).filter(([, v]) => v > 0).map(([k, v]) => `${k}: ${v}`).join(', ');
+    return `<tr>
+      <td>${i + 1}</td><td>${c.id}</td><td>${sizes}</td>
+      <td style="text-align:right">${c.total}</td>
+      <td style="text-align:right">${c.gross.toFixed(1)}</td>
+      <td style="text-align:right">${c.net ? c.net.toFixed(1) : '—'}</td>
+    </tr>`;
+  }).join('');
+  const win = window.open('', '_blank', 'width=860,height=700');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>Packing List — ${shp.ref}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:32px}
+    .brand{font-size:22px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .sub{font-size:10px;color:#666;margin-bottom:6px}
+    .doc-type{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#333;margin:14px 0 4px}
+    hr{border:none;border-top:1.5px solid #000;margin:10px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:12px 0}
+    .box{border:1px solid #ccc;padding:9px 13px;border-radius:3px}
+    .lbl{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:3px}
+    .val{font-size:11px;line-height:1.55}
+    table{width:100%;border-collapse:collapse;margin:12px 0;font-size:11px}
+    thead tr{background:#f4f4f4}
+    th{padding:6px 9px;text-align:left;border:1px solid #ddd;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    td{padding:5px 9px;border:1px solid #ddd}
+    tfoot td{font-weight:700;background:#f9f9f9}
+    .footer{margin-top:18px;font-size:9px;color:#aaa;text-align:center}
+    .print-btn{margin-top:16px;padding:8px 22px;cursor:pointer;font-size:12px}
+    @media print{.print-btn{display:none}}
+  </style></head><body>
+  <div class="brand">AVA MARIE</div>
+  <div class="sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+  <hr>
+  <div class="doc-type">Packing List</div>
+  <div class="two">
+    <div class="box"><div class="lbl">Shipper</div><div class="val">${shp.shipper}</div></div>
+    <div class="box"><div class="lbl">Consignee</div><div class="val">${shp.dest}</div></div>
+  </div>
+  <div class="two" style="margin-top:0">
+    <div class="box"><div class="lbl">Ref / PO</div><div class="val"><b>${shp.ref}</b> &nbsp;/&nbsp; ${shp.po}</div></div>
+    <div class="box"><div class="lbl">Dispatch / ETD / ETA</div><div class="val">${shp.dispatchDate} &nbsp;/&nbsp; ${shp.etd||'—'} &nbsp;/&nbsp; ${shp.etaClient||'—'}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Carton</th><th>Contents</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross kg</th>
+      <th style="text-align:right">Net kg</th></tr></thead>
+    <tbody>${ctnRows}</tbody>
+    <tfoot><tr><td colspan="3"><b>TOTAL — ${ctns.length} cartons</b></td>
+      <td style="text-align:right">${totPcs}</td>
+      <td style="text-align:right">${totGross}</td>
+      <td style="text-align:right">${totNet}</td></tr></tfoot>
+  </table>
+  <div class="footer">Generated ${new Date().toLocaleDateString('en-GB')} &nbsp;—&nbsp; Ava Marie ERP</div>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+  </body></html>`);
+  win.document.close(); win.focus();
+}
+
+/* ── Print: Invoice ──────────────────────────────────────────── */
+function printInvoice(id) {
+  const shp = OUTGOING.find(x => x.id === id);
+  if (!shp) return;
+  const ctns     = CARTONS.filter(c => c.po === shp.po);
+  const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+  const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(2);
+  const amount   = (totPcs * shp.unitPrice).toFixed(2);
+  const fmtEur   = v => parseFloat(v).toLocaleString('en-GB', { minimumFractionDigits:2 });
+  const win = window.open('', '_blank', 'width=860,height=700');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>Invoice — ${shp.ref}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:32px}
+    .brand{font-size:22px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .sub{font-size:10px;color:#666;margin-bottom:6px}
+    .doc-type{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#333;margin:14px 0 2px}
+    .inv-ref{font-size:12px;color:#C4A35A;font-weight:700;margin-bottom:14px}
+    hr{border:none;border-top:1.5px solid #000;margin:10px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:12px 0}
+    .box{border:1px solid #ccc;padding:9px 13px;border-radius:3px}
+    .lbl{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:3px}
+    .val{font-size:11px;line-height:1.55}
+    table{width:100%;border-collapse:collapse;margin:14px 0;font-size:11px}
+    thead tr{background:#f4f4f4}
+    th{padding:6px 9px;text-align:left;border:1px solid #ddd;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    td{padding:7px 9px;border:1px solid #ddd}
+    .totals{width:280px;margin-left:auto;margin-top:0;font-size:11px}
+    .totals td{border:none;padding:4px 9px}
+    .grand td{font-size:13px;font-weight:900;border-top:2px solid #000;padding-top:7px}
+    .terms{margin-top:18px;font-size:10px;color:#555;line-height:1.7}
+    .footer{margin-top:18px;font-size:9px;color:#aaa;text-align:center}
+    .print-btn{margin-top:16px;padding:8px 22px;cursor:pointer;font-size:12px}
+    @media print{.print-btn{display:none}}
+  </style></head><body>
+  <div class="brand">AVA MARIE</div>
+  <div class="sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+  <hr>
+  <div class="doc-type">Commercial Invoice</div>
+  <div class="inv-ref">Ref: ${shp.ref} &nbsp;·&nbsp; Date: ${shp.dispatchDate} &nbsp;·&nbsp; PO: ${shp.po}</div>
+  <div class="two">
+    <div class="box"><div class="lbl">Seller</div><div class="val">${shp.shipper}</div></div>
+    <div class="box"><div class="lbl">Buyer</div><div class="val">${shp.dest}</div></div>
+  </div>
+  <table>
+    <thead><tr>
+      <th>Description</th><th>Model</th>
+      <th style="text-align:right">Qty (pcs)</th>
+      <th style="text-align:right">Unit Price (€)</th>
+      <th style="text-align:right">Amount (€)</th>
+    </tr></thead>
+    <tbody><tr>
+      <td>${shp.modelName}</td><td>${shp.model}</td>
+      <td style="text-align:right">${totPcs.toLocaleString()}</td>
+      <td style="text-align:right">${shp.unitPrice.toFixed(2)}</td>
+      <td style="text-align:right">${fmtEur(amount)}</td>
+    </tr></tbody>
+  </table>
+  <table class="totals">
+    <tr><td>Subtotal</td><td style="text-align:right">€ ${fmtEur(amount)}</td></tr>
+    <tr><td style="color:#888">Gross weight</td><td style="text-align:right;color:#888">${totGross} kg</td></tr>
+    <tr class="grand"><td>TOTAL</td><td style="text-align:right">€ ${fmtEur(amount)}</td></tr>
+  </table>
+  <div class="terms"><b>Payment Terms:</b> 30 days net &nbsp;|&nbsp; <b>Incoterms:</b> FOB Tangier &nbsp;|&nbsp; <b>Currency:</b> EUR</div>
+  <div class="footer">Generated ${new Date().toLocaleDateString('en-GB')} &nbsp;—&nbsp; Ava Marie ERP</div>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+  </body></html>`);
+  win.document.close(); win.focus();
+}
+
+/* ── renderMaterials (updated) ───────────────────────────────── */
+function renderMaterials() {
+  const opts = ORDERS.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('req-po-filter').innerHTML = '<option value="">All POs</option>' + opts;
+  document.getElementById('inc-po').innerHTML        = '<option value="">Select…</option>' + opts;
+  document.getElementById('out-po').innerHTML        = '<option value="">Select…</option>' + opts;
+  renderMatKPIs();
+  renderReqTable();
+  renderIncTable();
+  renderOutTable();
+}
 
 
 /* ── Init ─────────────────────────────────────────────────────── */
