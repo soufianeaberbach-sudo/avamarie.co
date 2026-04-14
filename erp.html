@@ -892,6 +892,85 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 @media(max-width:900px){
   .mat-form-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ─── DASHBOARD ───────────────────────────────────────────────── */
+.dash-kpi-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px;
+}
+.dash-kpi-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:24px 26px 20px;position:relative;overflow:hidden;
+}
+.dash-kpi-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--border);transition:background .2s;
+}
+.dash-kpi-card:hover::after{background:var(--gold)}
+.dash-kpi-eyebrow{
+  font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted2);margin-bottom:10px;
+}
+.dash-kpi-num{
+  font-family:'Playfair Display',serif;font-size:3.4rem;line-height:1;
+  color:var(--text);letter-spacing:-.01em;
+}
+.dash-kpi-num.gold{color:var(--gold)}
+.dash-kpi-num.green{color:#196741}
+.dash-kpi-num.red{color:#DC2626}
+.dash-kpi-unit{
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;
+  color:var(--muted);margin-left:4px;
+}
+.dash-kpi-sub{font-size:.72rem;color:var(--muted);margin-top:6px;font-weight:500}
+/* Two-col below KPIs */
+.dash-two-col{
+  display:grid;grid-template-columns:1fr 1.6fr;gap:16px;align-items:start;
+}
+.dash-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.dash-card-hd{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dash-card-title{
+  font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+/* Alerts */
+.alert-list{padding:8px 0}
+.alert-item{
+  display:flex;align-items:flex-start;gap:12px;padding:11px 20px;
+  border-bottom:1px solid #F7F5F1;transition:background .1s;
+}
+.alert-item:last-child{border-bottom:none}
+.alert-item:hover{background:#FEFDF9}
+.alert-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;
+}
+.alert-dot.red{background:#DC2626}
+.alert-dot.amber{background:#C47000}
+.alert-dot.blue{background:#2455CC}
+.alert-dot.gold{background:var(--gold)}
+.alert-dot.green{background:#196741}
+.alert-text{font-size:.8rem;line-height:1.45;color:var(--text)}
+.alert-meta{font-size:.7rem;color:var(--muted2);margin-top:2px}
+/* Activity feed */
+.feed-list{padding:4px 0}
+.feed-item{
+  display:grid;grid-template-columns:8px 1fr;gap:12px;
+  align-items:start;padding:10px 20px;border-bottom:1px solid #F7F5F1;
+}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{
+  width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;
+}
+.feed-body{}
+.feed-what{font-size:.8rem;color:var(--text);line-height:1.4}
+.feed-when{font-size:.68rem;color:var(--muted2);margin-top:2px}
+@media(max-width:900px){
+  .dash-kpi-grid{grid-template-columns:1fr 1fr}
+  .dash-two-col{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -906,10 +985,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
   <div class="sb-nav">
 
-    <button class="nav-item" data-sec="dashboard" onclick="nav(this)">
+    <button class="nav-item active" data-sec="dashboard" onclick="nav(this)">
       <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
     </button>
-    <button class="nav-item active" data-sec="models" onclick="nav(this)">
+    <button class="nav-item" data-sec="models" onclick="nav(this)">
       <i data-lucide="scissors"></i><span>Models</span>
     </button>
     <button class="nav-item" data-sec="orders" onclick="nav(this)">
@@ -973,8 +1052,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
       <button class="tb-btn tb-ham" onclick="openSidebar()" aria-label="Menu">
         <i data-lucide="menu"></i>
       </button>
-      <div class="tb-icon" id="tb-icon"><i data-lucide="scissors"></i></div>
-      <span id="tb-title">Models</span>
+      <div class="tb-icon" id="tb-icon"><i data-lucide="layout-dashboard"></i></div>
+      <span id="tb-title">Dashboard</span>
     </div>
     <div class="tb-right">
       <span id="tb-date"></span>
@@ -991,18 +1070,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   <main id="content">
 
     <!-- ── DASHBOARD ─────────────────────────────────────── -->
-    <div id="sec-dashboard" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="layout-dashboard"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Dashboard</div>
-        <div class="ph-desc">KPI overview, production alerts, and daily activity feed.</div>
-        <div class="ph-tag">Coming Next</div>
+    <div id="sec-dashboard" class="sec active">
+
+      <!-- KPI grid -->
+      <div class="dash-kpi-grid" id="dash-kpis"></div>
+
+      <!-- Alerts + Feed -->
+      <div class="dash-two-col">
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Alerts</div>
+            <span id="dash-alert-count" class="toolbar-count"></span>
+          </div>
+          <div class="alert-list" id="dash-alerts"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Recent Activity</div>
+            <span class="toolbar-count">Last 10 events</span>
+          </div>
+          <div class="feed-list" id="dash-feed"></div>
+        </div>
       </div>
+
     </div>
 
     <!-- ── MODELS ─────────────────────────────────────────── -->
-    <div id="sec-models" class="sec active">
+    <div id="sec-models" class="sec">
 
       <!-- KPIs -->
       <div class="kpi-grid">
@@ -1741,6 +1835,102 @@ if (!sessionStorage.getItem('erp_auth')) {
   window.location.replace('login.html');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ══════════════════════════════════════════════════════════════ */
+
+const DASH_ALERTS = [
+  { dot:'red',   text:'High waste on C002 — 4.83% (threshold 3%)',          meta:'Cutting · 08 Apr 2026' },
+  { dot:'amber', text:'High QC fail rate on F003 — 3.59% (threshold 2%)',   meta:'Finishing · 12 Apr 2026' },
+  { dot:'blue',  text:'Satin Duchess Black & Navy ETA 20 Apr — not yet received', meta:'Incoming · INC-004, INC-005' },
+  { dot:'amber', text:'YKK Zips partial receipt — 1,200 of 2,400 confirmed', meta:'Materials · ASOS-PO-44521-A' },
+  { dot:'gold',  text:'AM-0052 Proto sample not yet produced',                meta:'Samples · AM-0052' },
+  { dot:'blue',  text:'Label Set not ordered for PO-44521-B',                 meta:'Materials · ASOS-PO-44521-B' },
+];
+
+const ACTIVITY_FEED = [
+  { dot:'#C4A35A', what:'Sewing log S006 — 47 pcs, Line 6 AM · Raw Edge defect flagged',         when:'12 Apr 2026 · Sewing'      },
+  { dot:'#C4A35A', what:'Sewing log S005 — 51 pcs, Line 5 AM · No defects',                       when:'12 Apr 2026 · Sewing'      },
+  { dot:'#196741', what:'QC session F003 — 195 inspected, 7 failed (3.59%) · AQL 4.0 · Nadia H.', when:'12 Apr 2026 · Finishing'   },
+  { dot:'#7B5EA7', what:'Carton CTN-0004 packed — 48 pcs · ASOS-PO-44521-A · Ivory',              when:'11 Apr 2026 · Packing'     },
+  { dot:'#7B5EA7', what:'Carton CTN-0003 packed — 48 pcs · ASOS-PO-44521-A · Ivory',              when:'11 Apr 2026 · Packing'     },
+  { dot:'#196741', what:'QC session F002 — 175 inspected, 3 failed (1.71%) · AQL 2.5 · Fatima R.',when:'11 Apr 2026 · Finishing'   },
+  { dot:'#2455CC', what:'INC-003 confirmed — YKK Zip 60 cm · 1,200 units received (partial)',      when:'05 Apr 2026 · Incoming'    },
+  { dot:'#C4A35A', what:'Cutting log C002 — 550 pcs cut · 248.5 m consumed · Waste 4.83% ⚠',     when:'08 Apr 2026 · Cutting'     },
+  { dot:'#C4A35A', what:'Cutting log C001 — 450 pcs cut · 197.2 m consumed · Waste 1.88%',        when:'07 Apr 2026 · Cutting'     },
+  { dot:'#2455CC', what:'Meeting note — Client confirmed Ivory priority. AQL 2.5 mandatory.',      when:'09 Apr 2026 · Orders'      },
+];
+
+function renderDashboard() {
+  /* ── KPIs ─────────────────────────────────────────────────── */
+  const totalCut   = (typeof CUTTING_LOG   !== 'undefined') ? CUTTING_LOG.reduce((a,r)=>a+r.qty,0)    : 0;
+  const totalSewn  = (typeof SEWING_LOG    !== 'undefined') ? SEWING_LOG.reduce((a,r)=>a+r.pieces,0)  : 0;
+  const totalCtns  = (typeof CARTONS       !== 'undefined') ? CARTONS.length                           : 0;
+  const avgWaste   = (typeof CUTTING_LOG   !== 'undefined' && CUTTING_LOG.length)
+    ? (CUTTING_LOG.reduce((a,r)=>a+r.waste,0)/CUTTING_LOG.length).toFixed(1) : '—';
+  const finInsp    = (typeof FINISHING_LOG !== 'undefined') ? FINISHING_LOG.reduce((a,r)=>a+r.inspected,0) : 0;
+  const finPass    = (typeof FINISHING_LOG !== 'undefined') ? FINISHING_LOG.reduce((a,r)=>a+r.passed,0)    : 0;
+  const passRate   = finInsp ? (finPass/finInsp*100).toFixed(1) : '—';
+  const wasteHigh  = typeof avgWaste === 'string' && avgWaste !== '—' && parseFloat(avgWaste) > 3;
+
+  document.getElementById('dash-kpis').innerHTML = `
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">Active Orders</div>
+      <div class="dash-kpi-num">${ORDERS.length}</div>
+      <div class="dash-kpi-sub">${ORDERS.filter(o=>o.status==='In Production').length} in production</div>
+    </div>
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">Pieces Cut</div>
+      <div class="dash-kpi-num">${totalCut.toLocaleString()}</div>
+      <div class="dash-kpi-sub">Across all cutting sessions</div>
+    </div>
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">Pieces Sewn</div>
+      <div class="dash-kpi-num">${totalSewn.toLocaleString()}</div>
+      <div class="dash-kpi-sub">Daily output logged</div>
+    </div>
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">Cartons Packed</div>
+      <div class="dash-kpi-num gold">${totalCtns}</div>
+      <div class="dash-kpi-sub">${CARTONS.reduce((a,c)=>a+c.total,0).toLocaleString()} pcs total</div>
+    </div>
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">Avg Fabric Waste</div>
+      <div class="dash-kpi-num ${wasteHigh?'red':''}">
+        ${avgWaste}<span class="dash-kpi-unit">%</span>
+      </div>
+      <div class="dash-kpi-sub">${wasteHigh?'Above 3% threshold':'Within target'}</div>
+    </div>
+    <div class="dash-kpi-card">
+      <div class="dash-kpi-eyebrow">QC Pass Rate</div>
+      <div class="dash-kpi-num green">
+        ${passRate}<span class="dash-kpi-unit">%</span>
+      </div>
+      <div class="dash-kpi-sub">${finInsp.toLocaleString()} units inspected</div>
+    </div>`;
+
+  /* ── Alerts ───────────────────────────────────────────────── */
+  document.getElementById('dash-alert-count').textContent = DASH_ALERTS.length + ' active';
+  document.getElementById('dash-alerts').innerHTML = DASH_ALERTS.map(a => `
+    <div class="alert-item">
+      <div class="alert-dot ${a.dot}"></div>
+      <div>
+        <div class="alert-text">${a.text}</div>
+        <div class="alert-meta">${a.meta}</div>
+      </div>
+    </div>`).join('');
+
+  /* ── Feed ─────────────────────────────────────────────────── */
+  document.getElementById('dash-feed').innerHTML = ACTIVITY_FEED.map(e => `
+    <div class="feed-item">
+      <div class="feed-dot" style="background:${e.dot}"></div>
+      <div class="feed-body">
+        <div class="feed-what">${e.what}</div>
+        <div class="feed-when">${e.when}</div>
+      </div>
+    </div>`).join('');
+}
+
 /* ── Section meta ─────────────────────────────────────────────── */
 const SECTION_META = {
   dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
@@ -1755,7 +1945,7 @@ const SECTION_META = {
   settings:  { title: 'Settings',        icon: 'settings'         },
 };
 
-let currentSec = 'models';
+let currentSec = 'dashboard';
 
 /* ── Navigate ─────────────────────────────────────────────────── */
 function nav(btn) {
@@ -4248,6 +4438,7 @@ document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
   updateDate();
   setInterval(updateDate, 60000);
+  renderDashboard();
   renderModels(MODELS);
   renderOrders(ORDERS);
   renderGantt();
