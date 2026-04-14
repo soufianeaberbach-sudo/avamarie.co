@@ -971,6 +971,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   .dash-kpi-grid{grid-template-columns:1fr 1fr}
   .dash-two-col{grid-template-columns:1fr}
 }
+
+/* ─── SETTINGS ───────────────────────────────────────────────── */
+.stg-tab{
+  padding:10px 22px;background:none;border:none;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  cursor:pointer;transition:color .15s,border-color .15s;
+}
+.stg-tab:hover{color:var(--text)}
+.stg-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.stg-pane{display:none}
+.stg-pane.active{display:block}
+.stg-form{max-width:580px}
+.stg-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.role-chip{
+  display:inline-block;background:#F0F4FF;border:1px solid #C7D4F5;border-radius:3px;
+  padding:2px 8px;font-size:.68rem;font-weight:700;color:#2455CC;
+}
+.line-active{color:#196741;font-weight:700}
+.line-idle  {color:var(--muted2)}
+@media(max-width:720px){.stg-form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1772,13 +1794,92 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 
     <!-- ── SETTINGS ───────────────────────────────────────── -->
     <div id="sec-settings" class="sec">
-      <div class="ph">
-        <div class="ph-ring"><i data-lucide="settings"></i></div>
-        <div class="gold-line"></div>
-        <div class="ph-name">Settings</div>
-        <div class="ph-desc">Company info, production line configuration, users, and roles.</div>
-        <div class="ph-tag">Coming Next</div>
+
+      <div class="mat-tabs" style="margin-bottom:18px">
+        <button class="stg-tab active" onclick="setStgTab(this,'stg-company')">Company Info</button>
+        <button class="stg-tab" onclick="setStgTab(this,'stg-lines')">Production Lines</button>
+        <button class="stg-tab" onclick="setStgTab(this,'stg-users')">Users</button>
       </div>
+
+      <!-- ── Company Info ──────────────────────────────── -->
+      <div id="stg-company" class="stg-pane active">
+        <div class="cs-form-card stg-form">
+          <div class="cs-card-title">Company Information</div>
+          <div class="stg-form-grid">
+            <div class="cs-field">
+              <label>Company Name</label>
+              <input type="text" id="stg-name" value="Ava Marie">
+            </div>
+            <div class="cs-field">
+              <label>Founded</label>
+              <input type="text" id="stg-founded" value="2019">
+            </div>
+            <div class="cs-field">
+              <label>Address</label>
+              <input type="text" id="stg-address" value="Zone Industrielle Charaf, Rue 4">
+            </div>
+            <div class="cs-field">
+              <label>City</label>
+              <input type="text" id="stg-city" value="Tangier">
+            </div>
+            <div class="cs-field">
+              <label>Country</label>
+              <input type="text" id="stg-country" value="Morocco">
+            </div>
+            <div class="cs-field">
+              <label>Phone</label>
+              <input type="text" id="stg-phone" value="+212 539 XX XX XX">
+            </div>
+            <div class="cs-field">
+              <label>Email</label>
+              <input type="email" id="stg-email" value="contact@avamarie.co">
+            </div>
+            <div class="cs-field">
+              <label>Website</label>
+              <input type="text" id="stg-website" value="www.avamarie.co">
+            </div>
+            <div class="cs-field">
+              <label>VAT Number</label>
+              <input type="text" id="stg-vat" value="MA-TGR-2019-4521">
+            </div>
+            <div class="cs-field">
+              <label>Default Currency</label>
+              <select id="stg-currency">
+                <option value="EUR" selected>EUR — Euro</option>
+                <option value="USD">USD — US Dollar</option>
+                <option value="GBP">GBP — British Pound</option>
+                <option value="MAD">MAD — Moroccan Dirham</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveCompanyInfo()">
+            <i data-lucide="check"></i> Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Production Lines ───────────────────────────── -->
+      <div id="stg-lines" class="stg-pane">
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Production Lines</div>
+            <span class="toolbar-count">20 lines</span>
+          </div>
+          <div id="stg-lines-table"></div>
+        </div>
+      </div>
+
+      <!-- ── Users ──────────────────────────────────────── -->
+      <div id="stg-users" class="stg-pane">
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">System Users</div>
+            <span class="toolbar-count" id="stg-user-count"></span>
+          </div>
+          <div id="stg-users-table"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── MODEL DETAIL ──────────────────────────────────────── -->
@@ -4433,12 +4534,112 @@ function renderMaterials() {
 }
 
 
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS
+   ══════════════════════════════════════════════════════════════ */
+
+function setStgTab(btn, paneId) {
+  document.querySelectorAll('.stg-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stg-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.add('active');
+  lucide.createIcons();
+}
+
+function saveCompanyInfo() {
+  showToast('Company info saved.');
+}
+
+/* 20 production lines */
+const PROD_LINES = [
+  { line:1,  name:'Sewing Line 1',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Fatima R.'   },
+  { line:2,  name:'Sewing Line 2',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Khadija M.'  },
+  { line:3,  name:'Sewing Line 3',    type:'Sewing',   machines:12, operators:11, capacity:110, status:'Active',  supervisor:'Zineb H.'    },
+  { line:4,  name:'Sewing Line 4',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Fatima R.'   },
+  { line:5,  name:'Sewing Line 5',    type:'Sewing',   machines:14, operators:14, capacity:140, status:'Active',  supervisor:'Karim A.'    },
+  { line:6,  name:'Sewing Line 6',    type:'Sewing',   machines:14, operators:13, capacity:130, status:'Active',  supervisor:'Karim A.'    },
+  { line:7,  name:'Sewing Line 7',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Nadia H.'    },
+  { line:8,  name:'Sewing Line 8',    type:'Sewing',   machines:12, operators:10, capacity:100, status:'Active',  supervisor:'Nadia H.'    },
+  { line:9,  name:'Sewing Line 9',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Idle',    supervisor:'—'           },
+  { line:10, name:'Sewing Line 10',   type:'Sewing',   machines:12, operators:12, capacity:120, status:'Idle',    supervisor:'—'           },
+  { line:11, name:'Cutting Line A',   type:'Cutting',  machines:4,  operators:6,  capacity:600, status:'Active',  supervisor:'Youssef B.'  },
+  { line:12, name:'Cutting Line B',   type:'Cutting',  machines:4,  operators:5,  capacity:500, status:'Active',  supervisor:'Youssef B.'  },
+  { line:13, name:'Cutting Line C',   type:'Cutting',  machines:3,  operators:4,  capacity:400, status:'Idle',    supervisor:'—'           },
+  { line:14, name:'Embroidery Unit',  type:'Embroidery',machines:6, operators:6,  capacity:80,  status:'Idle',    supervisor:'—'           },
+  { line:15, name:'Printing Unit',    type:'Printing', machines:2,  operators:4,  capacity:200, status:'Idle',    supervisor:'—'           },
+  { line:16, name:'Finishing Bay A',  type:'Finishing',machines:8,  operators:8,  capacity:250, status:'Active',  supervisor:'Ahmed T.'    },
+  { line:17, name:'Finishing Bay B',  type:'Finishing',machines:8,  operators:7,  capacity:220, status:'Active',  supervisor:'Ahmed T.'    },
+  { line:18, name:'QC Station',       type:'QC',       machines:0,  operators:4,  capacity:400, status:'Active',  supervisor:'Soufiane A.' },
+  { line:19, name:'Packing Station A',type:'Packing',  machines:2,  operators:6,  capacity:300, status:'Active',  supervisor:'Sara B.'     },
+  { line:20, name:'Packing Station B',type:'Packing',  machines:2,  operators:4,  capacity:200, status:'Idle',    supervisor:'—'           },
+];
+
+const USERS = [
+  { name:'Soufiane Aberbach', role:'Admin',              email:'s.aberbach@avamarie.co',  status:'Active',   lastLogin:'14 Apr 2026' },
+  { name:'Karim El Amrani',   role:'Production Manager', email:'k.elamrani@avamarie.co',  status:'Active',   lastLogin:'13 Apr 2026' },
+  { name:'Fatima Roudani',    role:'QC Supervisor',      email:'f.roudani@avamarie.co',   status:'Active',   lastLogin:'14 Apr 2026' },
+  { name:'Nadia Hassani',     role:'QC Inspector',       email:'n.hassani@avamarie.co',   status:'Active',   lastLogin:'12 Apr 2026' },
+  { name:'Youssef Berrada',   role:'Cutting Manager',    email:'y.berrada@avamarie.co',   status:'Active',   lastLogin:'11 Apr 2026' },
+  { name:'Ahmed Tazi',        role:'Materials Manager',  email:'a.tazi@avamarie.co',      status:'Active',   lastLogin:'10 Apr 2026' },
+  { name:'Sara Benchrif',     role:'Packing Supervisor', email:'s.benchrif@avamarie.co',  status:'Inactive', lastLogin:'02 Apr 2026' },
+];
+
+function renderSettings() {
+  /* Production lines table */
+  const lrows = PROD_LINES.map(l => {
+    const isActive = l.status === 'Active';
+    return `<tr>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);text-align:center">${l.line}</td>
+      <td style="font-weight:600">${l.name}</td>
+      <td><span class="chip chip-grey" style="font-size:.65rem">${l.type}</span></td>
+      <td style="text-align:right">${l.machines}</td>
+      <td style="text-align:right">${l.operators}</td>
+      <td style="text-align:right">${l.capacity.toLocaleString()} pcs/day</td>
+      <td>
+        <span class="chip ${isActive ? 'chip-green' : 'chip-grey'}">${l.status}</span>
+      </td>
+      <td style="color:var(--muted)">${l.supervisor}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('stg-lines-table').innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th style="text-align:center">Line</th>
+      <th>Name</th><th>Type</th>
+      <th style="text-align:right">Machines</th>
+      <th style="text-align:right">Operators</th>
+      <th style="text-align:right">Capacity</th>
+      <th>Status</th><th>Supervisor</th>
+    </tr></thead>
+    <tbody>${lrows}</tbody>
+  </table>`;
+
+  /* Users table */
+  const active = USERS.filter(u => u.status === 'Active').length;
+  document.getElementById('stg-user-count').textContent =
+    `${USERS.length} users · ${active} active`;
+  const urows = USERS.map(u => `<tr>
+    <td style="font-weight:600">${u.name}</td>
+    <td><span class="role-chip">${u.role}</span></td>
+    <td style="color:var(--muted);font-size:.78rem">${u.email}</td>
+    <td><span class="chip ${u.status === 'Active' ? 'chip-green' : 'chip-grey'}">${u.status}</span></td>
+    <td style="color:var(--muted2);font-size:.76rem">${u.lastLogin}</td>
+  </tr>`).join('');
+  document.getElementById('stg-users-table').innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Name</th><th>Role</th><th>Email</th><th>Status</th><th>Last Login</th>
+    </tr></thead>
+    <tbody>${urows}</tbody>
+  </table>`;
+}
+
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
   updateDate();
   setInterval(updateDate, 60000);
   renderDashboard();
+  renderSettings();
   renderModels(MODELS);
   renderOrders(ORDERS);
   renderGantt();
