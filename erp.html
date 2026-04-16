@@ -1159,10 +1159,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
       <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
     </button>
     <button class="nav-item" data-sec="models" onclick="nav(this)">
-      <i data-lucide="scissors"></i><span>Models</span>
+      <i data-lucide="shirt"></i><span>Models</span>
     </button>
     <button class="nav-item" data-sec="orders" onclick="nav(this)">
-      <i data-lucide="package"></i><span>Orders</span>
+      <i data-lucide="clipboard-list"></i><span>Orders</span>
     </button>
     <button class="nav-item" data-sec="planning" onclick="nav(this)">
       <i data-lucide="calendar-range"></i><span>Planning</span>
@@ -1171,22 +1171,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
     <div class="nav-sep"></div>
 
     <button class="nav-item" data-sec="cutting" onclick="nav(this)">
-      <i data-lucide="ruler"></i><span>Cutting</span>
+      <i data-lucide="scissors"></i><span>Cutting</span>
     </button>
     <button class="nav-item" data-sec="sewing" onclick="nav(this)">
-      <i data-lucide="cpu"></i><span>Sewing</span>
+      <i data-lucide="spool"></i><span>Sewing</span>
     </button>
     <button class="nav-item" data-sec="finishing" onclick="nav(this)">
-      <i data-lucide="wind"></i><span>Finishing</span>
+      <i data-lucide="sparkles"></i><span>Finishing</span>
     </button>
     <button class="nav-item" data-sec="packing" onclick="nav(this)">
-      <i data-lucide="archive"></i><span>Packing</span>
+      <i data-lucide="box"></i><span>Packing</span>
     </button>
 
     <div class="nav-sep"></div>
 
     <button class="nav-item" data-sec="materials" onclick="nav(this)">
-      <i data-lucide="truck"></i><span>Materials</span>
+      <i data-lucide="warehouse"></i><span>Materials</span>
     </button>
     <button class="nav-item" data-sec="settings" onclick="nav(this)">
       <i data-lucide="settings"></i><span>Settings</span>
@@ -2141,7 +2141,7 @@ function renderDashboard() {
   /* ── Row 1: KPI cards ─────────────────────────────────────── */
   const kpis = [
     {
-      icon:'package', label:'Active Orders',
+      icon:'clipboard-list', label:'Active Orders',
       value: ORDERS.length,
       sub: `${ORDERS.filter(o=>o.status==='In Production').length} in production`,
       accent:'gold',
@@ -2159,19 +2159,19 @@ function renderDashboard() {
       accent: urgentCount ? 'red' : 'gold',
     },
     {
-      icon:'trending-up', label:'Pieces Sewn',
+      icon:'spool', label:'Pieces Sewn',
       value: totalSewn.toLocaleString(),
       sub: `${SEWING_LOG.length} sessions logged`,
       accent:'gold',
     },
     {
-      icon:'check-circle', label:'QC Pass Rate',
+      icon:'sparkles', label:'QC Pass Rate',
       value: passRate,
       sub: `${finInsp.toLocaleString()} units inspected`,
       accent:'green',
     },
     {
-      icon:'layers', label:'Shipments In',
+      icon:'warehouse', label:'Shipments In',
       value: `${matConf}<span class="dash-kpi-unit"> / ${INCOMING.length}</span>`,
       sub: 'confirmed of total incoming',
       accent:'gold',
@@ -2286,15 +2286,15 @@ function renderDashboard() {
 /* ── Section meta ─────────────────────────────────────────────── */
 const SECTION_META = {
   dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
-  models:    { title: 'Models',           icon: 'scissors'         },
-  orders:    { title: 'Orders',           icon: 'package'          },
+  models:    { title: 'Models',           icon: 'shirt'            },
+  orders:    { title: 'Orders',           icon: 'clipboard-list'   },
   planning:  { title: 'Planning',         icon: 'calendar-range'   },
-  cutting:   { title: 'Cutting',          icon: 'ruler'            },
-  sewing:    { title: 'Sewing',           icon: 'cpu'              },
-  finishing: { title: 'Finishing & QC',   icon: 'wind'             },
-  packing:   { title: 'Packing',          icon: 'archive'          },
-  materials: { title: 'Materials',        icon: 'truck'            },
-  settings:  { title: 'Settings',        icon: 'settings'         },
+  cutting:   { title: 'Cutting',          icon: 'scissors'         },
+  sewing:    { title: 'Sewing',           icon: 'spool'            },
+  finishing: { title: 'Finishing & QC',   icon: 'sparkles'         },
+  packing:   { title: 'Packing',          icon: 'box'              },
+  materials: { title: 'Materials',        icon: 'warehouse'        },
+  settings:  { title: 'Settings',         icon: 'settings'         },
 };
 
 let currentSec = 'dashboard';
@@ -2702,7 +2702,7 @@ function openOrder(po) {
   document.getElementById('sec-orders').classList.remove('active');
   document.getElementById('sec-order-detail').classList.add('active');
   document.getElementById('tb-title').textContent = o.po;
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="clipboard-list"></i>';
   lucide.createIcons();
   document.getElementById('content').scrollTop = 0;
 
@@ -2979,7 +2979,7 @@ function closeOrder() {
   document.getElementById('sec-order-detail').classList.remove('active');
   document.getElementById('sec-orders').classList.add('active');
   document.getElementById('tb-title').textContent = 'Orders';
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="clipboard-list"></i>';
   lucide.createIcons();
 }
 
@@ -3213,7 +3213,7 @@ function openModel(id) {
 
   /* topbar */
   document.getElementById('tb-title').textContent = m.id + ' — ' + m.name;
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="shirt"></i>';
   lucide.createIcons();
 
   /* scroll top */
@@ -3256,7 +3256,7 @@ function closeModel() {
   document.getElementById('sec-model-detail').classList.remove('active');
   document.getElementById('sec-models').classList.add('active');
   document.getElementById('tb-title').textContent = 'Models';
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="shirt"></i>';
   lucide.createIcons();
 }
 
