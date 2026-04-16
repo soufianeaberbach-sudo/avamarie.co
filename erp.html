@@ -1283,7 +1283,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
         <span class="toolbar-count" id="m-count">5 models</span>
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn-outline" onclick="exportModelsCSV()">
-            <i data-lucide="download"></i> Export CSV
+            <i data-lucide="printer"></i> Print Report
           </button>
           <button class="btn-primary" onclick="showToast('New Model form — coming next')">
             <i data-lucide="plus"></i> New Model
@@ -1375,7 +1375,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
         <span class="toolbar-count" id="o-count">2 orders</span>
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn-outline" onclick="exportOrdersCSV()">
-            <i data-lucide="download"></i> Export CSV
+            <i data-lucide="printer"></i> Print Report
           </button>
           <button class="btn-primary" onclick="showToast('New order form — coming next')">
             <i data-lucide="plus"></i> New Order
@@ -2152,6 +2152,7 @@ const SECTION_META = {
 };
 
 let currentSec = 'dashboard';
+let currentOrderPO = null;   /* tracked so printOrderCP() knows which order is open */
 
 /* ── Navigate ─────────────────────────────────────────────────── */
 function nav(btn) {
@@ -2436,6 +2437,83 @@ function filterOrders() {
 }
 
 /* ── Export orders CSV ────────────────────────────────────────── */
+/* ── Shared print-window helper ───────────────────────────────── */
+function openPrintWin(docTitle, docMeta, bodyHtml) {
+  const date = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const win  = window.open('', '_blank', 'width=1000,height=750');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>${docTitle} — Ava Marie</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#1A1814;padding:36px 40px;background:#fff}
+    /* ── Header ── */
+    .doc-hdr{display:flex;justify-content:space-between;align-items:flex-start;
+      padding-bottom:14px;border-bottom:2.5px solid #C4A35A;margin-bottom:22px}
+    .brand{font-size:21px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+      color:#1A1814;font-family:'Arial Black',Arial,sans-serif}
+    .brand em{color:#C4A35A;font-style:normal}
+    .brand-sub{font-size:8.5px;color:#999;letter-spacing:.07em;margin-top:3px}
+    .doc-info{text-align:right}
+    .doc-title{font-size:14px;font-weight:700;text-transform:uppercase;
+      letter-spacing:.1em;color:#1A1814}
+    .doc-meta{font-size:9.5px;color:#888;margin-top:4px;line-height:1.5}
+    /* ── Print bar ── */
+    .print-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px}
+    .print-btn{padding:8px 22px;background:#C4A35A;color:#fff;border:none;border-radius:4px;
+      font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+      cursor:pointer;font-family:Arial,sans-serif}
+    .print-btn:hover{background:#A88430}
+    /* ── Section headings ── */
+    .sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+      color:#C4A35A;margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid #E8D5A3}
+    .sec-title:first-child{margin-top:0}
+    /* ── Table ── */
+    table{width:100%;border-collapse:collapse;margin-bottom:4px}
+    thead tr{background:#1A1814}
+    th{padding:8px 11px;text-align:left;font-size:8.5px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.12em;color:#C4A35A;white-space:nowrap}
+    td{padding:7px 11px;border-bottom:1px solid #EDEBE6;vertical-align:top;
+      font-size:10.5px;line-height:1.45}
+    tr:nth-child(even) td{background:#FAFAF8}
+    tfoot td{font-weight:700;border-top:2px solid #C4A35A;background:#FEF9EC!important;
+      font-size:11px}
+    /* ── Footer ── */
+    .doc-footer{text-align:center;font-size:8.5px;color:#bbb;
+      margin-top:28px;padding-top:12px;border-top:1px solid #EDEBE6}
+    @media print{.print-bar{display:none}}
+  </style></head><body>
+  <div class="doc-hdr">
+    <div>
+      <div class="brand">AVA <em>MARIE</em></div>
+      <div class="brand-sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+    </div>
+    <div class="doc-info">
+      <div class="doc-title">${docTitle}</div>
+      <div class="doc-meta">${docMeta}<br>Generated ${date}</div>
+    </div>
+  </div>
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">&#x1F5A8;&nbsp; Print / Save as PDF</button>
+  </div>
+  ${bodyHtml}
+  <div class="doc-footer">Ava Marie ERP &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; Confidential</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+}
+
+function buildTable(headers, rows, footerRow) {
+  const ths  = headers.map(h => `<th>${h}</th>`).join('');
+  const tds  = rows.map(r =>
+    `<tr>${r.map(c => `<td>${c == null ? '' : String(c)}</td>`).join('')}</tr>`
+  ).join('');
+  const foot = footerRow
+    ? `<tfoot><tr>${footerRow.map(c => `<td>${c == null ? '' : c}</td>`).join('')}</tr></tfoot>`
+    : '';
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${tds}</tbody>${foot}</table>`;
+}
+
+/* ── Orders export ────────────────────────────────────────────── */
 function exportOrdersCSV() {
   const q      = document.getElementById('o-search').value.toLowerCase().trim();
   const client = document.getElementById('o-client').value;
@@ -2452,28 +2530,26 @@ function exportOrdersCSV() {
     return true;
   });
 
-  const header = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (EUR)','Notes'];
-  const rows   = data.map(o => [
-    o.po, o.client, o.model, o.modelName, o.season,
-    o.issued, o.delivery, o.qty, o.colours, o.status, o.value, o.notes,
+  const headers = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (€)'];
+  const rows    = data.map(o => [
+    `<code>${o.po}</code>`, o.client, o.model, o.modelName, o.season,
+    o.issued, o.delivery, o.qty.toLocaleString(), o.colours, o.status,
+    `€ ${o.value.toLocaleString()}`,
   ]);
-  const csv = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
+  const totalVal = data.reduce((a, o) => a + o.value, 0);
+  const totalQty = data.reduce((a, o) => a + o.qty,   0);
+  const foot = ['', '', '', '', '', '', `${data.length} orders`,
+    totalQty.toLocaleString(), '', '<strong>TOTAL</strong>', `<strong>€ ${totalVal.toLocaleString()}</strong>`];
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `ava-marie-orders-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${data.length} order${data.length !== 1 ? 's' : ''} to CSV`);
+  const filters = [client, status, season].filter(Boolean).join(' · ') || 'All';
+  openPrintWin('Orders', `${data.length} orders &nbsp;·&nbsp; Filter: ${filters}`,
+    buildTable(headers, rows, foot));
+  showToast(`Opened ${data.length} orders for print / PDF`);
 }
 
 /* ── Open order detail ────────────────────────────────────────── */
 function openOrder(po) {
+  currentOrderPO = po;
   const o = ORDERS.find(x => x.po === po);
   if (!o) return;
 
@@ -2509,12 +2585,12 @@ function openOrder(po) {
   const actions = `
     <div class="od-actions">
       <button class="btn-outline" onclick="exportOrderCP('${po}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        CP Excel
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Export CP
       </button>
       <button class="btn-primary" onclick="printOrderCP()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        CP PDF
+        Print CP
       </button>
     </div>`;
 
@@ -2711,50 +2787,45 @@ function exportOrderCP(po) {
   const o = ORDERS.find(x => x.po === po);
   if (!o || !o.cp) return;
 
-  /* Sheet 1: Critical Path */
-  const cpHeader = ['Milestone','Planned Date','Actual Date','Status','Owner'];
-  const cpRows   = o.cp.map(r => [r.milestone, r.planned, r.actual||'', r.status, r.owner]);
+  /* Section 1: Critical Path */
+  const cpRows = o.cp.map(r => [r.milestone, r.planned, r.actual||'—', r.status, r.owner]);
+  const cpTable = buildTable(
+    ['Milestone','Planned Date','Actual Date','Status','Owner'],
+    cpRows
+  );
 
-  /* Sheet 2: Size matrix (CSV doesn't support multi-sheet; combine with spacer) */
-  const mxHeader  = ['', ...o.matrix.sizes, 'Total'];
-  const mxRows    = o.matrix.rows.map(r => {
+  /* Section 2: Size Matrix */
+  const mxHeader = ['Colour', ...o.matrix.sizes, 'Total'];
+  const mxRows = o.matrix.rows.map(r => {
     const inputs = document.querySelectorAll(`.qty-input[data-po="${po}"][data-row="${o.matrix.rows.indexOf(r)}"]`);
     const vals   = inputs.length ? [...inputs].map(i => parseInt(i.value)||0) : r.values;
     return [r.colour, ...vals, vals.reduce((a,b)=>a+b,0)];
   });
+  const totalsBySize = o.matrix.sizes.map((_, si) => mxRows.reduce((a, r) => a + (r[si+1]||0), 0));
+  const mxFoot = ['<strong>TOTAL</strong>', ...totalsBySize, totalsBySize.reduce((a,b)=>a+b,0)];
+  const mxTable = buildTable(mxHeader, mxRows, mxFoot);
 
-  const toCSV = rows => rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  /* Section 3: Materials Status */
+  const matRows = o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]);
+  const matTable = buildTable(
+    ['Material','Supplier','Required','On Order','Received','Status'],
+    matRows
+  );
 
-  const csv = [
-    `"CRITICAL PATH — ${o.po}"`,
-    `"${o.modelName} · ${o.client} · ${o.season} · Delivery: ${o.delivery}"`,
-    '',
-    toCSV([cpHeader, ...cpRows]),
-    '',
-    '"STYLE / COLOUR / SIZE MATRIX"',
-    toCSV([mxHeader, ...mxRows]),
-    '',
-    '"MATERIAL STATUS"',
-    toCSV([
-      ['Material','Supplier','Required','On Order','Received','Status'],
-      ...o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]),
-    ]),
-  ].join('\n');
+  const body = `
+    <p class="doc-meta">${o.modelName} &middot; ${o.client} &middot; ${o.season} &middot; Delivery: ${o.delivery}</p>
+    <h3 class="sec-title">Critical Path</h3>${cpTable}
+    <h3 class="sec-title" style="margin-top:24px">Style / Colour / Size Matrix</h3>${mxTable}
+    <h3 class="sec-title" style="margin-top:24px">Material Status</h3>${matTable}
+  `;
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `CP-${po}-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Critical Path exported — CP-${po}.csv`);
+  openPrintWin(`Critical Path — ${po}`, `${o.modelName} · ${o.client} · Delivery: ${o.delivery}`, body);
+  showToast(`Opened Critical Path for ${po}`);
 }
 
 /* ── Print CP as PDF ──────────────────────────────────────────── */
 function printOrderCP() {
-  window.print();
+  exportOrderCP(currentOrderPO);
 }
 
 /* ── Close order detail ───────────────────────────────────────── */
@@ -2818,7 +2889,7 @@ function filterModels() {
   renderModels(result);
 }
 
-/* ── Export CSV ───────────────────────────────────────────────── */
+/* ── Export Models (print window) ────────────────────────────── */
 function exportModelsCSV() {
   const q      = document.getElementById('m-search').value.toLowerCase().trim();
   const client = document.getElementById('m-client').value;
@@ -2835,21 +2906,24 @@ function exportModelsCSV() {
     return true;
   });
 
-  const header = ['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc (EUR)','Updated'];
-  const rows   = data.map(m => [
-    m.id, m.name, m.client, m.ref, m.cat, m.rev, m.status,
-    m.cost !== null ? m.cost.toFixed(2) : '', m.updated,
-  ]);
-  const csv = [header,...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
+  const filters = [
+    q      ? `Search: "${q}"` : '',
+    client ? `Client: ${client}` : '',
+    status ? `Status: ${status}` : '',
+    cat    ? `Category: ${cat}` : '',
+  ].filter(Boolean).join(' · ') || 'All models';
 
-  const blob = new Blob([csv],{type:'text/csv'});
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'),{href:url, download:`ava-marie-models-${new Date().toISOString().slice(0,10)}.csv`});
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${data.length} model${data.length!==1?'s':''} to CSV`);
+  const rows = data.map(m => [
+    `<code>${m.id}</code>`, m.name, m.client, m.ref, m.cat, `Rev ${m.rev}`, m.status,
+    m.cost !== null ? `€ ${m.cost.toFixed(2)}` : '—', m.updated,
+  ]);
+
+  openPrintWin(
+    'Models',
+    `${data.length} model${data.length!==1?'s':''} · ${filters}`,
+    buildTable(['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc','Updated'], rows)
+  );
+  showToast(`Opened ${data.length} model${data.length!==1?'s':''} for print / PDF`);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -3389,11 +3463,10 @@ function renderMdAudit(id) {
         <span class="sc-title">Audit Log &mdash; ${d.audit.length} entries</span>
         <button class="btn-outline" style="font-size:.68rem;padding:5px 12px" onclick="exportAuditCSV('${id}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <path d="M6 9l6 6 6-6"/>
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
           </svg>
-          Export CSV
+          Print Audit
         </button>
       </div>
       <div>${entries}</div>
@@ -3404,20 +3477,13 @@ function renderMdAudit(id) {
 function exportAuditCSV(id) {
   const d = MD[id];
   if (!d || !d.audit) return;
-  const header = ['Timestamp', 'User', 'Action', 'Detail'];
-  const rows   = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
-  const csv    = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
-    .join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `audit-${id}-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${d.audit.length} audit entries to CSV`);
+  const rows = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
+  openPrintWin(
+    `Audit Log — ${id}`,
+    `${d.audit.length} entr${d.audit.length!==1?'ies':'y'} · Model ${id}`,
+    buildTable(['Timestamp','User','Action','Detail'], rows)
+  );
+  showToast(`Opened audit log for ${id}`);
 }
 
 /* ══════════════════════════════════════════════════════════════
