@@ -993,6 +993,111 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 .line-active{color:#196741;font-weight:700}
 .line-idle  {color:var(--muted2)}
 @media(max-width:720px){.stg-form-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE  (≤768px / ≤375px)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Scrollable table wrapper ───────────────────────────────── */
+/* Applied via JS to every .cs-log-card and .dash-card table wrapper */
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-scroll .tbl{min-width:560px}
+
+/* ── Tab bars: horizontal scroll, no wrap ───────────────────── */
+.md-tabs,.mat-tabs,.stg-tab-bar{
+  overflow-x:auto;
+  scrollbar-width:none;flex-wrap:nowrap;
+}
+.md-tabs::-webkit-scrollbar,.mat-tabs::-webkit-scrollbar{display:none}
+
+/* ── Gantt: already overflow-x:auto, just ensure label col ─── */
+.gantt-row-lbl{flex-shrink:0}
+
+@media(max-width:768px){
+  /* Sidebar: show only when .open (already at 1024 but be explicit at 768) */
+  #sidebar{transform:translateX(-100%);transition:transform .22s ease}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0!important}
+  .tb-ham{display:flex!important}
+  #tb-date{display:none}
+
+  /* Content padding tighter */
+  #content{padding:16px 12px}
+
+  /* All KPI grids → 2 col */
+  .kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  .cs-kpi-bar{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  .dash-kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+
+  /* Dashboard two-col → stack */
+  .dash-two-col{grid-template-columns:1fr!important}
+
+  /* Cutting/Sewing/Finishing/Packing: form above log */
+  .cs-layout{grid-template-columns:1fr!important}
+
+  /* All field rows → 1 col */
+  .field-row{grid-template-columns:1fr!important}
+  .stg-form-grid{grid-template-columns:1fr!important}
+  .mat-form-grid{grid-template-columns:1fr!important;gap:10px}
+  .defect-checks{grid-template-columns:1fr 1fr}
+
+  /* Bulk-create row: wrap */
+  .bulk-row{flex-wrap:wrap;gap:8px}
+
+  /* Order detail overlay: full width */
+  #sec-order-detail,#sec-model-detail{padding:0}
+
+  /* Model detail header: stack */
+  .md-header-card{flex-direction:column;gap:12px}
+  .md-tabs{overflow-x:auto;flex-wrap:nowrap;border-bottom:1px solid var(--border)}
+  .md-tab{flex-shrink:0}
+
+  /* Materials tabs */
+  .mat-tabs{overflow-x:auto;flex-wrap:nowrap}
+  .mat-tab{flex-shrink:0}
+
+  /* Settings stg-tab bar */
+  .mat-tabs .stg-tab{flex-shrink:0}
+
+  /* Form cards: full width */
+  .cs-form-card,.mat-form-wrap{padding:16px}
+  .stg-form{max-width:100%}
+
+  /* Toolbar: stack */
+  .toolbar{flex-direction:column;align-items:flex-start;gap:8px}
+  .mat-hdr{flex-direction:column;align-items:flex-start;gap:8px}
+
+  /* KPI nums smaller */
+  .kpi-num{font-size:2rem}
+  .dash-kpi-num{font-size:2.4rem}
+
+  /* Sample grid: 1 col */
+  .sample-grid{grid-template-columns:1fr!important}
+
+  /* Outgoing table action buttons: stack */
+  .btn-sm{font-size:.65rem;padding:4px 7px}
+
+  /* Size inputs for cartons: wrap more aggressively */
+  .size-inputs{flex-wrap:wrap}
+  .size-inp-col{min-width:44px}
+}
+
+@media(max-width:480px){
+  /* KPI grids → 1 col on small phones */
+  .kpi-grid{grid-template-columns:1fr!important}
+  .cs-kpi-bar{grid-template-columns:1fr 1fr!important}
+  .dash-kpi-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Period buttons stay side-by-side */
+  .sew-period-row{gap:8px}
+
+  /* Topbar: tighter */
+  #tb-title{font-size:.85rem}
+
+  /* filter-bar: stack */
+  .filter-bar{flex-direction:column;align-items:stretch;gap:8px}
+  .f-input,.f-select{width:100%}
+}
 </style>
 </head>
 <body>
@@ -4634,6 +4739,28 @@ function renderSettings() {
 
 
 /* ── Init ─────────────────────────────────────────────────────── */
+/* ── Wrap all .tbl tables in a scroll div after each render ─── */
+function wrapTables() {
+  document.querySelectorAll('.tbl').forEach(function(tbl) {
+    if (tbl.parentElement.classList.contains('tbl-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-scroll';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+}
+
+/* Also wrap the order-detail matrix and the od-matrix */
+function wrapMatrices() {
+  document.querySelectorAll('.od-matrix').forEach(function(tbl) {
+    if (tbl.parentElement.classList.contains('tbl-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-scroll';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   lucide.createIcons();
   updateDate();
@@ -4648,6 +4775,14 @@ document.addEventListener('DOMContentLoaded', function () {
   renderFinishing();
   renderPacking();
   renderMaterials();
+  /* Wrap tables present at load */
+  wrapTables();
+  wrapMatrices();
+  /* Auto-wrap any tables injected later (order/model detail, log saves) */
+  new MutationObserver(function() {
+    wrapTables();
+    wrapMatrices();
+  }).observe(document.getElementById('main'), { childList:true, subtree:true });
 });
 </script>
 </body>
