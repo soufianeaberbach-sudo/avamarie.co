@@ -954,6 +954,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 .alert-dot.green{background:#196741}
 .alert-text{font-size:.8rem;line-height:1.45;color:var(--text)}
 .alert-meta{font-size:.7rem;color:var(--muted2);margin-top:2px}
+/* Alert border-left variants */
+.alert-item.border-red  {border-left:3px solid #DC2626;padding-left:17px}
+.alert-item.border-amber{border-left:3px solid #C47000;padding-left:17px}
+.alert-item.border-blue {border-left:3px solid #2455CC;padding-left:17px}
+.alert-item.border-gold {border-left:3px solid var(--gold);padding-left:17px}
+.alert-item.border-green{border-left:3px solid #196741;padding-left:17px}
 /* Activity feed */
 .feed-list{padding:4px 0}
 .feed-item{
@@ -967,9 +973,46 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 .feed-body{}
 .feed-what{font-size:.8rem;color:var(--text);line-height:1.4}
 .feed-when{font-size:.68rem;color:var(--muted2);margin-top:2px}
+/* Dashboard KPI icon */
+.dash-kpi-icon{
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  background:rgba(196,163,90,.12);border-radius:8px;color:var(--gold);
+  margin-bottom:12px;
+}
+.dash-kpi-icon svg{width:17px;height:17px;stroke-width:1.8}
+.dash-kpi-icon.red  {background:rgba(220,38,38,.1);color:#DC2626}
+.dash-kpi-icon.green{background:rgba(25,103,65,.1);color:#196741}
+.dash-kpi-icon.blue {background:rgba(36,85,204,.1);color:#2455CC}
+.kpi-alert::after{background:#DC2626 !important}
+/* Dashboard row 2: orders(60%) + alerts(40%) */
+.dash-row2{display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;align-items:start}
+/* Dashboard row 3: production + feed */
+.dash-row3{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+/* Orders mini-table inside dashboard */
+.dash-ord-tbl td,.dash-ord-tbl th{padding:10px 14px;font-size:.78rem}
+.dash-ord-tbl th{font-size:.62rem}
+/* Order progress bar */
+.ord-prog-bar{height:5px;background:#F0EDE7;border-radius:3px;overflow:hidden}
+.ord-prog-fill{height:100%;background:var(--gold);border-radius:3px}
+/* Production-by-line rows */
+.prod-line-item{
+  display:grid;grid-template-columns:36px 1fr auto;
+  gap:12px;align-items:center;padding:11px 20px;
+  border-bottom:1px solid #F7F5F1;
+}
+.prod-line-item:last-child{border-bottom:none}
+.prod-line-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
+  color:var(--muted2);text-align:center;line-height:1;
+}
+.prod-line-active .prod-line-num{color:var(--gold)}
+.prod-line-name{font-size:.8rem;font-weight:600;color:var(--text);line-height:1.3}
+.prod-line-sub {font-size:.67rem;color:var(--muted2);margin-top:2px}
+.prod-line-pcs {font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--text);white-space:nowrap}
+.prod-line-idle .prod-line-pcs{color:var(--muted2)}
 @media(max-width:900px){
   .dash-kpi-grid{grid-template-columns:1fr 1fr}
-  .dash-two-col{grid-template-columns:1fr}
+  .dash-row2,.dash-row3{grid-template-columns:1fr}
 }
 
 /* ─── SETTINGS ───────────────────────────────────────────────── */
@@ -1029,8 +1072,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   .cs-kpi-bar{grid-template-columns:repeat(2,1fr)!important;gap:10px}
   .dash-kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px}
 
-  /* Dashboard two-col → stack */
-  .dash-two-col{grid-template-columns:1fr!important}
+  /* Dashboard rows → stack */
+  .dash-two-col,.dash-row2,.dash-row3{grid-template-columns:1fr!important}
 
   /* Cutting/Sewing/Finishing/Packing: form above log */
   .cs-layout{grid-template-columns:1fr!important}
@@ -1116,10 +1159,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
       <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
     </button>
     <button class="nav-item" data-sec="models" onclick="nav(this)">
-      <i data-lucide="scissors"></i><span>Models</span>
+      <i data-lucide="shirt"></i><span>Models</span>
     </button>
     <button class="nav-item" data-sec="orders" onclick="nav(this)">
-      <i data-lucide="package"></i><span>Orders</span>
+      <i data-lucide="clipboard-list"></i><span>Orders</span>
     </button>
     <button class="nav-item" data-sec="planning" onclick="nav(this)">
       <i data-lucide="calendar-range"></i><span>Planning</span>
@@ -1128,22 +1171,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
     <div class="nav-sep"></div>
 
     <button class="nav-item" data-sec="cutting" onclick="nav(this)">
-      <i data-lucide="ruler"></i><span>Cutting</span>
+      <i data-lucide="scissors"></i><span>Cutting</span>
     </button>
     <button class="nav-item" data-sec="sewing" onclick="nav(this)">
-      <i data-lucide="cpu"></i><span>Sewing</span>
+      <i data-lucide="spool"></i><span>Sewing</span>
     </button>
     <button class="nav-item" data-sec="finishing" onclick="nav(this)">
-      <i data-lucide="wind"></i><span>Finishing</span>
+      <i data-lucide="sparkles"></i><span>Finishing</span>
     </button>
     <button class="nav-item" data-sec="packing" onclick="nav(this)">
-      <i data-lucide="archive"></i><span>Packing</span>
+      <i data-lucide="box"></i><span>Packing</span>
     </button>
 
     <div class="nav-sep"></div>
 
     <button class="nav-item" data-sec="materials" onclick="nav(this)">
-      <i data-lucide="truck"></i><span>Materials</span>
+      <i data-lucide="warehouse"></i><span>Materials</span>
     </button>
     <button class="nav-item" data-sec="settings" onclick="nav(this)">
       <i data-lucide="settings"></i><span>Settings</span>
@@ -1199,17 +1242,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
     <!-- ── DASHBOARD ─────────────────────────────────────── -->
     <div id="sec-dashboard" class="sec active">
 
-      <!-- KPI grid -->
+      <!-- Row 1: KPI cards -->
       <div class="dash-kpi-grid" id="dash-kpis"></div>
 
-      <!-- Alerts + Feed -->
-      <div class="dash-two-col">
+      <!-- Row 2: Active Orders + Alerts -->
+      <div class="dash-row2">
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Active Orders</div>
+            <span class="toolbar-count" id="dash-ord-count"></span>
+          </div>
+          <div id="dash-orders-tbl"></div>
+        </div>
         <div class="dash-card">
           <div class="dash-card-hd">
             <div class="dash-card-title">Alerts</div>
             <span id="dash-alert-count" class="toolbar-count"></span>
           </div>
           <div class="alert-list" id="dash-alerts"></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Today's Production + Activity Feed -->
+      <div class="dash-row3">
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Today's Production by Line</div>
+            <span class="toolbar-count" id="dash-prod-date"></span>
+          </div>
+          <div id="dash-production"></div>
         </div>
         <div class="dash-card">
           <div class="dash-card-hd">
@@ -1283,7 +1344,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
         <span class="toolbar-count" id="m-count">5 models</span>
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn-outline" onclick="exportModelsCSV()">
-            <i data-lucide="download"></i> Export CSV
+            <i data-lucide="printer"></i> Print Report
           </button>
           <button class="btn-primary" onclick="showToast('New Model form — coming next')">
             <i data-lucide="plus"></i> New Model
@@ -1375,7 +1436,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
         <span class="toolbar-count" id="o-count">2 orders</span>
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn-outline" onclick="exportOrdersCSV()">
-            <i data-lucide="download"></i> Export CSV
+            <i data-lucide="printer"></i> Print Report
           </button>
           <button class="btn-primary" onclick="showToast('New order form — coming next')">
             <i data-lucide="plus"></i> New Order
@@ -2068,65 +2129,150 @@ const ACTIVITY_FEED = [
 ];
 
 function renderDashboard() {
-  /* ── KPIs ─────────────────────────────────────────────────── */
-  const totalCut   = (typeof CUTTING_LOG   !== 'undefined') ? CUTTING_LOG.reduce((a,r)=>a+r.qty,0)    : 0;
-  const totalSewn  = (typeof SEWING_LOG    !== 'undefined') ? SEWING_LOG.reduce((a,r)=>a+r.pieces,0)  : 0;
-  const totalCtns  = (typeof CARTONS       !== 'undefined') ? CARTONS.length                           : 0;
-  const avgWaste   = (typeof CUTTING_LOG   !== 'undefined' && CUTTING_LOG.length)
-    ? (CUTTING_LOG.reduce((a,r)=>a+r.waste,0)/CUTTING_LOG.length).toFixed(1) : '—';
-  const finInsp    = (typeof FINISHING_LOG !== 'undefined') ? FINISHING_LOG.reduce((a,r)=>a+r.inspected,0) : 0;
-  const finPass    = (typeof FINISHING_LOG !== 'undefined') ? FINISHING_LOG.reduce((a,r)=>a+r.passed,0)    : 0;
-  const passRate   = finInsp ? (finPass/finInsp*100).toFixed(1) : '—';
-  const wasteHigh  = typeof avgWaste === 'string' && avgWaste !== '—' && parseFloat(avgWaste) > 3;
+  /* ── Calculations ─────────────────────────────────────────── */
+  const totalCut    = CUTTING_LOG.reduce((a,r)=>a+r.qty,0);
+  const totalSewn   = SEWING_LOG.reduce((a,r)=>a+r.pieces,0);
+  const finInsp     = FINISHING_LOG.reduce((a,r)=>a+r.inspected,0);
+  const finPass     = FINISHING_LOG.reduce((a,r)=>a+r.passed,0);
+  const passRate    = finInsp ? (finPass/finInsp*100).toFixed(1)+'%' : '—';
+  const urgentCount = DASH_ALERTS.filter(a=>a.dot==='red').length;
+  const matConf     = INCOMING.filter(i=>i.status==='Confirmed').length;
 
-  document.getElementById('dash-kpis').innerHTML = `
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">Active Orders</div>
-      <div class="dash-kpi-num">${ORDERS.length}</div>
-      <div class="dash-kpi-sub">${ORDERS.filter(o=>o.status==='In Production').length} in production</div>
-    </div>
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">Pieces Cut</div>
-      <div class="dash-kpi-num">${totalCut.toLocaleString()}</div>
-      <div class="dash-kpi-sub">Across all cutting sessions</div>
-    </div>
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">Pieces Sewn</div>
-      <div class="dash-kpi-num">${totalSewn.toLocaleString()}</div>
-      <div class="dash-kpi-sub">Daily output logged</div>
-    </div>
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">Cartons Packed</div>
-      <div class="dash-kpi-num gold">${totalCtns}</div>
-      <div class="dash-kpi-sub">${CARTONS.reduce((a,c)=>a+c.total,0).toLocaleString()} pcs total</div>
-    </div>
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">Avg Fabric Waste</div>
-      <div class="dash-kpi-num ${wasteHigh?'red':''}">
-        ${avgWaste}<span class="dash-kpi-unit">%</span>
-      </div>
-      <div class="dash-kpi-sub">${wasteHigh?'Above 3% threshold':'Within target'}</div>
-    </div>
-    <div class="dash-kpi-card">
-      <div class="dash-kpi-eyebrow">QC Pass Rate</div>
-      <div class="dash-kpi-num green">
-        ${passRate}<span class="dash-kpi-unit">%</span>
-      </div>
-      <div class="dash-kpi-sub">${finInsp.toLocaleString()} units inspected</div>
-    </div>`;
+  /* ── Row 1: KPI cards ─────────────────────────────────────── */
+  const kpis = [
+    {
+      icon:'clipboard-list', label:'Active Orders',
+      value: ORDERS.length,
+      sub: `${ORDERS.filter(o=>o.status==='In Production').length} in production`,
+      accent:'gold',
+    },
+    {
+      icon:'scissors', label:'Pieces Cut',
+      value: totalCut.toLocaleString(),
+      sub: `${CUTTING_LOG.length} cutting sessions`,
+      accent:'gold',
+    },
+    {
+      icon:'alert-triangle', label:'Active Alerts',
+      value: DASH_ALERTS.length,
+      sub: urgentCount ? `${urgentCount} urgent` : 'No critical issues',
+      accent: urgentCount ? 'red' : 'gold',
+    },
+    {
+      icon:'spool', label:'Pieces Sewn',
+      value: totalSewn.toLocaleString(),
+      sub: `${SEWING_LOG.length} sessions logged`,
+      accent:'gold',
+    },
+    {
+      icon:'sparkles', label:'QC Pass Rate',
+      value: passRate,
+      sub: `${finInsp.toLocaleString()} units inspected`,
+      accent:'green',
+    },
+    {
+      icon:'warehouse', label:'Shipments In',
+      value: `${matConf}<span class="dash-kpi-unit"> / ${INCOMING.length}</span>`,
+      sub: 'confirmed of total incoming',
+      accent:'gold',
+    },
+  ];
 
-  /* ── Alerts ───────────────────────────────────────────────── */
+  document.getElementById('dash-kpis').innerHTML = kpis.map(k => `
+    <div class="dash-kpi-card${k.accent==='red'?' kpi-alert':''}">
+      <div class="dash-kpi-icon${k.accent==='red'?' red':k.accent==='green'?' green':''}">
+        <i data-lucide="${k.icon}"></i>
+      </div>
+      <div class="dash-kpi-eyebrow">${k.label}</div>
+      <div class="dash-kpi-num${k.accent==='gold'?'':' '+k.accent}">${k.value}</div>
+      <div class="dash-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+  lucide.createIcons();
+
+  /* ── Row 2a: Active Orders table ─────────────────────────── */
+  document.getElementById('dash-ord-count').textContent = ORDERS.length + ' orders';
+  const statusColor = {'In Production':'#196741','Confirmed':'#2455CC','Completed':'#888'};
+  const statusBg    = {'In Production':'#EEFAF4','Confirmed':'#EEF3FF','Completed':'#F5F5F5'};
+  document.getElementById('dash-orders-tbl').innerHTML = `
+    <table class="tbl dash-ord-tbl">
+      <thead><tr>
+        <th>PO Number</th><th>Model</th><th>Qty</th>
+        <th style="min-width:130px">Progress</th><th>Deadline</th><th>Status</th>
+      </tr></thead>
+      <tbody>${ORDERS.map(o => {
+        const stageWt = 1 / (o.progress ? o.progress.length : 1);
+        const pct = o.progress
+          ? Math.round(o.progress.reduce((a,s) => a + (s.total ? s.done/s.total : 0)*stageWt, 0)*100)
+          : 0;
+        const sc = statusColor[o.status]||'#888';
+        const sb = statusBg[o.status]||'#F5F5F5';
+        return `<tr style="cursor:pointer" onclick="openOrder('${o.po}')">
+          <td>
+            <span style="font-family:'Courier New',monospace;font-size:.72rem;color:var(--gold);font-weight:600">${o.po}</span>
+          </td>
+          <td>
+            <div style="font-size:.78rem;font-weight:600;line-height:1.2">${o.model}</div>
+            <div style="font-size:.67rem;color:var(--muted2)">${o.modelName}</div>
+          </td>
+          <td style="font-family:'Bebas Neue',sans-serif;font-size:1.15rem;text-align:right">${o.qty.toLocaleString()}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:7px">
+              <div class="ord-prog-bar" style="flex:1"><div class="ord-prog-fill" style="width:${pct}%"></div></div>
+              <span style="font-size:.68rem;color:var(--muted2);min-width:28px;text-align:right">${pct}%</span>
+            </div>
+          </td>
+          <td style="font-size:.75rem;white-space:nowrap">${o.delivery}</td>
+          <td>
+            <span style="background:${sb};color:${sc};border-radius:3px;padding:2px 8px;font-size:.63rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:inline-block">${o.status}</span>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+
+  /* ── Row 2b: Alerts with colored borders ─────────────────── */
   document.getElementById('dash-alert-count').textContent = DASH_ALERTS.length + ' active';
   document.getElementById('dash-alerts').innerHTML = DASH_ALERTS.map(a => `
-    <div class="alert-item">
-      <div class="alert-dot ${a.dot}"></div>
+    <div class="alert-item border-${a.dot}">
       <div>
         <div class="alert-text">${a.text}</div>
         <div class="alert-meta">${a.meta}</div>
       </div>
     </div>`).join('');
 
-  /* ── Feed ─────────────────────────────────────────────────── */
+  /* ── Row 3a: Today's Production by Line ──────────────────── */
+  const latestDate = SEWING_LOG.reduce((d,r) => r.date > d ? r.date : d, '');
+  document.getElementById('dash-prod-date').textContent = latestDate || '—';
+  const todayLogs = SEWING_LOG.filter(r => r.date === latestDate);
+  const lineMap = {};
+  todayLogs.forEach(r => {
+    if (!lineMap[r.line]) lineMap[r.line] = { pieces:0, po:r.po, defects:0 };
+    lineMap[r.line].pieces  += r.pieces;
+    lineMap[r.line].defects += r.defects.length;
+  });
+  document.getElementById('dash-production').innerHTML = [1,2,3,4,5,6,7,8].map(n => {
+    const d = lineMap[n];
+    if (d) {
+      const ord = ORDERS.find(o => o.po === d.po);
+      return `<div class="prod-line-item prod-line-active">
+        <div class="prod-line-num">${n}</div>
+        <div>
+          <div class="prod-line-name">${ord ? ord.model+' &middot; '+ord.modelName : d.po}</div>
+          <div class="prod-line-sub">${d.po}${d.defects ? ' &middot; <span style="color:#C47000">'+d.defects+' defect flag'+(d.defects>1?'s':'')+'</span>' : ' &middot; No defects'}</div>
+        </div>
+        <div class="prod-line-pcs">${d.pieces}<span style="font-family:'DM Sans',sans-serif;font-size:.62rem;color:var(--muted);margin-left:3px">pcs</span></div>
+      </div>`;
+    }
+    return `<div class="prod-line-item prod-line-idle">
+      <div class="prod-line-num">${n}</div>
+      <div>
+        <div class="prod-line-name" style="color:var(--muted2);font-weight:400">Idle</div>
+        <div class="prod-line-sub">No activity logged</div>
+      </div>
+      <div class="prod-line-pcs">—</div>
+    </div>`;
+  }).join('');
+
+  /* ── Row 3b: Activity feed ───────────────────────────────── */
   document.getElementById('dash-feed').innerHTML = ACTIVITY_FEED.map(e => `
     <div class="feed-item">
       <div class="feed-dot" style="background:${e.dot}"></div>
@@ -2140,18 +2286,19 @@ function renderDashboard() {
 /* ── Section meta ─────────────────────────────────────────────── */
 const SECTION_META = {
   dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
-  models:    { title: 'Models',           icon: 'scissors'         },
-  orders:    { title: 'Orders',           icon: 'package'          },
+  models:    { title: 'Models',           icon: 'shirt'            },
+  orders:    { title: 'Orders',           icon: 'clipboard-list'   },
   planning:  { title: 'Planning',         icon: 'calendar-range'   },
-  cutting:   { title: 'Cutting',          icon: 'ruler'            },
-  sewing:    { title: 'Sewing',           icon: 'cpu'              },
-  finishing: { title: 'Finishing & QC',   icon: 'wind'             },
-  packing:   { title: 'Packing',          icon: 'archive'          },
-  materials: { title: 'Materials',        icon: 'truck'            },
-  settings:  { title: 'Settings',        icon: 'settings'         },
+  cutting:   { title: 'Cutting',          icon: 'scissors'         },
+  sewing:    { title: 'Sewing',           icon: 'spool'            },
+  finishing: { title: 'Finishing & QC',   icon: 'sparkles'         },
+  packing:   { title: 'Packing',          icon: 'box'              },
+  materials: { title: 'Materials',        icon: 'warehouse'        },
+  settings:  { title: 'Settings',         icon: 'settings'         },
 };
 
 let currentSec = 'dashboard';
+let currentOrderPO = null;   /* tracked so printOrderCP() knows which order is open */
 
 /* ── Navigate ─────────────────────────────────────────────────── */
 function nav(btn) {
@@ -2436,6 +2583,83 @@ function filterOrders() {
 }
 
 /* ── Export orders CSV ────────────────────────────────────────── */
+/* ── Shared print-window helper ───────────────────────────────── */
+function openPrintWin(docTitle, docMeta, bodyHtml) {
+  const date = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const win  = window.open('', '_blank', 'width=1000,height=750');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>${docTitle} — Ava Marie</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#1A1814;padding:36px 40px;background:#fff}
+    /* ── Header ── */
+    .doc-hdr{display:flex;justify-content:space-between;align-items:flex-start;
+      padding-bottom:14px;border-bottom:2.5px solid #C4A35A;margin-bottom:22px}
+    .brand{font-size:21px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+      color:#1A1814;font-family:'Arial Black',Arial,sans-serif}
+    .brand em{color:#C4A35A;font-style:normal}
+    .brand-sub{font-size:8.5px;color:#999;letter-spacing:.07em;margin-top:3px}
+    .doc-info{text-align:right}
+    .doc-title{font-size:14px;font-weight:700;text-transform:uppercase;
+      letter-spacing:.1em;color:#1A1814}
+    .doc-meta{font-size:9.5px;color:#888;margin-top:4px;line-height:1.5}
+    /* ── Print bar ── */
+    .print-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px}
+    .print-btn{padding:8px 22px;background:#C4A35A;color:#fff;border:none;border-radius:4px;
+      font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+      cursor:pointer;font-family:Arial,sans-serif}
+    .print-btn:hover{background:#A88430}
+    /* ── Section headings ── */
+    .sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+      color:#C4A35A;margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid #E8D5A3}
+    .sec-title:first-child{margin-top:0}
+    /* ── Table ── */
+    table{width:100%;border-collapse:collapse;margin-bottom:4px}
+    thead tr{background:#1A1814}
+    th{padding:8px 11px;text-align:left;font-size:8.5px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.12em;color:#C4A35A;white-space:nowrap}
+    td{padding:7px 11px;border-bottom:1px solid #EDEBE6;vertical-align:top;
+      font-size:10.5px;line-height:1.45}
+    tr:nth-child(even) td{background:#FAFAF8}
+    tfoot td{font-weight:700;border-top:2px solid #C4A35A;background:#FEF9EC!important;
+      font-size:11px}
+    /* ── Footer ── */
+    .doc-footer{text-align:center;font-size:8.5px;color:#bbb;
+      margin-top:28px;padding-top:12px;border-top:1px solid #EDEBE6}
+    @media print{.print-bar{display:none}}
+  </style></head><body>
+  <div class="doc-hdr">
+    <div>
+      <div class="brand">AVA <em>MARIE</em></div>
+      <div class="brand-sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+    </div>
+    <div class="doc-info">
+      <div class="doc-title">${docTitle}</div>
+      <div class="doc-meta">${docMeta}<br>Generated ${date}</div>
+    </div>
+  </div>
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">&#x1F5A8;&nbsp; Print / Save as PDF</button>
+  </div>
+  ${bodyHtml}
+  <div class="doc-footer">Ava Marie ERP &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; Confidential</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+}
+
+function buildTable(headers, rows, footerRow) {
+  const ths  = headers.map(h => `<th>${h}</th>`).join('');
+  const tds  = rows.map(r =>
+    `<tr>${r.map(c => `<td>${c == null ? '' : String(c)}</td>`).join('')}</tr>`
+  ).join('');
+  const foot = footerRow
+    ? `<tfoot><tr>${footerRow.map(c => `<td>${c == null ? '' : c}</td>`).join('')}</tr></tfoot>`
+    : '';
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${tds}</tbody>${foot}</table>`;
+}
+
+/* ── Orders export ────────────────────────────────────────────── */
 function exportOrdersCSV() {
   const q      = document.getElementById('o-search').value.toLowerCase().trim();
   const client = document.getElementById('o-client').value;
@@ -2452,35 +2676,33 @@ function exportOrdersCSV() {
     return true;
   });
 
-  const header = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (EUR)','Notes'];
-  const rows   = data.map(o => [
-    o.po, o.client, o.model, o.modelName, o.season,
-    o.issued, o.delivery, o.qty, o.colours, o.status, o.value, o.notes,
+  const headers = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (€)'];
+  const rows    = data.map(o => [
+    `<code>${o.po}</code>`, o.client, o.model, o.modelName, o.season,
+    o.issued, o.delivery, o.qty.toLocaleString(), o.colours, o.status,
+    `€ ${o.value.toLocaleString()}`,
   ]);
-  const csv = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
+  const totalVal = data.reduce((a, o) => a + o.value, 0);
+  const totalQty = data.reduce((a, o) => a + o.qty,   0);
+  const foot = ['', '', '', '', '', '', `${data.length} orders`,
+    totalQty.toLocaleString(), '', '<strong>TOTAL</strong>', `<strong>€ ${totalVal.toLocaleString()}</strong>`];
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `ava-marie-orders-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${data.length} order${data.length !== 1 ? 's' : ''} to CSV`);
+  const filters = [client, status, season].filter(Boolean).join(' · ') || 'All';
+  openPrintWin('Orders', `${data.length} orders &nbsp;·&nbsp; Filter: ${filters}`,
+    buildTable(headers, rows, foot));
+  showToast(`Opened ${data.length} orders for print / PDF`);
 }
 
 /* ── Open order detail ────────────────────────────────────────── */
 function openOrder(po) {
+  currentOrderPO = po;
   const o = ORDERS.find(x => x.po === po);
   if (!o) return;
 
   document.getElementById('sec-orders').classList.remove('active');
   document.getElementById('sec-order-detail').classList.add('active');
   document.getElementById('tb-title').textContent = o.po;
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="clipboard-list"></i>';
   lucide.createIcons();
   document.getElementById('content').scrollTop = 0;
 
@@ -2509,12 +2731,12 @@ function openOrder(po) {
   const actions = `
     <div class="od-actions">
       <button class="btn-outline" onclick="exportOrderCP('${po}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        CP Excel
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Export CP
       </button>
       <button class="btn-primary" onclick="printOrderCP()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        CP PDF
+        Print CP
       </button>
     </div>`;
 
@@ -2711,50 +2933,45 @@ function exportOrderCP(po) {
   const o = ORDERS.find(x => x.po === po);
   if (!o || !o.cp) return;
 
-  /* Sheet 1: Critical Path */
-  const cpHeader = ['Milestone','Planned Date','Actual Date','Status','Owner'];
-  const cpRows   = o.cp.map(r => [r.milestone, r.planned, r.actual||'', r.status, r.owner]);
+  /* Section 1: Critical Path */
+  const cpRows = o.cp.map(r => [r.milestone, r.planned, r.actual||'—', r.status, r.owner]);
+  const cpTable = buildTable(
+    ['Milestone','Planned Date','Actual Date','Status','Owner'],
+    cpRows
+  );
 
-  /* Sheet 2: Size matrix (CSV doesn't support multi-sheet; combine with spacer) */
-  const mxHeader  = ['', ...o.matrix.sizes, 'Total'];
-  const mxRows    = o.matrix.rows.map(r => {
+  /* Section 2: Size Matrix */
+  const mxHeader = ['Colour', ...o.matrix.sizes, 'Total'];
+  const mxRows = o.matrix.rows.map(r => {
     const inputs = document.querySelectorAll(`.qty-input[data-po="${po}"][data-row="${o.matrix.rows.indexOf(r)}"]`);
     const vals   = inputs.length ? [...inputs].map(i => parseInt(i.value)||0) : r.values;
     return [r.colour, ...vals, vals.reduce((a,b)=>a+b,0)];
   });
+  const totalsBySize = o.matrix.sizes.map((_, si) => mxRows.reduce((a, r) => a + (r[si+1]||0), 0));
+  const mxFoot = ['<strong>TOTAL</strong>', ...totalsBySize, totalsBySize.reduce((a,b)=>a+b,0)];
+  const mxTable = buildTable(mxHeader, mxRows, mxFoot);
 
-  const toCSV = rows => rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  /* Section 3: Materials Status */
+  const matRows = o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]);
+  const matTable = buildTable(
+    ['Material','Supplier','Required','On Order','Received','Status'],
+    matRows
+  );
 
-  const csv = [
-    `"CRITICAL PATH — ${o.po}"`,
-    `"${o.modelName} · ${o.client} · ${o.season} · Delivery: ${o.delivery}"`,
-    '',
-    toCSV([cpHeader, ...cpRows]),
-    '',
-    '"STYLE / COLOUR / SIZE MATRIX"',
-    toCSV([mxHeader, ...mxRows]),
-    '',
-    '"MATERIAL STATUS"',
-    toCSV([
-      ['Material','Supplier','Required','On Order','Received','Status'],
-      ...o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]),
-    ]),
-  ].join('\n');
+  const body = `
+    <p class="doc-meta">${o.modelName} &middot; ${o.client} &middot; ${o.season} &middot; Delivery: ${o.delivery}</p>
+    <h3 class="sec-title">Critical Path</h3>${cpTable}
+    <h3 class="sec-title" style="margin-top:24px">Style / Colour / Size Matrix</h3>${mxTable}
+    <h3 class="sec-title" style="margin-top:24px">Material Status</h3>${matTable}
+  `;
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `CP-${po}-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Critical Path exported — CP-${po}.csv`);
+  openPrintWin(`Critical Path — ${po}`, `${o.modelName} · ${o.client} · Delivery: ${o.delivery}`, body);
+  showToast(`Opened Critical Path for ${po}`);
 }
 
 /* ── Print CP as PDF ──────────────────────────────────────────── */
 function printOrderCP() {
-  window.print();
+  exportOrderCP(currentOrderPO);
 }
 
 /* ── Close order detail ───────────────────────────────────────── */
@@ -2762,7 +2979,7 @@ function closeOrder() {
   document.getElementById('sec-order-detail').classList.remove('active');
   document.getElementById('sec-orders').classList.add('active');
   document.getElementById('tb-title').textContent = 'Orders';
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="package"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="clipboard-list"></i>';
   lucide.createIcons();
 }
 
@@ -2818,7 +3035,7 @@ function filterModels() {
   renderModels(result);
 }
 
-/* ── Export CSV ───────────────────────────────────────────────── */
+/* ── Export Models (print window) ────────────────────────────── */
 function exportModelsCSV() {
   const q      = document.getElementById('m-search').value.toLowerCase().trim();
   const client = document.getElementById('m-client').value;
@@ -2835,21 +3052,24 @@ function exportModelsCSV() {
     return true;
   });
 
-  const header = ['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc (EUR)','Updated'];
-  const rows   = data.map(m => [
-    m.id, m.name, m.client, m.ref, m.cat, m.rev, m.status,
-    m.cost !== null ? m.cost.toFixed(2) : '', m.updated,
-  ]);
-  const csv = [header,...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
+  const filters = [
+    q      ? `Search: "${q}"` : '',
+    client ? `Client: ${client}` : '',
+    status ? `Status: ${status}` : '',
+    cat    ? `Category: ${cat}` : '',
+  ].filter(Boolean).join(' · ') || 'All models';
 
-  const blob = new Blob([csv],{type:'text/csv'});
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'),{href:url, download:`ava-marie-models-${new Date().toISOString().slice(0,10)}.csv`});
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${data.length} model${data.length!==1?'s':''} to CSV`);
+  const rows = data.map(m => [
+    `<code>${m.id}</code>`, m.name, m.client, m.ref, m.cat, `Rev ${m.rev}`, m.status,
+    m.cost !== null ? `€ ${m.cost.toFixed(2)}` : '—', m.updated,
+  ]);
+
+  openPrintWin(
+    'Models',
+    `${data.length} model${data.length!==1?'s':''} · ${filters}`,
+    buildTable(['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc','Updated'], rows)
+  );
+  showToast(`Opened ${data.length} model${data.length!==1?'s':''} for print / PDF`);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2993,7 +3213,7 @@ function openModel(id) {
 
   /* topbar */
   document.getElementById('tb-title').textContent = m.id + ' — ' + m.name;
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="shirt"></i>';
   lucide.createIcons();
 
   /* scroll top */
@@ -3036,7 +3256,7 @@ function closeModel() {
   document.getElementById('sec-model-detail').classList.remove('active');
   document.getElementById('sec-models').classList.add('active');
   document.getElementById('tb-title').textContent = 'Models';
-  document.getElementById('tb-icon').innerHTML = '<i data-lucide="scissors"></i>';
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="shirt"></i>';
   lucide.createIcons();
 }
 
@@ -3389,11 +3609,10 @@ function renderMdAudit(id) {
         <span class="sc-title">Audit Log &mdash; ${d.audit.length} entries</span>
         <button class="btn-outline" style="font-size:.68rem;padding:5px 12px" onclick="exportAuditCSV('${id}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <path d="M6 9l6 6 6-6"/>
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
           </svg>
-          Export CSV
+          Print Audit
         </button>
       </div>
       <div>${entries}</div>
@@ -3404,20 +3623,13 @@ function renderMdAudit(id) {
 function exportAuditCSV(id) {
   const d = MD[id];
   if (!d || !d.audit) return;
-  const header = ['Timestamp', 'User', 'Action', 'Detail'];
-  const rows   = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
-  const csv    = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
-    .join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href: url,
-    download: `audit-${id}-${new Date().toISOString().slice(0,10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`Exported ${d.audit.length} audit entries to CSV`);
+  const rows = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
+  openPrintWin(
+    `Audit Log — ${id}`,
+    `${d.audit.length} entr${d.audit.length!==1?'ies':'y'} · Model ${id}`,
+    buildTable(['Timestamp','User','Action','Detail'], rows)
+  );
+  showToast(`Opened audit log for ${id}`);
 }
 
 /* ══════════════════════════════════════════════════════════════
