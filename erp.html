@@ -564,97 +564,135 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
 /* Print layout */
 @media print{
   #sidebar,#topbar,.od-actions,.md-back,.note-add-wrap,
-  #gantt-popup,.toolbar button,.gantt-print-hide{display:none!important}
+  #plan-view-popup,#plan-add-popup,.toolbar button,.plan-print-hide{display:none!important}
   #sb-overlay{display:none!important}
   #main{margin-left:0!important}
   #content{overflow:visible!important;height:auto!important;padding:16px!important}
   .sec{display:none!important}
   .sec.active{display:block!important}
   .sc{break-inside:avoid}
-  .gantt-wrap{overflow:visible!important;border:none!important}
-  .gantt-inner{min-width:unset!important}
+  .plan-wrap{overflow:visible!important;border:none!important}
+  .plan-inner{min-width:unset!important}
 }
 
-/* ─── GANTT ───────────────────────────────────────────────────── */
-.gantt-wrap{
+/* ─── PLANNING ────────────────────────────────────────────────── */
+.plan-wrap{
   background:var(--white);border:1px solid var(--border);border-radius:8px;
   overflow:hidden;overflow-x:auto;
 }
-.gantt-inner{min-width:860px}
-.gantt-header-row{
-  display:flex;height:52px;
+.plan-inner{min-width:900px}
+.plan-nav-bar{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px 0;
+}
+.plan-nav-btn{
+  background:none;border:1px solid var(--border);border-radius:6px;
+  width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:color .15s,background .15s;
+}
+.plan-nav-btn:hover{color:var(--text);background:#F0EDE8}
+.plan-month-lbl{
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;
+  color:var(--text);
+}
+.plan-header-row{
+  display:flex;height:46px;
   background:#FAFAF8;border-bottom:2px solid var(--border);
+  border-top:1px solid var(--border);margin-top:10px;
   position:sticky;top:0;z-index:5;
 }
-.gantt-lbl-hd{
+.plan-lbl-hd{
   width:128px;flex-shrink:0;padding:0 14px;
   display:flex;align-items:center;
   font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
   color:var(--muted2);border-right:1px solid var(--border);
 }
-.gantt-dhd-wrap{flex:1;display:flex}
-.gantt-dhd{
+.plan-dhd-wrap{flex:1;display:flex}
+.plan-dhd{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:2px;border-right:1px solid rgba(230,226,220,.5);user-select:none;
+  gap:1px;border-right:1px solid rgba(230,226,220,.5);user-select:none;
 }
-.gantt-dhd .dnum{font-size:.8rem;font-weight:700;color:var(--text)}
-.gantt-dhd .dday{font-size:.54rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
-.gantt-dhd.g-weekend{background:rgba(0,0,0,.024)}
-.gantt-dhd.g-weekend .dnum{color:var(--muted2)}
-.gantt-dhd.g-today{background:rgba(196,163,90,.08)}
-.gantt-dhd.g-today .dnum{color:var(--gold);font-weight:800}
-.gantt-rows{display:flex;flex-direction:column}
-.gantt-row{display:flex;height:44px;border-bottom:1px solid #F4F2EE}
-.gantt-row:last-child{border-bottom:none}
-.gantt-row-lbl{
-  width:128px;flex-shrink:0;padding:0 14px;
-  display:flex;align-items:center;gap:6px;
+.plan-dhd .pdnum{font-size:.76rem;font-weight:700;color:var(--text)}
+.plan-dhd .pdday{font-size:.52rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
+.plan-dhd.p-sun{background:rgba(0,0,0,.035)}
+.plan-dhd.p-sun .pdnum,.plan-dhd.p-sun .pdday{color:var(--muted2);opacity:.6}
+.plan-dhd.p-sat{background:rgba(0,0,0,.015)}
+.plan-dhd.p-today{background:rgba(196,163,90,.08)}
+.plan-dhd.p-today .pdnum{color:var(--gold);font-weight:800}
+.plan-rows{display:flex;flex-direction:column}
+.plan-row{display:flex;min-height:72px;border-bottom:1px solid #F4F2EE}
+.plan-row:last-child{border-bottom:none}
+.plan-row-lbl{
+  width:128px;flex-shrink:0;padding:0 10px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
   border-right:1px solid var(--border);background:var(--white);
-  font-size:.74rem;font-weight:600;color:var(--text);
 }
-.gantt-row-lbl .lnum{
+.plan-row-lbl .plnum{
   font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--muted2);flex-shrink:0;
+  color:var(--muted2);
 }
-.gantt-cells-area{flex:1;position:relative;overflow:hidden}
-.gantt-bg-cells{position:absolute;inset:0;display:flex;pointer-events:none}
-.gantt-bg-cell{flex:1;border-right:1px solid rgba(230,226,220,.35)}
-.gantt-bg-cell.g-weekend{background:rgba(0,0,0,.024)}
-.gantt-bg-cell.g-today{background:rgba(196,163,90,.06)}
-.gantt-block{
-  position:absolute;top:6px;height:32px;
+.plan-row-lbl .plmodel{
+  font-size:.72rem;font-weight:600;color:var(--gold);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.plan-cells-wrap{flex:1;position:relative;display:flex;min-height:72px}
+.plan-day-col{
+  flex:1;border-right:1px solid rgba(230,226,220,.35);
+  cursor:pointer;min-height:72px;
+}
+.plan-day-col:hover{background:rgba(196,163,90,.04)}
+.plan-day-col.p-sun{background:rgba(0,0,0,.03);cursor:default;pointer-events:none}
+.plan-day-col.p-sat{background:rgba(0,0,0,.012)}
+.plan-day-col.p-today{background:rgba(196,163,90,.05)}
+.plan-block{
+  position:absolute;height:26px;top:8px;
   border-radius:4px;cursor:pointer;
-  display:flex;align-items:center;padding:0 10px;
-  overflow:hidden;z-index:1;
+  display:flex;align-items:center;padding:0 8px;
+  overflow:hidden;z-index:2;
   transition:filter .15s,box-shadow .15s;
+  pointer-events:auto;
 }
-.gantt-block:hover{filter:brightness(1.1);box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.gantt-block-lbl{
-  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+.plan-block.lane-1{top:40px}
+.plan-block:hover{filter:brightness(1.1);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.plan-block-lbl{
+  font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:600;
   color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.2);
 }
-/* Gantt legend */
-.gantt-legend{
-  display:flex;gap:18px;flex-wrap:wrap;
-  padding:12px 16px;background:var(--white);
+/* legend */
+.plan-legend{
+  display:flex;gap:16px;flex-wrap:wrap;
+  padding:11px 16px;background:var(--white);
   border:1px solid var(--border);border-radius:8px;margin-bottom:14px;
   align-items:center;
 }
-.g-legend-item{display:flex;align-items:center;gap:6px}
-.g-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.g-legend-txt{font-size:.74rem;font-weight:600;color:var(--text)}
-/* Popup */
-#gantt-popup{
+.pl-item{display:flex;align-items:center;gap:6px}
+.pl-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.pl-txt{font-size:.74rem;font-weight:600;color:var(--text)}
+/* view popup */
+#plan-view-popup{
   position:fixed;inset:0;z-index:2000;
   background:rgba(26,23,20,.32);
   display:none;align-items:center;justify-content:center;
 }
-#gantt-popup.open{display:flex}
-#gantt-popup-card{
+#plan-view-popup.open{display:flex}
+#plan-view-card{
   background:var(--white);border:1px solid var(--border);border-radius:8px;
-  padding:24px 26px;width:100%;max-width:400px;
+  padding:24px 26px;width:100%;max-width:420px;
   box-shadow:0 20px 60px rgba(0,0,0,.18);position:relative;
+}
+/* add popup */
+#plan-add-popup{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(26,23,20,.32);
+  display:none;align-items:center;justify-content:center;
+}
+#plan-add-popup.open{display:flex}
+#plan-add-card{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:24px 26px;width:100%;max-width:440px;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);position:relative;
+  max-height:90vh;overflow-y:auto;
 }
 .popup-close{
   position:absolute;top:12px;right:12px;
@@ -1484,36 +1522,61 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
     <div id="sec-planning" class="sec">
 
       <!-- Toolbar -->
-      <div class="toolbar" style="margin-bottom:14px">
+      <div class="toolbar plan-print-hide" style="margin-bottom:14px">
         <div>
           <div style="font-size:.92rem;font-weight:600;color:var(--text)">Production Planning</div>
-          <div style="font-size:.74rem;color:var(--muted);margin-top:2px">07 Apr – 27 Apr 2026 &nbsp;·&nbsp; 20 Lines &nbsp;·&nbsp; 5 scheduled jobs</div>
+          <div style="font-size:.74rem;color:var(--muted);margin-top:2px" id="plan-toolbar-sub">20 Lines · Sewing</div>
         </div>
-        <button class="btn-outline gantt-print-hide" onclick="printGantt()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print Gantt
-        </button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="togglePlanHoursPanel()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Hours
+          </button>
+          <button class="btn-outline" onclick="printGantt()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print
+          </button>
+        </div>
+      </div>
+
+      <!-- Hours panel -->
+      <div id="plan-hrs-panel" class="plan-print-hide" style="display:none;margin-bottom:14px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:12px">Working Hours Per Day</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Mon</div><input type="number" id="ph-1" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="9.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Tue</div><input type="number" id="ph-2" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="9.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Wed</div><input type="number" id="ph-3" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="9.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Thu</div><input type="number" id="ph-4" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="9.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Fri</div><input type="number" id="ph-5" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="8.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">Sat</div><input type="number" id="ph-6" class="f-input" style="padding:6px 8px;font-size:.8rem" min="0" max="24" step=".5" value="9.5"></div>
+          <div><div style="font-size:.64rem;font-weight:700;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;opacity:.5">Sun</div><input type="number" id="ph-0" class="f-input" style="padding:6px 8px;font-size:.8rem;opacity:.4" value="0" disabled></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn-primary" onclick="savePlanHours()" style="font-size:.78rem;padding:8px 16px">Save Hours</button>
+          <button class="btn-outline" onclick="togglePlanHoursPanel()" style="font-size:.78rem;padding:8px 16px">Cancel</button>
+        </div>
       </div>
 
       <!-- Legend -->
-      <div class="gantt-legend gantt-print-hide">
-        <div class="g-legend-item"><div class="g-legend-dot" style="background:#C4A35A"></div><span class="g-legend-txt">Cutting</span></div>
-        <div class="g-legend-item"><div class="g-legend-dot" style="background:#2455CC"></div><span class="g-legend-txt">Sewing</span></div>
-        <div class="g-legend-item"><div class="g-legend-dot" style="background:#7B5EA7"></div><span class="g-legend-txt">Proto</span></div>
-        <div class="g-legend-item"><div class="g-legend-dot" style="background:#196741"></div><span class="g-legend-txt">Finishing / QC</span></div>
-        <div class="g-legend-item" style="margin-left:auto;display:flex;align-items:center;gap:6px">
+      <div class="plan-legend plan-print-hide">
+        <div class="pl-item"><div class="pl-dot" style="background:#2455CC"></div><span class="pl-txt">ASOS</span></div>
+        <div class="pl-item"><div class="pl-dot" style="background:#C4A35A"></div><span class="pl-txt">PLT</span></div>
+        <div class="pl-item"><div class="pl-dot" style="background:#196741"></div><span class="pl-txt">River Island</span></div>
+        <div class="pl-item"><div class="pl-dot" style="background:#D4626B"></div><span class="pl-txt">Boohoo</span></div>
+        <div class="pl-item"><div class="pl-dot" style="background:#7B5EA7"></div><span class="pl-txt">Proto / Sample</span></div>
+        <div class="pl-item" style="margin-left:auto">
           <div style="width:12px;height:12px;background:rgba(0,0,0,.04);border:1px solid #E6E2DC;border-radius:2px"></div>
-          <span class="g-legend-txt" style="color:var(--muted)">Weekend</span>
+          <span class="pl-txt" style="color:var(--muted)">Sunday OFF</span>
         </div>
-        <div class="g-legend-item">
+        <div class="pl-item">
           <div style="width:12px;height:12px;background:rgba(196,163,90,.12);border:1px solid rgba(196,163,90,.3);border-radius:2px"></div>
-          <span class="g-legend-txt" style="color:var(--gold)">Today</span>
+          <span class="pl-txt" style="color:var(--gold)">Today</span>
         </div>
       </div>
 
-      <!-- Gantt chart -->
-      <div class="gantt-wrap">
-        <div id="gantt-root"></div>
+      <!-- Calendar -->
+      <div class="plan-wrap">
+        <div id="plan-root"></div>
       </div>
 
     </div>
@@ -2086,9 +2149,60 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg)}
   </main>
 </div>
 
-<!-- GANTT POPUP -->
-<div id="gantt-popup" onclick="closeBlockPopup()">
-  <div id="gantt-popup-card" onclick="event.stopPropagation()"></div>
+<!-- PLAN VIEW POPUP -->
+<div id="plan-view-popup" onclick="closePlanView()">
+  <div id="plan-view-card" onclick="event.stopPropagation()">
+    <div id="plan-view-body"></div>
+  </div>
+</div>
+
+<!-- PLAN ADD POPUP -->
+<div id="plan-add-popup" onclick="closePlanAdd()">
+  <div id="plan-add-card" onclick="event.stopPropagation()">
+    <button class="popup-close" onclick="closePlanAdd()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="popup-model-id" style="margin-bottom:4px">NEW BLOCK</div>
+    <div class="popup-op-lbl" id="plan-add-title" style="margin-bottom:18px">Add Production Block</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="cs-field" style="grid-column:1/-1">
+        <label class="cs-lbl">Line</label>
+        <select id="pa-line" class="cs-select"><option value="">Select line…</option></select>
+      </div>
+      <div class="cs-field" style="grid-column:1/-1">
+        <label class="cs-lbl">Model / Style</label>
+        <select id="pa-model" class="cs-select" onchange="onAddBModelChange()"><option value="">Select model…</option></select>
+      </div>
+      <div class="cs-field" style="grid-column:1/-1">
+        <label class="cs-lbl">PO / Job Ref</label>
+        <select id="pa-po" class="cs-select" onchange="onAddBPoChange()"><option value="">Select PO…</option></select>
+      </div>
+      <div class="cs-field">
+        <label class="cs-lbl">Colour</label>
+        <input type="text" id="pa-colour" class="cs-input" placeholder="e.g. Ivory">
+      </div>
+      <div class="cs-field">
+        <label class="cs-lbl">Qty (pcs)</label>
+        <input type="number" id="pa-qty" class="cs-input" min="1" placeholder="e.g. 500" oninput="calcAddBEnd()">
+      </div>
+      <div class="cs-field">
+        <label class="cs-lbl">PPH (pcs/hour)</label>
+        <input type="number" id="pa-pph" class="cs-input" min="1" placeholder="e.g. 25" oninput="calcAddBEnd()">
+      </div>
+      <div class="cs-field">
+        <label class="cs-lbl">Start Date</label>
+        <input type="date" id="pa-start" class="cs-input" onchange="calcAddBEnd()">
+      </div>
+      <div class="cs-field">
+        <label class="cs-lbl">Est. End Date</label>
+        <input type="text" id="pa-end" class="cs-input" placeholder="Auto-calculated" readonly style="background:#FAFAF8;color:var(--muted)">
+      </div>
+    </div>
+    <div style="margin-top:18px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-outline" onclick="closePlanAdd()">Cancel</button>
+      <button class="btn-primary" onclick="saveNewBlock()">Add Block</button>
+    </div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -3633,187 +3747,338 @@ function exportAuditCSV(id) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GANTT — data & render
+   PLANNING — Monthly calendar for 20 sewing lines
    ══════════════════════════════════════════════════════════════ */
 
-const GANTT_ORIGIN = new Date('2026-04-07T00:00:00');
-const GANTT_TOTAL  = 21;   // days shown
-const GANTT_LINES  = 20;
-const GANTT_TODAY  = new Date('2026-04-13T00:00:00');
+/* Working hours per day: index = day of week (0=Sun … 6=Sat) */
+let PLAN_HRS = [0, 9.5, 9.5, 9.5, 9.5, 8.5, 9.5];
 
-const GANTT_BLOCKS = [
-  {
-    id:'B1', line:1, s:0, d:5,
-    label:'AM-0045 · Cutting — Ivory',
-    color:'#C4A35A',
-    model:'AM-0045', po:'ASOS-PO-44521-A',
-    op:'Fabric Cutting', colour:'Ivory', qty:1000,
-    dates:'07 Apr – 11 Apr 2026',
-    notes:'Ivory batch (1,000 pcs). Marker efficiency target 83%. Bundle tickets issued to cutting floor. Fusing press on interfacing before bundling.',
-  },
-  {
-    id:'B2', line:5, s:3, d:13,
-    label:'AM-0045 · Sewing — Ivory',
-    color:'#2455CC',
-    model:'AM-0045', po:'ASOS-PO-44521-A',
-    op:'Sewing', colour:'Ivory', qty:600,
-    dates:'10 Apr – 22 Apr 2026',
-    notes:'Line 5 target 80 pcs/day. SMV 24.6 min. AQL inline inspection at 50% mark. Operator briefing done for YKK zip insertion (Op 050).',
-  },
-  {
-    id:'B3', line:6, s:3, d:13,
-    label:'AM-0045 · Sewing — Ivory',
-    color:'#2455CC',
-    model:'AM-0045', po:'ASOS-PO-44521-A',
-    op:'Sewing', colour:'Ivory', qty:400,
-    dates:'10 Apr – 22 Apr 2026',
-    notes:'Supporting Line 5. Combined target 160 pcs/day across both lines. Same style — operators share briefing.',
-  },
-  {
-    id:'B4', line:12, s:7, d:5,
-    label:'AM-0052 · Sewing — Proto',
-    color:'#7B5EA7',
-    model:'AM-0052', po:'PLT-CR-8821',
-    op:'Proto Sewing', colour:'All colourways', qty:50,
-    dates:'14 Apr – 18 Apr 2026',
-    notes:'Proto run for PLT crop top jersey. 50 pcs, 100% QC inspection before dispatch to client. No AQL — full check required.',
-  },
-  {
-    id:'B5', line:15, s:0, d:11,
-    label:'AM-0039 · Finishing / QC',
-    color:'#196741',
-    model:'AM-0039', po:'RI-PL-3301',
-    op:'Finishing / QC', colour:'All colourways', qty:400,
-    dates:'07 Apr – 17 Apr 2026',
-    notes:'Steam press, final inspection, AQL 2.5. Folding + polybag per River Island packing spec. Target ex-factory 18 Apr 2026.',
-  },
+const PLAN_TODAY = new Date('2026-04-18T00:00:00');
+let planYear     = PLAN_TODAY.getFullYear();
+let planMonth    = PLAN_TODAY.getMonth(); // 0-based
+const PLAN_LINES = 20;
+const PLAN_MONTH_NAMES = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+const PLAN_DAY_ABBR    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+/* Seed blocks — duration auto-calculated from qty ÷ (pph × hrs/day) */
+let PLAN_BLOCKS = [
+  { id:'PB1', line:1,  model:'AM-0045', po:'ASOS-PO-44521-A', colour:'Ivory', qty:2400, pph:25, start:'2026-04-01', color:'#2455CC' },
+  { id:'PB7', line:3,  model:'AM-0039', po:'RI-PL-3301',      colour:'Navy',  qty:800,  pph:18, start:'2026-04-03', color:'#196741' },
+  { id:'PB2', line:3,  model:'AM-0045', po:'ASOS-PO-44521-A', colour:'Ivory', qty:1800, pph:25, start:'2026-04-09', color:'#2455CC' },
+  { id:'PB3', line:5,  model:'AM-0052', po:'PLT-CR-8821',     colour:'Black', qty:3000, pph:22, start:'2026-04-05', color:'#C4A35A' },
+  { id:'PB4', line:8,  model:'AM-0039', po:'RI-PL-3301',      colour:'Navy',  qty:1200, pph:20, start:'2026-04-10', color:'#196741' },
+  { id:'PB5', line:12, model:'AM-0052', po:'PLT-CR-8821',     colour:'Proto', qty:100,  pph:15, start:'2026-04-14', color:'#7B5EA7' },
+  { id:'PB6', line:15, model:'AM-0045', po:'ASOS-PO-44521-A', colour:'White', qty:1500, pph:25, start:'2026-04-16', color:'#D4626B' },
 ];
 
-/* ── Render Gantt ─────────────────────────────────────────────── */
-function renderGantt() {
-  const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const todayIdx  = Math.round((GANTT_TODAY - GANTT_ORIGIN) / 86400000);
+/* ── Helpers ──────────────────────────────────────────────────── */
+function planDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
 
-  /* day metadata */
-  const days = Array.from({ length: GANTT_TOTAL }, (_, i) => {
-    const d   = new Date(GANTT_ORIGIN);
-    d.setDate(d.getDate() + i);
-    const dow = d.getDay();
-    return {
-      num:     d.getDate(),
-      name:    DAY_NAMES[dow],
-      weekend: dow === 0 || dow === 6,
-      today:   i === todayIdx,
-    };
+function planDateStr(d) { return d.toISOString().slice(0, 10); }
+
+function planFmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* Calculate end date (inclusive) given start ISO, qty, pph */
+function planCalcEnd(startStr, qty, pph) {
+  const d = new Date(startStr + 'T00:00:00');
+  let rem = qty;
+  while (rem > 0) {
+    const hrs = PLAN_HRS[d.getDay()];
+    if (hrs > 0) rem -= pph * hrs;
+    if (rem > 0) d.setDate(d.getDate() + 1);
+  }
+  return planDateStr(d);
+}
+
+/* Count working days a block occupies */
+function planWorkDays(startStr, qty, pph) {
+  const d = new Date(startStr + 'T00:00:00');
+  let rem = qty, days = 0;
+  while (rem > 0) {
+    const hrs = PLAN_HRS[d.getDay()];
+    if (hrs > 0) { rem -= pph * hrs; days++; }
+    if (rem > 0) d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+/* Assign non-overlapping vertical lanes to blocks on a line */
+function assignLanes(lineBlocks) {
+  const sorted = [...lineBlocks].sort((a, b) => a.start.localeCompare(b.start));
+  const laneEnds = [];
+  return sorted.map(b => {
+    const endStr = planCalcEnd(b.start, b.qty, b.pph);
+    let lane = laneEnds.findIndex(e => e < b.start);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = endStr;
+    return { ...b, lane, endStr };
   });
+}
 
-  /* header row */
-  const headerCells = days.map(d => {
-    const cls = ['gantt-dhd', d.weekend ? 'g-weekend' : '', d.today ? 'g-today' : '']
-      .filter(Boolean).join(' ');
-    return `<div class="${cls}">
-      <span class="dnum">${d.num}</span>
-      <span class="dday">${d.name}</span>
-    </div>`;
+/* ── Render ───────────────────────────────────────────────────── */
+function renderPlanning() {
+  const total      = planDaysInMonth(planYear, planMonth);
+  const root       = document.getElementById('plan-root');
+  const todayIso   = planDateStr(PLAN_TODAY);
+  const mStr       = String(planMonth + 1).padStart(2, '0');
+  const monthStart = `${planYear}-${mStr}-01`;
+  const monthEnd   = `${planYear}-${mStr}-${String(total).padStart(2, '0')}`;
+
+  /* toolbar subtitle */
+  const sub = document.getElementById('plan-toolbar-sub');
+  if (sub) {
+    const cnt = PLAN_BLOCKS.filter(b => {
+      const e = planCalcEnd(b.start, b.qty, b.pph);
+      return b.start <= monthEnd && e >= monthStart;
+    }).length;
+    sub.textContent = `${PLAN_MONTH_NAMES[planMonth]} ${planYear} · ${PLAN_LINES} Lines · ${cnt} scheduled blocks`;
+  }
+
+  /* day header cells */
+  const hdrCells = Array.from({ length: total }, (_, i) => {
+    const day  = i + 1;
+    const dow  = new Date(planYear, planMonth, day).getDay();
+    const iso  = `${planYear}-${mStr}-${String(day).padStart(2, '0')}`;
+    const cls  = ['plan-dhd', dow === 0 ? 'p-sun' : (dow === 6 ? 'p-sat' : ''), iso === todayIso ? 'p-today' : ''].filter(Boolean).join(' ');
+    return `<div class="${cls}"><span class="pdnum">${day}</span><span class="pdday">${PLAN_DAY_ABBR[dow]}</span></div>`;
   }).join('');
 
-  /* one row per line */
-  const rowsHtml = Array.from({ length: GANTT_LINES }, (_, li) => {
+  /* one row per sewing line */
+  const rowsHtml = Array.from({ length: PLAN_LINES }, (_, li) => {
     const lineNum    = li + 1;
-    const lineBlocks = GANTT_BLOCKS.filter(b => b.line === lineNum);
+    const raw        = PLAN_BLOCKS.filter(b => b.line === lineNum);
+    const laneBlocks = assignLanes(raw);
 
-    const bgCells = days.map(d => {
-      const cls = ['gantt-bg-cell', d.weekend ? 'g-weekend' : '', d.today ? 'g-today' : '']
-        .filter(Boolean).join(' ');
-      return `<div class="${cls}"></div>`;
+    /* day columns — click target + background shading */
+    const dayCols = Array.from({ length: total }, (_, i) => {
+      const day = i + 1;
+      const dow = new Date(planYear, planMonth, day).getDay();
+      const iso = `${planYear}-${mStr}-${String(day).padStart(2, '0')}`;
+      const cls = ['plan-day-col', dow === 0 ? 'p-sun' : (dow === 6 ? 'p-sat' : ''), iso === todayIso ? 'p-today' : ''].filter(Boolean).join(' ');
+      const click = dow === 0 ? '' : `onclick="openAddBlock(${lineNum},'${iso}')"`;
+      return `<div class="${cls}" ${click}></div>`;
     }).join('');
 
-    const blocks = lineBlocks.map(b => {
-      const left  = (b.s / GANTT_TOTAL * 100).toFixed(4);
-      const width = (b.d / GANTT_TOTAL * 100).toFixed(4);
-      return `<div class="gantt-block"
+    /* block elements — absolutely positioned over day columns */
+    const blocksHtml = laneBlocks.map(b => {
+      if (b.start > monthEnd || b.endStr < monthStart) return '';
+      const csStart  = b.start < monthStart ? monthStart : b.start;
+      const csEnd    = b.endStr > monthEnd   ? monthEnd   : b.endStr;
+      const startIdx = parseInt(csStart.slice(8)) - 1;
+      const endIdx   = parseInt(csEnd.slice(8)) - 1;
+      const left     = (startIdx / total * 100).toFixed(3);
+      const width    = ((endIdx - startIdx + 1) / total * 100).toFixed(3);
+      const laneCls  = b.lane >= 1 ? ' lane-1' : '';
+      const lbl      = `${b.model} · ${b.colour}`;
+      const tip      = `${b.model} · ${b.colour} · ${b.qty.toLocaleString()} pcs · ${planFmtDate(b.start)} – ${planFmtDate(b.endStr)}`;
+      return `<div class="plan-block${laneCls}"
         style="left:${left}%;width:calc(${width}% - 3px);background:${b.color}"
-        onclick="openBlockPopup('${b.id}')"
-        title="${b.label} · ${b.dates}">
-        <span class="gantt-block-lbl">${b.label}</span>
-      </div>`;
+        onclick="event.stopPropagation();openPlanBlock('${b.id}')"
+        title="${tip}"><span class="plan-block-lbl">${lbl}</span></div>`;
     }).join('');
 
-    const modelTag = lineBlocks.length
-      ? `<span style="font-size:.7rem;color:var(--gold);font-weight:700">${lineBlocks[0].model}</span>`
-      : '';
+    /* label: show models active this month */
+    const active  = laneBlocks.filter(b => b.start <= monthEnd && b.endStr >= monthStart);
+    const uniq    = [...new Set(active.map(b => b.model))];
+    const modelTags = uniq.slice(0, 2).map(m => `<span class="plmodel">${m}</span>`).join('');
 
-    return `<div class="gantt-row">
-      <div class="gantt-row-lbl">
-        <span class="lnum">L${String(lineNum).padStart(2,'0')}</span>
-        ${modelTag}
+    return `<div class="plan-row">
+      <div class="plan-row-lbl">
+        <span class="plnum">L${String(lineNum).padStart(2, '0')}</span>
+        ${modelTags}
       </div>
-      <div class="gantt-cells-area">
-        <div class="gantt-bg-cells">${bgCells}</div>
-        ${blocks}
-      </div>
+      <div class="plan-cells-wrap">${dayCols}${blocksHtml}</div>
     </div>`;
   }).join('');
 
-  document.getElementById('gantt-root').innerHTML = `
-    <div class="gantt-inner">
-      <div class="gantt-header-row">
-        <div class="gantt-lbl-hd">Line / Day</div>
-        <div class="gantt-dhd-wrap">${headerCells}</div>
+  root.innerHTML = `
+    <div class="plan-inner">
+      <div class="plan-nav-bar plan-print-hide">
+        <button class="plan-nav-btn" onclick="planPrevMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="plan-month-lbl">${PLAN_MONTH_NAMES[planMonth].toUpperCase()} ${planYear}</span>
+        <button class="plan-nav-btn" onclick="planNextMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
-      <div class="gantt-rows">${rowsHtml}</div>
+      <div class="plan-header-row">
+        <div class="plan-lbl-hd">Line</div>
+        <div class="plan-dhd-wrap">${hdrCells}</div>
+      </div>
+      <div class="plan-rows">${rowsHtml}</div>
     </div>`;
 }
 
-/* ── Block popup ──────────────────────────────────────────────── */
-function openBlockPopup(id) {
-  const b = GANTT_BLOCKS.find(x => x.id === id);
-  if (!b) return;
+function planPrevMonth() {
+  planMonth--; if (planMonth < 0) { planMonth = 11; planYear--; }
+  renderPlanning();
+}
+function planNextMonth() {
+  planMonth++; if (planMonth > 11) { planMonth = 0; planYear++; }
+  renderPlanning();
+}
 
-  document.getElementById('gantt-popup-card').innerHTML = `
-    <button class="popup-close" onclick="closeBlockPopup()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
+/* ── View popup ───────────────────────────────────────────────── */
+function openPlanBlock(id) {
+  const b = PLAN_BLOCKS.find(x => x.id === id);
+  if (!b) return;
+  const endStr = planCalcEnd(b.start, b.qty, b.pph);
+  const wDays  = planWorkDays(b.start, b.qty, b.pph);
+  document.getElementById('plan-view-body').innerHTML = `
+    <button class="popup-close" onclick="closePlanView()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div style="width:14px;height:14px;border-radius:3px;background:${b.color};flex-shrink:0"></div>
       <div>
         <div class="popup-model-id">${b.model}</div>
-        <div class="popup-op-lbl">${b.op} &mdash; ${b.colour}</div>
+        <div class="popup-op-lbl">Line ${b.line} &mdash; ${b.colour}</div>
       </div>
     </div>
     <div class="popup-grid">
-      <div>
-        <div class="popup-item-lbl">PO Number</div>
-        <div class="popup-item-val" style="font-family:'Courier New',monospace;font-size:.76rem">${b.po}</div>
-      </div>
-      <div>
-        <div class="popup-item-lbl">Line</div>
-        <div class="popup-item-val">Line ${b.line}</div>
-      </div>
-      <div>
-        <div class="popup-item-lbl">Dates</div>
-        <div class="popup-item-val">${b.dates}</div>
-      </div>
-      <div>
-        <div class="popup-item-lbl">Qty</div>
-        <div class="popup-item-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${b.qty.toLocaleString()} pcs</div>
-      </div>
+      <div><div class="popup-item-lbl">PO / Job Ref</div><div class="popup-item-val" style="font-family:'Courier New',monospace;font-size:.76rem">${b.po}</div></div>
+      <div><div class="popup-item-lbl">Line</div><div class="popup-item-val">Line ${b.line}</div></div>
+      <div><div class="popup-item-lbl">Start</div><div class="popup-item-val">${planFmtDate(b.start)}</div></div>
+      <div><div class="popup-item-lbl">Est. End</div><div class="popup-item-val">${planFmtDate(endStr)}</div></div>
+      <div><div class="popup-item-lbl">Qty</div><div class="popup-item-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${b.qty.toLocaleString()} pcs</div></div>
+      <div><div class="popup-item-lbl">PPH</div><div class="popup-item-val">${b.pph} pcs/hr</div></div>
+      <div><div class="popup-item-lbl">Working Days</div><div class="popup-item-val">${wDays} days</div></div>
+      <div><div class="popup-item-lbl">Colour</div><div class="popup-item-val">${b.colour}</div></div>
     </div>
-    <div class="popup-notes-box">${b.notes}</div>`;
-
-  document.getElementById('gantt-popup').classList.add('open');
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn-outline" onclick="deletePlanBlock('${b.id}')" style="color:#C0392B;border-color:#C0392B;font-size:.78rem;padding:7px 14px">Delete</button>
+      <button class="btn-primary" onclick="closePlanView()" style="font-size:.78rem;padding:7px 14px">Close</button>
+    </div>`;
+  document.getElementById('plan-view-popup').classList.add('open');
 }
 
-function closeBlockPopup() {
-  document.getElementById('gantt-popup').classList.remove('open');
+function closePlanView() { document.getElementById('plan-view-popup').classList.remove('open'); }
+
+function deletePlanBlock(id) {
+  PLAN_BLOCKS = PLAN_BLOCKS.filter(b => b.id !== id);
+  closePlanView();
+  renderPlanning();
+  showToast('Block deleted');
 }
 
-/* ── Print Gantt ──────────────────────────────────────────────── */
+/* ── Add popup ────────────────────────────────────────────────── */
+function openAddBlock(line, dateStr) {
+  const lineEl = document.getElementById('pa-line');
+  lineEl.innerHTML = '<option value="">Select line…</option>' +
+    Array.from({ length: PLAN_LINES }, (_, i) => `<option value="${i+1}">Line ${i+1}</option>`).join('');
+  lineEl.value = line;
+
+  document.getElementById('pa-model').innerHTML = '<option value="">Select model…</option>' +
+    MODELS.map(m => `<option value="${m.id}">${m.id} – ${m.name}</option>`).join('');
+
+  document.getElementById('pa-po').innerHTML = '<option value="">Select PO…</option>' +
+    ORDERS.filter(o => o.status !== 'Shipped').map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+
+  document.getElementById('pa-start').value  = dateStr;
+  document.getElementById('pa-colour').value = '';
+  document.getElementById('pa-qty').value    = '';
+  document.getElementById('pa-pph').value    = '';
+  document.getElementById('pa-end').value    = '';
+  document.getElementById('plan-add-title').textContent = `Line ${line} · ${planFmtDate(dateStr)}`;
+  document.getElementById('plan-add-popup').classList.add('open');
+}
+
+function closePlanAdd() { document.getElementById('plan-add-popup').classList.remove('open'); }
+
+function onAddBModelChange() {
+  const modelId = document.getElementById('pa-model').value;
+  const filtered = modelId
+    ? ORDERS.filter(o => o.model === modelId && o.status !== 'Shipped')
+    : ORDERS.filter(o => o.status !== 'Shipped');
+  document.getElementById('pa-po').innerHTML = '<option value="">Select PO…</option>' +
+    filtered.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+}
+
+function onAddBPoChange() {
+  const po = ORDERS.find(o => o.po === document.getElementById('pa-po').value);
+  if (!po) return;
+  if (!document.getElementById('pa-colour').value) document.getElementById('pa-colour').value = po.colours || '';
+  if (!document.getElementById('pa-qty').value)    document.getElementById('pa-qty').value    = po.qty    || '';
+  calcAddBEnd();
+}
+
+function calcAddBEnd() {
+  const qty   = parseFloat(document.getElementById('pa-qty').value);
+  const pph   = parseFloat(document.getElementById('pa-pph').value);
+  const start = document.getElementById('pa-start').value;
+  if (!qty || !pph || !start) { document.getElementById('pa-end').value = ''; return; }
+  document.getElementById('pa-end').value = planFmtDate(planCalcEnd(start, qty, pph));
+}
+
+const PO_COLORS = { 'ASOS':'#2455CC', 'PLT':'#C4A35A', 'RI-':'#196741', 'Boohoo':'#D4626B' };
+function getPOColor(po) {
+  for (const [k, v] of Object.entries(PO_COLORS)) { if (po.startsWith(k)) return v; }
+  return '#7B5EA7';
+}
+
+function saveNewBlock() {
+  const line   = parseInt(document.getElementById('pa-line').value);
+  const model  = document.getElementById('pa-model').value;
+  const po     = document.getElementById('pa-po').value;
+  const colour = document.getElementById('pa-colour').value.trim();
+  const qty    = parseFloat(document.getElementById('pa-qty').value);
+  const pph    = parseFloat(document.getElementById('pa-pph').value);
+  const start  = document.getElementById('pa-start').value;
+  if (!line || !model || !po || !colour || !qty || !pph || !start) {
+    showToast('Please fill in all fields', 'warn'); return;
+  }
+  if (new Date(start + 'T00:00:00').getDay() === 0) {
+    showToast('Cannot start on Sunday', 'warn'); return;
+  }
+  PLAN_BLOCKS.push({ id: 'PB' + Date.now(), line, model, po, colour, qty, pph, start, color: getPOColor(po) });
+  closePlanAdd();
+  renderPlanning();
+  showToast('Block added');
+}
+
+/* ── Hours panel ──────────────────────────────────────────────── */
+function togglePlanHoursPanel() {
+  const p = document.getElementById('plan-hrs-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function savePlanHours() {
+  for (let d = 0; d <= 6; d++) {
+    const el = document.getElementById(`ph-${d}`);
+    if (el && !el.disabled) PLAN_HRS[d] = parseFloat(el.value) || 0;
+  }
+  togglePlanHoursPanel();
+  renderPlanning();
+  showToast('Working hours updated');
+}
+
+/* ── Print ────────────────────────────────────────────────────── */
 function printGantt() {
-  window.print();
+  const total    = planDaysInMonth(planYear, planMonth);
+  const mStr     = String(planMonth + 1).padStart(2, '0');
+  const mStart   = `${planYear}-${mStr}-01`;
+  const mEnd     = `${planYear}-${mStr}-${String(total).padStart(2, '0')}`;
+  const visible  = PLAN_BLOCKS.filter(b => {
+    const e = planCalcEnd(b.start, b.qty, b.pph);
+    return b.start <= mEnd && e >= mStart;
+  });
+  if (!visible.length) { showToast('No blocks this month', 'warn'); return; }
+  const rows = visible.map(b => {
+    const e = planCalcEnd(b.start, b.qty, b.pph);
+    return [`Line ${b.line}`, b.model, b.po, b.colour,
+            b.qty.toLocaleString(), `${b.pph} pph`,
+            planFmtDate(b.start), planFmtDate(e), `${planWorkDays(b.start, b.qty, b.pph)} days`];
+  });
+  openPrintWin(
+    `Planning — ${PLAN_MONTH_NAMES[planMonth]} ${planYear}`,
+    `${PLAN_MONTH_NAMES[planMonth]} ${planYear} · ${visible.length} blocks · 20 Sewing Lines`,
+    buildTable(['Line','Model','PO','Colour','Qty','PPH','Start','Est. End','Working Days'], rows)
+  );
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -4981,7 +5246,7 @@ document.addEventListener('DOMContentLoaded', function () {
   renderSettings();
   renderModels(MODELS);
   renderOrders(ORDERS);
-  renderGantt();
+  renderPlanning();
   renderCutting();
   renderSewing();
   renderFinishing();
