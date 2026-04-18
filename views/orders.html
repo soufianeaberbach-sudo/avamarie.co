@@ -1,0 +1,88 @@
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Orders</div>
+          <div class="kpi-num" id="o-kpi-total">2</div>
+          <div class="kpi-sub">Active purchase orders</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Units</div>
+          <div class="kpi-num gold" id="o-kpi-units">3,200</div>
+          <div class="kpi-sub">Pieces across all orders</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Production</div>
+          <div class="kpi-num" id="o-kpi-inprod">1</div>
+          <div class="kpi-sub">Currently on factory floor</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Value</div>
+          <div class="kpi-num gold" style="font-size:2rem" id="o-kpi-value">€61,728</div>
+          <div class="kpi-sub">Ex-factory (EUR)</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="card filter-bar">
+        <input class="f-input" type="text" id="o-search"
+          placeholder="Search by PO number, client, or model…"
+          oninput="filterOrders()">
+        <select class="f-select" id="o-client" onchange="filterOrders()">
+          <option value="">All Clients</option>
+          <option>ASOS</option>
+          <option>PrettyLittleThing</option>
+          <option>River Island</option>
+        </select>
+        <select class="f-select" id="o-status" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option>Confirmed</option>
+          <option>In Production</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
+        <select class="f-select" id="o-season" onchange="filterOrders()">
+          <option value="">All Seasons</option>
+          <option>SS26</option>
+          <option>AW26</option>
+          <option>SS27</option>
+        </select>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-count" id="o-count">2 orders</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="exportOrdersCSV()">
+            <i data-lucide="printer"></i> Print Report
+          </button>
+          <button class="btn-primary" onclick="showToast('New order form — coming next')">
+            <i data-lucide="plus"></i> New Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="o-table">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Client</th>
+              <th>Model</th>
+              <th>Season</th>
+              <th>Issued</th>
+              <th>Delivery</th>
+              <th style="text-align:right">Qty</th>
+              <th>Status</th>
+              <th style="text-align:right">Value (EUR)</th>
+            </tr>
+          </thead>
+          <tbody id="o-tbody"></tbody>
+        </table>
+        <div id="o-empty" class="tbl-empty" style="display:none">
+          <i data-lucide="search-x"></i>
+          <p>No orders match your filters.</p>
+        </div>
+      </div>
+

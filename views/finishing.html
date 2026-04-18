@@ -1,0 +1,86 @@
+
+      <!-- KPI bar -->
+      <div class="cs-kpi-bar" id="fin-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Log Finishing &amp; QC Session</div>
+
+          <!-- High-fail alert -->
+          <div id="fin-fail-alert" class="fin-warn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Failure rate exceeds 5% — batch may require re-inspection.
+          </div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="fin-po" onchange="onFinPoChange()">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="cs-field">
+            <label>Model</label>
+            <input type="text" id="fin-model" readonly placeholder="Auto-filled from order">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Date</label>
+              <input type="date" id="fin-date">
+            </div>
+            <div class="cs-field">
+              <label>Inspector</label>
+              <input type="text" id="fin-inspector" placeholder="e.g. Fatima R.">
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Pressing Count (pcs)</label>
+            <input type="number" id="fin-pressed" min="0" placeholder="0">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Inspected (pcs)</label>
+              <input type="number" id="fin-inspected" min="0" placeholder="0" oninput="onFinCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Failed (pcs)</label>
+              <input type="number" id="fin-failed" min="0" placeholder="0" oninput="onFinCalc()">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Passed (pcs)</label>
+              <div class="passed-display" id="fin-passed-display">—</div>
+            </div>
+            <div class="cs-field">
+              <label>AQL Level</label>
+              <select id="fin-aql">
+                <option value="1.0">AQL 1.0 — Critical</option>
+                <option value="2.5" selected>AQL 2.5 — Major</option>
+                <option value="4.0">AQL 4.0 — Minor</option>
+                <option value="6.5">AQL 6.5 — General</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="saveFinLog()">
+            <i data-lucide="check"></i> Save Entry
+          </button>
+        </div>
+
+        <!-- Log table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">QC Log</div>
+            <span id="fin-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="fin-log-table"></div>
+        </div>
+
+      </div>

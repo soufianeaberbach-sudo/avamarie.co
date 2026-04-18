@@ -1,0 +1,31 @@
+
+      <button class="md-back" onclick="closeModel()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Models
+      </button>
+
+      <!-- Header card (filled by JS) -->
+      <div class="md-header-card" id="md-header"></div>
+
+      <!-- Tab bar -->
+      <div class="md-tabs" id="md-tab-bar">
+        <button class="md-tab active" data-pane="md-overview"   onclick="setMdTab(this)">Overview</button>
+        <button class="md-tab"        data-pane="md-bom"        onclick="setMdTab(this)">BOM</button>
+        <button class="md-tab"        data-pane="md-gamme"      onclick="setMdTab(this)">Gamme</button>
+        <button class="md-tab"        data-pane="md-pom"        onclick="setMdTab(this)">POM</button>
+        <button class="md-tab"        data-pane="md-revisions"  onclick="setMdTab(this)">Revisions</button>
+        <button class="md-tab"        data-pane="md-samples"    onclick="setMdTab(this)">Samples</button>
+        <button class="md-tab"        data-pane="md-orders"     onclick="setMdTab(this)">Linked Orders</button>
+        <button class="md-tab"        data-pane="md-audit"      onclick="setMdTab(this)">Audit</button>
+      </div>
+
+      <!-- Panes (all filled by JS) -->
+      <div id="md-overview"  class="md-pane active"></div>
+      <div id="md-bom"       class="md-pane"></div>
+      <div id="md-gamme"     class="md-pane"></div>
+      <div id="md-pom"       class="md-pane"></div>
+      <div id="md-revisions" class="md-pane"></div>
+      <div id="md-samples"   class="md-pane"></div>
+      <div id="md-orders"    class="md-pane"></div>
+      <div id="md-audit"     class="md-pane"></div>
+

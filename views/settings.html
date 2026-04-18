@@ -1,0 +1,86 @@
+
+      <div class="mat-tabs" style="margin-bottom:18px">
+        <button class="stg-tab active" onclick="setStgTab(this,'stg-company')">Company Info</button>
+        <button class="stg-tab" onclick="setStgTab(this,'stg-lines')">Production Lines</button>
+        <button class="stg-tab" onclick="setStgTab(this,'stg-users')">Users</button>
+      </div>
+
+      <!-- ── Company Info ──────────────────────────────── -->
+      <div id="stg-company" class="stg-pane active">
+        <div class="cs-form-card stg-form">
+          <div class="cs-card-title">Company Information</div>
+          <div class="stg-form-grid">
+            <div class="cs-field">
+              <label>Company Name</label>
+              <input type="text" id="stg-name" value="Ava Marie">
+            </div>
+            <div class="cs-field">
+              <label>Founded</label>
+              <input type="text" id="stg-founded" value="2019">
+            </div>
+            <div class="cs-field">
+              <label>Address</label>
+              <input type="text" id="stg-address" value="Zone Industrielle Charaf, Rue 4">
+            </div>
+            <div class="cs-field">
+              <label>City</label>
+              <input type="text" id="stg-city" value="Tangier">
+            </div>
+            <div class="cs-field">
+              <label>Country</label>
+              <input type="text" id="stg-country" value="Morocco">
+            </div>
+            <div class="cs-field">
+              <label>Phone</label>
+              <input type="text" id="stg-phone" value="+212 539 XX XX XX">
+            </div>
+            <div class="cs-field">
+              <label>Email</label>
+              <input type="email" id="stg-email" value="contact@avamarie.co">
+            </div>
+            <div class="cs-field">
+              <label>Website</label>
+              <input type="text" id="stg-website" value="www.avamarie.co">
+            </div>
+            <div class="cs-field">
+              <label>VAT Number</label>
+              <input type="text" id="stg-vat" value="MA-TGR-2019-4521">
+            </div>
+            <div class="cs-field">
+              <label>Default Currency</label>
+              <select id="stg-currency">
+                <option value="EUR" selected>EUR — Euro</option>
+                <option value="USD">USD — US Dollar</option>
+                <option value="GBP">GBP — British Pound</option>
+                <option value="MAD">MAD — Moroccan Dirham</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveCompanyInfo()">
+            <i data-lucide="check"></i> Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Production Lines ───────────────────────────── -->
+      <div id="stg-lines" class="stg-pane">
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Production Lines</div>
+            <span class="toolbar-count">20 lines</span>
+          </div>
+          <div id="stg-lines-table"></div>
+        </div>
+      </div>
+
+      <!-- ── Users ──────────────────────────────────────── -->
+      <div id="stg-users" class="stg-pane">
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">System Users</div>
+            <span class="toolbar-count" id="stg-user-count"></span>
+          </div>
+          <div id="stg-users-table"></div>
+        </div>
+      </div>
+

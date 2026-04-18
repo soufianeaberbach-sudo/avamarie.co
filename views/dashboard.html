@@ -1,0 +1,40 @@
+
+      <!-- Row 1: KPI cards -->
+      <div class="dash-kpi-grid" id="dash-kpis"></div>
+
+      <!-- Row 2: Active Orders + Alerts -->
+      <div class="dash-row2">
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Active Orders</div>
+            <span class="toolbar-count" id="dash-ord-count"></span>
+          </div>
+          <div id="dash-orders-tbl"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Alerts</div>
+            <span id="dash-alert-count" class="toolbar-count"></span>
+          </div>
+          <div class="alert-list" id="dash-alerts"></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Today's Production + Activity Feed -->
+      <div class="dash-row3">
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Today's Production by Line</div>
+            <span class="toolbar-count" id="dash-prod-date"></span>
+          </div>
+          <div id="dash-production"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-hd">
+            <div class="dash-card-title">Recent Activity</div>
+            <span class="toolbar-count">Last 10 events</span>
+          </div>
+          <div class="feed-list" id="dash-feed"></div>
+        </div>
+      </div>
+
