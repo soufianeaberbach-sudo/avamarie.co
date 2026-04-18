@@ -1,0 +1,3064 @@
+
+/* ── Auth guard ───────────────────────────────────────────────── */
+if (!sessionStorage.getItem('erp_auth')) {
+  window.location.replace('login.html');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ══════════════════════════════════════════════════════════════ */
+
+const DASH_ALERTS = [
+  { dot:'red',   text:'High waste on C002 — 4.83% (threshold 3%)',          meta:'Cutting · 08 Apr 2026' },
+  { dot:'amber', text:'High QC fail rate on F003 — 3.59% (threshold 2%)',   meta:'Finishing · 12 Apr 2026' },
+  { dot:'blue',  text:'Satin Duchess Black & Navy ETA 20 Apr — not yet received', meta:'Incoming · INC-004, INC-005' },
+  { dot:'amber', text:'YKK Zips partial receipt — 1,200 of 2,400 confirmed', meta:'Materials · ASOS-PO-44521-A' },
+  { dot:'gold',  text:'AM-0052 Proto sample not yet produced',                meta:'Samples · AM-0052' },
+  { dot:'blue',  text:'Label Set not ordered for PO-44521-B',                 meta:'Materials · ASOS-PO-44521-B' },
+];
+
+const ACTIVITY_FEED = [
+  { dot:'#C4A35A', what:'Sewing log S006 — 47 pcs, Line 6 AM · Raw Edge defect flagged',         when:'12 Apr 2026 · Sewing'      },
+  { dot:'#C4A35A', what:'Sewing log S005 — 51 pcs, Line 5 AM · No defects',                       when:'12 Apr 2026 · Sewing'      },
+  { dot:'#196741', what:'QC session F003 — 195 inspected, 7 failed (3.59%) · AQL 4.0 · Nadia H.', when:'12 Apr 2026 · Finishing'   },
+  { dot:'#7B5EA7', what:'Carton CTN-0004 packed — 48 pcs · ASOS-PO-44521-A · Ivory',              when:'11 Apr 2026 · Packing'     },
+  { dot:'#7B5EA7', what:'Carton CTN-0003 packed — 48 pcs · ASOS-PO-44521-A · Ivory',              when:'11 Apr 2026 · Packing'     },
+  { dot:'#196741', what:'QC session F002 — 175 inspected, 3 failed (1.71%) · AQL 2.5 · Fatima R.',when:'11 Apr 2026 · Finishing'   },
+  { dot:'#2455CC', what:'INC-003 confirmed — YKK Zip 60 cm · 1,200 units received (partial)',      when:'05 Apr 2026 · Incoming'    },
+  { dot:'#C4A35A', what:'Cutting log C002 — 550 pcs cut · 248.5 m consumed · Waste 4.83% ⚠',     when:'08 Apr 2026 · Cutting'     },
+  { dot:'#C4A35A', what:'Cutting log C001 — 450 pcs cut · 197.2 m consumed · Waste 1.88%',        when:'07 Apr 2026 · Cutting'     },
+  { dot:'#2455CC', what:'Meeting note — Client confirmed Ivory priority. AQL 2.5 mandatory.',      when:'09 Apr 2026 · Orders'      },
+];
+
+function renderDashboard() {
+  /* ── Calculations ─────────────────────────────────────────── */
+  const totalCut    = CUTTING_LOG.reduce((a,r)=>a+r.qty,0);
+  const totalSewn   = SEWING_LOG.reduce((a,r)=>a+r.pieces,0);
+  const finInsp     = FINISHING_LOG.reduce((a,r)=>a+r.inspected,0);
+  const finPass     = FINISHING_LOG.reduce((a,r)=>a+r.passed,0);
+  const passRate    = finInsp ? (finPass/finInsp*100).toFixed(1)+'%' : '—';
+  const urgentCount = DASH_ALERTS.filter(a=>a.dot==='red').length;
+  const matConf     = INCOMING.filter(i=>i.status==='Confirmed').length;
+
+  /* ── Row 1: KPI cards ─────────────────────────────────────── */
+  const kpis = [
+    {
+      icon:'clipboard-list', label:'Active Orders',
+      value: ORDERS.length,
+      sub: `${ORDERS.filter(o=>o.status==='In Production').length} in production`,
+      accent:'gold',
+    },
+    {
+      icon:'scissors', label:'Pieces Cut',
+      value: totalCut.toLocaleString(),
+      sub: `${CUTTING_LOG.length} cutting sessions`,
+      accent:'gold',
+    },
+    {
+      icon:'alert-triangle', label:'Active Alerts',
+      value: DASH_ALERTS.length,
+      sub: urgentCount ? `${urgentCount} urgent` : 'No critical issues',
+      accent: urgentCount ? 'red' : 'gold',
+    },
+    {
+      icon:'spool', label:'Pieces Sewn',
+      value: totalSewn.toLocaleString(),
+      sub: `${SEWING_LOG.length} sessions logged`,
+      accent:'gold',
+    },
+    {
+      icon:'sparkles', label:'QC Pass Rate',
+      value: passRate,
+      sub: `${finInsp.toLocaleString()} units inspected`,
+      accent:'green',
+    },
+    {
+      icon:'warehouse', label:'Shipments In',
+      value: `${matConf}<span class="dash-kpi-unit"> / ${INCOMING.length}</span>`,
+      sub: 'confirmed of total incoming',
+      accent:'gold',
+    },
+  ];
+
+  document.getElementById('dash-kpis').innerHTML = kpis.map(k => `
+    <div class="dash-kpi-card${k.accent==='red'?' kpi-alert':''}">
+      <div class="dash-kpi-icon${k.accent==='red'?' red':k.accent==='green'?' green':''}">
+        <i data-lucide="${k.icon}"></i>
+      </div>
+      <div class="dash-kpi-eyebrow">${k.label}</div>
+      <div class="dash-kpi-num${k.accent==='gold'?'':' '+k.accent}">${k.value}</div>
+      <div class="dash-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+  lucide.createIcons();
+
+  /* ── Row 2a: Active Orders table ─────────────────────────── */
+  document.getElementById('dash-ord-count').textContent = ORDERS.length + ' orders';
+  const statusColor = {'In Production':'#196741','Confirmed':'#2455CC','Completed':'#888'};
+  const statusBg    = {'In Production':'#EEFAF4','Confirmed':'#EEF3FF','Completed':'#F5F5F5'};
+  document.getElementById('dash-orders-tbl').innerHTML = `
+    <table class="tbl dash-ord-tbl">
+      <thead><tr>
+        <th>PO Number</th><th>Model</th><th>Qty</th>
+        <th style="min-width:130px">Progress</th><th>Deadline</th><th>Status</th>
+      </tr></thead>
+      <tbody>${ORDERS.map(o => {
+        const stageWt = 1 / (o.progress ? o.progress.length : 1);
+        const pct = o.progress
+          ? Math.round(o.progress.reduce((a,s) => a + (s.total ? s.done/s.total : 0)*stageWt, 0)*100)
+          : 0;
+        const sc = statusColor[o.status]||'#888';
+        const sb = statusBg[o.status]||'#F5F5F5';
+        return `<tr style="cursor:pointer" onclick="openOrder('${o.po}')">
+          <td>
+            <span style="font-family:'Courier New',monospace;font-size:.72rem;color:var(--gold);font-weight:600">${o.po}</span>
+          </td>
+          <td>
+            <div style="font-size:.78rem;font-weight:600;line-height:1.2">${o.model}</div>
+            <div style="font-size:.67rem;color:var(--muted2)">${o.modelName}</div>
+          </td>
+          <td style="font-family:'Bebas Neue',sans-serif;font-size:1.15rem;text-align:right">${o.qty.toLocaleString()}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:7px">
+              <div class="ord-prog-bar" style="flex:1"><div class="ord-prog-fill" style="width:${pct}%"></div></div>
+              <span style="font-size:.68rem;color:var(--muted2);min-width:28px;text-align:right">${pct}%</span>
+            </div>
+          </td>
+          <td style="font-size:.75rem;white-space:nowrap">${o.delivery}</td>
+          <td>
+            <span style="background:${sb};color:${sc};border-radius:3px;padding:2px 8px;font-size:.63rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:inline-block">${o.status}</span>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+
+  /* ── Row 2b: Alerts with colored borders ─────────────────── */
+  document.getElementById('dash-alert-count').textContent = DASH_ALERTS.length + ' active';
+  document.getElementById('dash-alerts').innerHTML = DASH_ALERTS.map(a => `
+    <div class="alert-item border-${a.dot}">
+      <div>
+        <div class="alert-text">${a.text}</div>
+        <div class="alert-meta">${a.meta}</div>
+      </div>
+    </div>`).join('');
+
+  /* ── Row 3a: Today's Production by Line ──────────────────── */
+  const latestDate = SEWING_LOG.reduce((d,r) => r.date > d ? r.date : d, '');
+  document.getElementById('dash-prod-date').textContent = latestDate || '—';
+  const todayLogs = SEWING_LOG.filter(r => r.date === latestDate);
+  const lineMap = {};
+  todayLogs.forEach(r => {
+    if (!lineMap[r.line]) lineMap[r.line] = { pieces:0, po:r.po, defects:0 };
+    lineMap[r.line].pieces  += r.pieces;
+    lineMap[r.line].defects += r.defects.length;
+  });
+  document.getElementById('dash-production').innerHTML = [1,2,3,4,5,6,7,8].map(n => {
+    const d = lineMap[n];
+    if (d) {
+      const ord = ORDERS.find(o => o.po === d.po);
+      return `<div class="prod-line-item prod-line-active">
+        <div class="prod-line-num">${n}</div>
+        <div>
+          <div class="prod-line-name">${ord ? ord.model+' &middot; '+ord.modelName : d.po}</div>
+          <div class="prod-line-sub">${d.po}${d.defects ? ' &middot; <span style="color:#C47000">'+d.defects+' defect flag'+(d.defects>1?'s':'')+'</span>' : ' &middot; No defects'}</div>
+        </div>
+        <div class="prod-line-pcs">${d.pieces}<span style="font-family:'DM Sans',sans-serif;font-size:.62rem;color:var(--muted);margin-left:3px">pcs</span></div>
+      </div>`;
+    }
+    return `<div class="prod-line-item prod-line-idle">
+      <div class="prod-line-num">${n}</div>
+      <div>
+        <div class="prod-line-name" style="color:var(--muted2);font-weight:400">Idle</div>
+        <div class="prod-line-sub">No activity logged</div>
+      </div>
+      <div class="prod-line-pcs">—</div>
+    </div>`;
+  }).join('');
+
+  /* ── Row 3b: Activity feed ───────────────────────────────── */
+  document.getElementById('dash-feed').innerHTML = ACTIVITY_FEED.map(e => `
+    <div class="feed-item">
+      <div class="feed-dot" style="background:${e.dot}"></div>
+      <div class="feed-body">
+        <div class="feed-what">${e.what}</div>
+        <div class="feed-when">${e.when}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Section meta ─────────────────────────────────────────────── */
+const SECTION_META = {
+  dashboard: { title: 'Dashboard',       icon: 'layout-dashboard' },
+  models:    { title: 'Models',           icon: 'shirt'            },
+  orders:    { title: 'Orders',           icon: 'clipboard-list'   },
+  planning:  { title: 'Planning',         icon: 'calendar-range'   },
+  cutting:   { title: 'Cutting',          icon: 'scissors'         },
+  sewing:    { title: 'Sewing',           icon: 'spool'            },
+  finishing: { title: 'Finishing & QC',   icon: 'sparkles'         },
+  packing:   { title: 'Packing',          icon: 'box'              },
+  materials: { title: 'Materials',        icon: 'warehouse'        },
+  settings:  { title: 'Settings',         icon: 'settings'         },
+};
+
+let currentSec = 'dashboard';
+let currentOrderPO = null;   /* tracked so printOrderCP() knows which order is open */
+
+/* ── View renderer map ────────────────────────────────────────── */
+const VIEW_RENDERERS = {
+  dashboard:      () => renderDashboard(),
+  models:         () => renderModels(MODELS),
+  orders:         () => renderOrders(ORDERS),
+  'order-detail': () => {},
+  planning:       () => renderPlanning(),
+  cutting:        () => renderCutting(),
+  sewing:         () => renderSewing(),
+  finishing:      () => renderFinishing(),
+  packing:        () => renderPacking(),
+  materials:      () => renderMaterials(),
+  settings:       () => renderSettings(),
+  'model-detail': () => {},
+};
+
+/* ── Lazy view loader ─────────────────────────────────────────── */
+async function loadView(viewName) {
+  const el = document.getElementById('sec-' + viewName);
+  if (!el || el.dataset.loaded) return;
+  try {
+    const res = await fetch(`views/${viewName}.html`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    el.innerHTML = await res.text();
+    el.dataset.loaded = '1';
+    const renderer = VIEW_RENDERERS[viewName];
+    if (renderer) renderer();
+    wrapTables();
+    wrapMatrices();
+    lucide.createIcons();
+  } catch (e) {
+    console.error('loadView failed:', viewName, e);
+  }
+}
+
+/* ── Navigate (shared by nav button clicks and programmatic calls) */
+async function navTo(secId) {
+  await loadView(secId);
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('sec-' + secId);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const btn = document.querySelector(`.nav-item[data-sec="${secId}"]`);
+  if (btn) btn.classList.add('active');
+  const meta = SECTION_META[secId] || { title: secId, icon: 'circle' };
+  document.getElementById('tb-title').textContent = meta.title;
+  document.getElementById('tb-icon').innerHTML = `<i data-lucide="${meta.icon}"></i>`;
+  currentSec = secId;
+  lucide.createIcons();
+  closeSidebar();
+}
+
+function nav(btn) {
+  const sec = btn.dataset.sec;
+  if (!sec) return;
+  navTo(sec);
+}
+
+/* ── Logout ───────────────────────────────────────────────────── */
+function logout() {
+  sessionStorage.removeItem('erp_auth');
+  sessionStorage.removeItem('erp_user');
+  window.location.href = 'login.html';
+}
+
+/* ── Mobile sidebar ───────────────────────────────────────────── */
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+/* ── Date ─────────────────────────────────────────────────────── */
+function updateDate() {
+  const d = new Date();
+  const s = d.toLocaleDateString('en-GB', {
+    weekday:'short', day:'numeric', month:'short', year:'numeric'
+  });
+  document.getElementById('tb-date').textContent = s;
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const el = document.getElementById('toast-inner');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── Models data ──────────────────────────────────────────────── */
+const MODELS = [
+  {
+    id:'AM-0045', name:'Robe Satin Longue',
+    client:'ASOS', ref:'ASOS-ST-44521',
+    cat:'Robe', rev:4, status:'In Production',
+    cost:19.29, updated:'28 Mar 2026', updatedBy:'Soufiane',
+    desc:'Long satin duchess dress with fitted silhouette. Invisible zip at centre back. Full poly lining on bodice.'
+  },
+  {
+    id:'AM-0052', name:'Crop Top Jersey',
+    client:'PrettyLittleThing', ref:'PLT-CR-8821',
+    cat:'Top', rev:2, status:'Sample',
+    cost:8.00, updated:'02 Apr 2026', updatedBy:'Karim',
+    desc:'Fitted jersey crop top with elasticated hem. Round neckline, short puff sleeves. 95% poly, 5% elastane.'
+  },
+  {
+    id:'AM-0039', name:'Wide Leg Linen Trousers',
+    client:'River Island', ref:'RI-PL-3301',
+    cat:'Pantalon', rev:1, status:'Completed',
+    cost:11.22, updated:'15 Jan 2026', updatedBy:'Ahmed',
+    desc:'Relaxed wide-leg trouser in linen-viscose blend. Side pockets, concealed hook bar waist, turn-up hem.'
+  },
+  {
+    id:'AM-0060', name:'Pleated Midi Skirt',
+    client:'ASOS', ref:'ASOS-JP-9933',
+    cat:'Jupe', rev:1, status:'Draft',
+    cost:null, updated:'05 Apr 2026', updatedBy:'Fatima',
+    desc:'Knife-pleated midi skirt, satin finish. Elasticated back waistband. Pending fabric and costing sign-off.'
+  },
+  {
+    id:'AM-0061', name:'Wrap Blouse Viscose',
+    client:'PrettyLittleThing', ref:'PLT-WB-1105',
+    cat:'Top', rev:3, status:'Confirmed',
+    cost:10.12, updated:'19 Mar 2026', updatedBy:'Soufiane',
+    desc:'Wrap-front blouse in 100% viscose challis. Long sleeves with button cuff, self-tie belt, V neckline.'
+  },
+];
+
+const STATUS_CLASS = {
+  'Draft':'badge-draft','Sample':'badge-sample',
+  'Confirmed':'badge-confirmed','In Production':'badge-production',
+  'Completed':'badge-completed','Cancelled':'badge-draft',
+};
+
+/* ══════════════════════════════════════════════════════════════
+   ORDERS — data & functions
+   ══════════════════════════════════════════════════════════════ */
+
+const ORDERS = [
+  {
+    po:       'ASOS-PO-44521-A',
+    client:   'ASOS',
+    model:    'AM-0045',
+    modelName:'Robe Satin Longue',
+    season:   'SS26',
+    issued:   '01 Apr 2026',
+    delivery: '15 May 2026',
+    qty:      2400,
+    sizes:    'XS×240 / S×540 / M×720 / L×540 / XL×360',
+    colours:  'Ivory',
+    status:   'In Production',
+    value:    46296,
+    notes:    'Priority shipment. All cartons to be labelled per ASOS routing guide v3.2. AQL 2.5 required.',
+    matrix: {
+      sizes: ['S','M','L','XL'],
+      rows: [
+        { colour:'Ivory',     hex:'#F5F0E8', values:[240,320,240,200] },
+        { colour:'Black',     hex:'#1A1A1A', values:[180,220,160,140] },
+        { colour:'Navy',      hex:'#1B2A4A', values:[160,200,180,160] },
+      ],
+    },
+    materials: [
+      { name:'Satin Duchess — Ivory',    supplier:'Duchesse-Satin SA', req:'1,850 m', ordered:'1,850 m', received:'1,850 m', status:'In Stock'         },
+      { name:'Satin Duchess — Black',    supplier:'Duchesse-Satin SA', req:'666 m',   ordered:'666 m',   received:'0 m',     status:'Awaiting Delivery' },
+      { name:'Satin Duchess — Navy',     supplier:'Duchesse-Satin SA', req:'592 m',   ordered:'592 m',   received:'0 m',     status:'Awaiting Delivery' },
+      { name:'Poly Lining',              supplier:'Poly-Tissu MA',     req:'2,280 m', ordered:'2,280 m', received:'2,280 m', status:'In Stock'          },
+      { name:'YKK Zip 60 cm (concealed)',supplier:'YKK Morocco',       req:'2,400',   ordered:'2,400',   received:'1,200',   status:'Partial'           },
+      { name:'Label Set (brand+care+sz)',supplier:'Etiquettes SA',     req:'2,400',   ordered:'2,400',   received:'0',       status:'On Order'          },
+    ],
+    progress: [
+      { stage:'Fabric Cutting', done:450, total:1000, colour:'Ivory batch only' },
+      { stage:'Sewing',         done:220, total:1000, colour:'Ivory batch only' },
+      { stage:'Finishing / QC', done:80,  total:1000, colour:'Ivory batch only' },
+      { stage:'Packing',        done:0,   total:2400, colour:'All colours'      },
+    ],
+    meetingNotes: [
+      { date:'09 Apr 2026', author:'Soufiane', text:'Client confirmed Ivory is priority colourway. Black & Navy cutting to follow after Ivory QC clearance. AQL 2.5 mandatory — arrange third-party inspector.' },
+      { date:'05 Apr 2026', author:'Karim',    text:'PP sample approved by ASOS buyer (ref PPAM0045-04). Production go-ahead confirmed. Ivory fabric in stock, bulk cutting started 01 Apr.' },
+      { date:'01 Apr 2026', author:'Fatima',   text:'PO-44521-A received. Materials plan issued. Ivory fabric confirmed in stock. Black & Navy ordered from Duchesse-Satin SA — ETA 20 Apr 2026.' },
+    ],
+    cp: [
+      { milestone:'Tech pack issued',           planned:'15 Jan 2026', actual:'15 Jan 2026', status:'Done',     owner:'Fatima'   },
+      { milestone:'PP sample approval',         planned:'28 Mar 2026', actual:'28 Mar 2026', status:'Done',     owner:'Soufiane' },
+      { milestone:'Fabric delivery — Ivory',    planned:'28 Mar 2026', actual:'20 Mar 2026', status:'Done',     owner:'Ahmed'    },
+      { milestone:'Bulk cutting start — Ivory', planned:'01 Apr 2026', actual:'01 Apr 2026', status:'Done',     owner:'Karim'    },
+      { milestone:'Bulk sewing start — Ivory',  planned:'10 Apr 2026', actual:'10 Apr 2026', status:'Done',     owner:'Karim'    },
+      { milestone:'Fabric delivery — Blk/Navy', planned:'20 Apr 2026', actual:'',            status:'On Track', owner:'Ahmed'    },
+      { milestone:'QC inline inspection',       planned:'25 Apr 2026', actual:'',            status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Final inspection (AQL 2.5)', planned:'05 May 2026', actual:'',            status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Export booking',             planned:'08 May 2026', actual:'',            status:'Upcoming', owner:'Fatima'   },
+      { milestone:'Ex-factory',                 planned:'15 May 2026', actual:'',            status:'On Track', owner:'Soufiane' },
+    ],
+  },
+  {
+    po:       'ASOS-PO-44521-B',
+    client:   'ASOS',
+    model:    'AM-0045',
+    modelName:'Robe Satin Longue',
+    season:   'SS26',
+    issued:   '05 Apr 2026',
+    delivery: '30 Jun 2026',
+    qty:      800,
+    sizes:    'S×200 / M×280 / L×200 / XL×120',
+    colours:  'Dusty Rose, Mauve, Blush',
+    status:   'Confirmed',
+    value:    15432,
+    notes:    'Second colourway pack. Fabric ETA from supplier 20 Apr. Cutting to follow once PP for colourways approved.',
+    matrix: {
+      sizes: ['S','M','L','XL'],
+      rows: [
+        { colour:'Dusty Rose', hex:'#E8B4A0', values:[80,120,80,60]  },
+        { colour:'Mauve',      hex:'#C4A0B8', values:[70,100,70,50]  },
+        { colour:'Blush',      hex:'#F0D0C8', values:[50, 60,50,10]  },
+      ],
+    },
+    materials: [
+      { name:'Satin Duchess — Dusty Rose', supplier:'Duchesse-Satin SA', req:'296 m',  ordered:'296 m',  received:'0 m',  status:'On Order'          },
+      { name:'Satin Duchess — Mauve',      supplier:'Duchesse-Satin SA', req:'555 m',  ordered:'555 m',  received:'0 m',  status:'On Order'          },
+      { name:'Satin Duchess — Blush',      supplier:'Duchesse-Satin SA', req:'370 m',  ordered:'370 m',  received:'0 m',  status:'On Order'          },
+      { name:'Poly Lining',                supplier:'Poly-Tissu MA',     req:'760 m',  ordered:'760 m',  received:'0 m',  status:'On Order'          },
+      { name:'YKK Zip 60 cm (concealed)',  supplier:'YKK Morocco',       req:'800',    ordered:'800',    received:'0',    status:'On Order'           },
+      { name:'Label Set (brand+care+sz)',  supplier:'Etiquettes SA',     req:'800',    ordered:'0',      received:'0',    status:'Awaiting Delivery' },
+    ],
+    progress: [
+      { stage:'Fabric Cutting', done:0, total:800, colour:'All colours' },
+      { stage:'Sewing',         done:0, total:800, colour:'All colours' },
+      { stage:'Finishing / QC', done:0, total:800, colour:'All colours' },
+      { stage:'Packing',        done:0, total:800, colour:'All colours' },
+    ],
+    meetingNotes: [
+      { date:'05 Apr 2026', author:'Soufiane', text:'PO-44521-B received. Colourways confirmed: Dusty Rose, Mauve, Blush. Fabric ordered from Duchesse-Satin SA — ETA 20 Apr. PP approval for colourways required before cutting.' },
+    ],
+    cp: [
+      { milestone:'PP sample approval (colourways)', planned:'28 Apr 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Fabric delivery (all colours)',   planned:'20 Apr 2026', actual:'', status:'On Track', owner:'Ahmed'    },
+      { milestone:'Bulk cutting start',              planned:'30 Apr 2026', actual:'', status:'Upcoming', owner:'Karim'    },
+      { milestone:'Bulk sewing start',               planned:'10 May 2026', actual:'', status:'Upcoming', owner:'Karim'    },
+      { milestone:'QC inline inspection',            planned:'10 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Final inspection (AQL 2.5)',      planned:'20 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+      { milestone:'Export booking',                  planned:'24 Jun 2026', actual:'', status:'Upcoming', owner:'Fatima'   },
+      { milestone:'Ex-factory',                      planned:'30 Jun 2026', actual:'', status:'Upcoming', owner:'Soufiane' },
+    ],
+  },
+];
+
+/* ── KPI recalc ───────────────────────────────────────────────── */
+function recalcOrderKPIs(data) {
+  const totalUnits = data.reduce((s, o) => s + o.qty, 0);
+  const totalValue = data.reduce((s, o) => s + o.value, 0);
+  const inProd     = data.filter(o => o.status === 'In Production').length;
+  document.getElementById('o-kpi-total').textContent  = data.length;
+  document.getElementById('o-kpi-units').textContent  = totalUnits.toLocaleString();
+  document.getElementById('o-kpi-inprod').textContent = inProd;
+  document.getElementById('o-kpi-value').textContent  = '€' + totalValue.toLocaleString();
+}
+
+/* ── Render orders table ──────────────────────────────────────── */
+function renderOrders(data) {
+  const tbody = document.getElementById('o-tbody');
+  const empty = document.getElementById('o-empty');
+  const count = document.getElementById('o-count');
+
+  count.textContent = `${data.length} order${data.length !== 1 ? 's' : ''}`;
+  recalcOrderKPIs(data);
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    lucide.createIcons();
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(o => `
+    <tr class="tbl-row" onclick="openOrder('${o.po}')">
+      <td style="font-family:'Courier New',monospace;font-size:.78rem;font-weight:600;color:var(--text)">${o.po}</td>
+      <td class="fw-600">${o.client}</td>
+      <td>
+        <span class="model-id" style="font-size:.9rem">${o.model}</span>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:1px">${o.modelName}</div>
+      </td>
+      <td><span class="badge badge-draft" style="background:#F0EDE8">${o.season}</span></td>
+      <td class="muted-cell">${o.issued}</td>
+      <td class="muted-cell">${o.delivery}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.02em">${o.qty.toLocaleString()}</td>
+      <td><span class="badge ${STATUS_CLASS[o.status]||'badge-draft'}">${o.status}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.02em;color:var(--gold)">€${o.value.toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+
+/* ── Filter orders ────────────────────────────────────────────── */
+function filterOrders() {
+  const q      = document.getElementById('o-search').value.toLowerCase().trim();
+  const client = document.getElementById('o-client').value;
+  const status = document.getElementById('o-status').value;
+  const season = document.getElementById('o-season').value;
+
+  const result = ORDERS.filter(o => {
+    if (q && !o.po.toLowerCase().includes(q) &&
+             !o.client.toLowerCase().includes(q) &&
+             !o.model.toLowerCase().includes(q) &&
+             !o.modelName.toLowerCase().includes(q)) return false;
+    if (client && o.client !== client) return false;
+    if (status && o.status !== status) return false;
+    if (season && o.season !== season) return false;
+    return true;
+  });
+
+  renderOrders(result);
+  lucide.createIcons();
+}
+
+/* ── Export orders CSV ────────────────────────────────────────── */
+/* ── Shared print-window helper ───────────────────────────────── */
+function openPrintWin(docTitle, docMeta, bodyHtml) {
+  const date = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const win  = window.open('', '_blank', 'width=1000,height=750');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>${docTitle} — Ava Marie</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#1A1814;padding:36px 40px;background:#fff}
+    /* ── Header ── */
+    .doc-hdr{display:flex;justify-content:space-between;align-items:flex-start;
+      padding-bottom:14px;border-bottom:2.5px solid #C4A35A;margin-bottom:22px}
+    .brand{font-size:21px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+      color:#1A1814;font-family:'Arial Black',Arial,sans-serif}
+    .brand em{color:#C4A35A;font-style:normal}
+    .brand-sub{font-size:8.5px;color:#999;letter-spacing:.07em;margin-top:3px}
+    .doc-info{text-align:right}
+    .doc-title{font-size:14px;font-weight:700;text-transform:uppercase;
+      letter-spacing:.1em;color:#1A1814}
+    .doc-meta{font-size:9.5px;color:#888;margin-top:4px;line-height:1.5}
+    /* ── Print bar ── */
+    .print-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px}
+    .print-btn{padding:8px 22px;background:#C4A35A;color:#fff;border:none;border-radius:4px;
+      font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+      cursor:pointer;font-family:Arial,sans-serif}
+    .print-btn:hover{background:#A88430}
+    /* ── Section headings ── */
+    .sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+      color:#C4A35A;margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid #E8D5A3}
+    .sec-title:first-child{margin-top:0}
+    /* ── Table ── */
+    table{width:100%;border-collapse:collapse;margin-bottom:4px}
+    thead tr{background:#1A1814}
+    th{padding:8px 11px;text-align:left;font-size:8.5px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.12em;color:#C4A35A;white-space:nowrap}
+    td{padding:7px 11px;border-bottom:1px solid #EDEBE6;vertical-align:top;
+      font-size:10.5px;line-height:1.45}
+    tr:nth-child(even) td{background:#FAFAF8}
+    tfoot td{font-weight:700;border-top:2px solid #C4A35A;background:#FEF9EC!important;
+      font-size:11px}
+    /* ── Footer ── */
+    .doc-footer{text-align:center;font-size:8.5px;color:#bbb;
+      margin-top:28px;padding-top:12px;border-top:1px solid #EDEBE6}
+    @media print{.print-bar{display:none}}
+  </style></head><body>
+  <div class="doc-hdr">
+    <div>
+      <div class="brand">AVA <em>MARIE</em></div>
+      <div class="brand-sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+    </div>
+    <div class="doc-info">
+      <div class="doc-title">${docTitle}</div>
+      <div class="doc-meta">${docMeta}<br>Generated ${date}</div>
+    </div>
+  </div>
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">&#x1F5A8;&nbsp; Print / Save as PDF</button>
+  </div>
+  ${bodyHtml}
+  <div class="doc-footer">Ava Marie ERP &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; Confidential</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+}
+
+function buildTable(headers, rows, footerRow) {
+  const ths  = headers.map(h => `<th>${h}</th>`).join('');
+  const tds  = rows.map(r =>
+    `<tr>${r.map(c => `<td>${c == null ? '' : String(c)}</td>`).join('')}</tr>`
+  ).join('');
+  const foot = footerRow
+    ? `<tfoot><tr>${footerRow.map(c => `<td>${c == null ? '' : c}</td>`).join('')}</tr></tfoot>`
+    : '';
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${tds}</tbody>${foot}</table>`;
+}
+
+/* ── Orders export ────────────────────────────────────────────── */
+function exportOrdersCSV() {
+  const q      = document.getElementById('o-search').value.toLowerCase().trim();
+  const client = document.getElementById('o-client').value;
+  const status = document.getElementById('o-status').value;
+  const season = document.getElementById('o-season').value;
+
+  const data = ORDERS.filter(o => {
+    if (q && !o.po.toLowerCase().includes(q) &&
+             !o.client.toLowerCase().includes(q) &&
+             !o.model.toLowerCase().includes(q)) return false;
+    if (client && o.client !== client) return false;
+    if (status && o.status !== status) return false;
+    if (season && o.season !== season) return false;
+    return true;
+  });
+
+  const headers = ['PO Number','Client','Model','Model Name','Season','Issued','Delivery','Qty','Colours','Status','Value (€)'];
+  const rows    = data.map(o => [
+    `<code>${o.po}</code>`, o.client, o.model, o.modelName, o.season,
+    o.issued, o.delivery, o.qty.toLocaleString(), o.colours, o.status,
+    `€ ${o.value.toLocaleString()}`,
+  ]);
+  const totalVal = data.reduce((a, o) => a + o.value, 0);
+  const totalQty = data.reduce((a, o) => a + o.qty,   0);
+  const foot = ['', '', '', '', '', '', `${data.length} orders`,
+    totalQty.toLocaleString(), '', '<strong>TOTAL</strong>', `<strong>€ ${totalVal.toLocaleString()}</strong>`];
+
+  const filters = [client, status, season].filter(Boolean).join(' · ') || 'All';
+  openPrintWin('Orders', `${data.length} orders &nbsp;·&nbsp; Filter: ${filters}`,
+    buildTable(headers, rows, foot));
+  showToast(`Opened ${data.length} orders for print / PDF`);
+}
+
+/* ── Open order detail ────────────────────────────────────────── */
+async function openOrder(po) {
+  await loadView('order-detail');
+  currentOrderPO = po;
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+
+  document.getElementById('sec-orders').classList.remove('active');
+  document.getElementById('sec-order-detail').classList.add('active');
+  document.getElementById('tb-title').textContent = o.po;
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="clipboard-list"></i>';
+  lucide.createIcons();
+  document.getElementById('content').scrollTop = 0;
+
+  /* ── Header card ── */
+  document.getElementById('od-header').innerHTML = `
+    <div>
+      <div class="md-id-badge">${o.po}</div>
+      <div class="md-model-name">${o.modelName}
+        <span style="font-size:1rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400">(${o.model})</span>
+      </div>
+      <div class="md-meta-row">
+        <div><div class="md-meta-label">Client</div><div class="md-meta-value">${o.client}</div></div>
+        <div><div class="md-meta-label">Season</div><div class="md-meta-value">${o.season}</div></div>
+        <div><div class="md-meta-label">Issued</div><div class="md-meta-value">${o.issued}</div></div>
+        <div><div class="md-meta-label">Delivery</div><div class="md-meta-value">${o.delivery}</div></div>
+        <div><div class="md-meta-label">Colours</div><div class="md-meta-value">${o.colours}</div></div>
+        <div><div class="md-meta-label">Status</div><div class="md-meta-value"><span class="badge ${STATUS_CLASS[o.status]||''}">${o.status}</span></div></div>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="md-cost-big">€${o.value.toLocaleString()}</div>
+      <div class="md-cost-sub">${o.qty.toLocaleString()} units</div>
+    </div>`;
+
+  /* ── Export action bar ── */
+  const actions = `
+    <div class="od-actions">
+      <button class="btn-outline" onclick="exportOrderCP('${po}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Export CP
+      </button>
+      <button class="btn-primary" onclick="printOrderCP()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print CP
+      </button>
+    </div>`;
+
+  /* ── Style / Color / Size matrix ── */
+  const mx = o.matrix;
+  const sizeHeaders = mx.sizes.map(s =>
+    `<th>${s}</th>`).join('') + '<th>Total</th>';
+
+  const matrixRows = mx.rows.map((r, ri) => {
+    const rowTotal = r.values.reduce((a,b) => a+b, 0);
+    const cells = r.values.map((v, ci) =>
+      `<td><input class="qty-input" type="number" min="0"
+         data-po="${po}" data-row="${ri}" data-col="${ci}"
+         value="${v}" oninput="recalcMatrix('${po}')"></td>`
+    ).join('');
+    return `<tr>
+      <td><div class="colour-cell">
+        <div class="colour-swatch" style="background:${r.hex}"></div>
+        <span style="font-size:.82rem;font-weight:600">${r.colour}</span>
+      </div></td>
+      ${cells}
+      <td class="row-total" id="rt-${po}-${ri}">${rowTotal.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  const colTotals = mx.sizes.map((_, ci) =>
+    mx.rows.reduce((s, r) => s + r.values[ci], 0)
+  );
+  const grandTotal = colTotals.reduce((a,b) => a+b, 0);
+  const footCells = colTotals.map((t, ci) =>
+    `<td id="ct-${po}-${ci}">${t.toLocaleString()}</td>`).join('');
+
+  const matrixHtml = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Style · Colour / Size Matrix</span>
+        <span style="font-size:.78rem;font-weight:600;color:var(--muted)">
+          Grand total: <span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:1.1rem" id="gt-${po}">${grandTotal.toLocaleString()}</span> pcs
+        </span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="od-matrix">
+          <thead><tr><th style="text-align:left">Colour</th>${sizeHeaders}</tr></thead>
+          <tbody>${matrixRows}</tbody>
+          <tfoot><tr><td>Total</td>${footCells}<td id="gt2-${po}">${grandTotal.toLocaleString()}</td></tr></tfoot>
+        </table>
+      </div>
+    </div>`;
+
+  /* ── Materials status ── */
+  const MAT_CLS = { 'In Stock':'mat-instock','Awaiting Delivery':'mat-awaiting','Partial':'mat-partial','On Order':'mat-onorder' };
+  const matRows = o.materials.map(m => `
+    <tr class="tbl-row">
+      <td class="fw-600">${m.name}</td>
+      <td class="muted-cell">${m.supplier}</td>
+      <td style="text-align:right">${m.req}</td>
+      <td style="text-align:right">${m.ordered}</td>
+      <td style="text-align:right">${m.received}</td>
+      <td><span class="mat-status ${MAT_CLS[m.status]||'mat-onorder'}">${m.status}</span></td>
+    </tr>`).join('');
+
+  const matHtml = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Material Status</span></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Material</th><th>Supplier</th><th style="text-align:right">Required</th><th style="text-align:right">On Order</th><th style="text-align:right">Received</th><th>Status</th></tr></thead>
+          <tbody>${matRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  /* ── Production progress ── */
+  const progRows = o.progress.map(p => {
+    const pct = p.total > 0 ? Math.round((p.done / p.total) * 100) : 0;
+    const fillClass = pct === 100 ? 'done' : pct === 0 ? 'zero' : '';
+    return `<div>
+      <div class="prog-row-lbl">
+        <div>
+          <span class="prog-stage">${p.stage}</span>
+          <span style="font-size:.7rem;color:var(--muted2);margin-left:6px">${p.colour}</span>
+        </div>
+        <span class="prog-count">${p.done.toLocaleString()} / ${p.total.toLocaleString()} pcs &nbsp; <span style="color:var(--gold)">${pct}%</span></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill ${fillClass}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const progHtml = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Production Progress</span></div>
+      <div class="prog-section">${progRows}</div>
+    </div>`;
+
+  /* ── Meeting notes ── */
+  const noteCards = o.meetingNotes.map(n => `
+    <div class="note-card">
+      <div class="note-head">
+        <span class="note-author">${n.author}</span>
+        <span class="note-date">${n.date}</span>
+      </div>
+      <div class="note-text">${n.text}</div>
+    </div>`).join('');
+
+  const notesHtml = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Meeting Notes &mdash; ${o.meetingNotes.length} entries</span>
+      </div>
+      <div id="note-list-${po}">${noteCards}</div>
+      <div class="note-add-wrap">
+        <textarea class="note-add-input" id="note-input-${po}"
+          placeholder="Add a meeting note, decision, or client instruction…"></textarea>
+        <button class="btn-primary" style="font-size:.7rem;padding:7px 14px"
+          onclick="addMeetingNote('${po}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Note
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById('od-body').innerHTML = actions + matrixHtml + matHtml + progHtml + notesHtml;
+}
+
+/* ── Recalculate matrix totals ────────────────────────────────── */
+function recalcMatrix(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+  const nRows = o.matrix.rows.length;
+  const nCols = o.matrix.sizes.length;
+
+  let grand = 0;
+  /* row totals */
+  for (let ri = 0; ri < nRows; ri++) {
+    let rowSum = 0;
+    for (let ci = 0; ci < nCols; ci++) {
+      const inp = document.querySelector(`.qty-input[data-po="${po}"][data-row="${ri}"][data-col="${ci}"]`);
+      rowSum += inp ? (parseInt(inp.value) || 0) : 0;
+    }
+    const rt = document.getElementById(`rt-${po}-${ri}`);
+    if (rt) rt.textContent = rowSum.toLocaleString();
+    grand += rowSum;
+  }
+  /* column totals */
+  for (let ci = 0; ci < nCols; ci++) {
+    let colSum = 0;
+    for (let ri = 0; ri < nRows; ri++) {
+      const inp = document.querySelector(`.qty-input[data-po="${po}"][data-row="${ri}"][data-col="${ci}"]`);
+      colSum += inp ? (parseInt(inp.value) || 0) : 0;
+    }
+    const ct = document.getElementById(`ct-${po}-${ci}`);
+    if (ct) ct.textContent = colSum.toLocaleString();
+  }
+  /* grand total */
+  ['gt-'+po, 'gt2-'+po].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = grand.toLocaleString();
+  });
+}
+
+/* ── Add meeting note ─────────────────────────────────────────── */
+function addMeetingNote(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o) return;
+  const inp = document.getElementById('note-input-' + po);
+  const text = inp ? inp.value.trim() : '';
+  if (!text) { showToast('Please type a note first.'); return; }
+
+  const today = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const user  = sessionStorage.getItem('erp_user') || 'User';
+  const note  = { date: today, author: user.charAt(0).toUpperCase() + user.slice(1), text };
+
+  o.meetingNotes.unshift(note);
+
+  const newCard = document.createElement('div');
+  newCard.className = 'note-card';
+  newCard.style.background = 'rgba(196,163,90,.04)';
+  newCard.innerHTML = `
+    <div class="note-head">
+      <span class="note-author">${note.author}</span>
+      <span class="note-date">${note.date}</span>
+    </div>
+    <div class="note-text">${note.text}</div>`;
+
+  const list = document.getElementById('note-list-' + po);
+  if (list) list.prepend(newCard);
+
+  inp.value = '';
+  showToast('Note added');
+}
+
+/* ── Export CP as Excel (CSV) ─────────────────────────────────── */
+function exportOrderCP(po) {
+  const o = ORDERS.find(x => x.po === po);
+  if (!o || !o.cp) return;
+
+  /* Section 1: Critical Path */
+  const cpRows = o.cp.map(r => [r.milestone, r.planned, r.actual||'—', r.status, r.owner]);
+  const cpTable = buildTable(
+    ['Milestone','Planned Date','Actual Date','Status','Owner'],
+    cpRows
+  );
+
+  /* Section 2: Size Matrix */
+  const mxHeader = ['Colour', ...o.matrix.sizes, 'Total'];
+  const mxRows = o.matrix.rows.map(r => {
+    const inputs = document.querySelectorAll(`.qty-input[data-po="${po}"][data-row="${o.matrix.rows.indexOf(r)}"]`);
+    const vals   = inputs.length ? [...inputs].map(i => parseInt(i.value)||0) : r.values;
+    return [r.colour, ...vals, vals.reduce((a,b)=>a+b,0)];
+  });
+  const totalsBySize = o.matrix.sizes.map((_, si) => mxRows.reduce((a, r) => a + (r[si+1]||0), 0));
+  const mxFoot = ['<strong>TOTAL</strong>', ...totalsBySize, totalsBySize.reduce((a,b)=>a+b,0)];
+  const mxTable = buildTable(mxHeader, mxRows, mxFoot);
+
+  /* Section 3: Materials Status */
+  const matRows = o.materials.map(m => [m.name, m.supplier, m.req, m.ordered, m.received, m.status]);
+  const matTable = buildTable(
+    ['Material','Supplier','Required','On Order','Received','Status'],
+    matRows
+  );
+
+  const body = `
+    <p class="doc-meta">${o.modelName} &middot; ${o.client} &middot; ${o.season} &middot; Delivery: ${o.delivery}</p>
+    <h3 class="sec-title">Critical Path</h3>${cpTable}
+    <h3 class="sec-title" style="margin-top:24px">Style / Colour / Size Matrix</h3>${mxTable}
+    <h3 class="sec-title" style="margin-top:24px">Material Status</h3>${matTable}
+  `;
+
+  openPrintWin(`Critical Path — ${po}`, `${o.modelName} · ${o.client} · Delivery: ${o.delivery}`, body);
+  showToast(`Opened Critical Path for ${po}`);
+}
+
+/* ── Print CP as PDF ──────────────────────────────────────────── */
+function printOrderCP() {
+  exportOrderCP(currentOrderPO);
+}
+
+/* ── Close order detail ───────────────────────────────────────── */
+function closeOrder() { navTo('orders'); }
+
+/* ── Render models table ──────────────────────────────────────── */
+function renderModels(data) {
+  const tbody = document.getElementById('m-tbody');
+  const empty = document.getElementById('m-empty');
+  const count = document.getElementById('m-count');
+
+  count.textContent = `${data.length} model${data.length !== 1 ? 's' : ''}`;
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    lucide.createIcons();
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(m => `
+    <tr class="tbl-row" onclick="openModel('${m.id}')">
+      <td><span class="model-id">${m.id}</span></td>
+      <td class="fw-600">${m.name}</td>
+      <td>${m.client}</td>
+      <td class="ref-cell">${m.ref}</td>
+      <td>${m.cat}</td>
+      <td style="text-align:center" class="fw-600">${m.rev}</td>
+      <td><span class="badge ${STATUS_CLASS[m.status]||''}">${m.status}</span></td>
+      <td class="cost-cell">${m.cost !== null ? '€'+m.cost.toFixed(2) : '<span style="color:var(--muted2)">—</span>'}</td>
+      <td class="muted-cell">${m.updated}</td>
+    </tr>
+  `).join('');
+}
+
+/* ── Filter ───────────────────────────────────────────────────── */
+function filterModels() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const result = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)  &&
+             !m.client.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  renderModels(result);
+}
+
+/* ── Export Models (print window) ────────────────────────────── */
+function exportModelsCSV() {
+  const q      = document.getElementById('m-search').value.toLowerCase().trim();
+  const client = document.getElementById('m-client').value;
+  const status = document.getElementById('m-status').value;
+  const cat    = document.getElementById('m-cat').value;
+
+  const data = MODELS.filter(m => {
+    if (q && !m.id.toLowerCase().includes(q) &&
+             !m.name.toLowerCase().includes(q) &&
+             !m.ref.toLowerCase().includes(q)) return false;
+    if (client && m.client !== client) return false;
+    if (status && m.status !== status) return false;
+    if (cat    && m.cat    !== cat)    return false;
+    return true;
+  });
+
+  const filters = [
+    q      ? `Search: "${q}"` : '',
+    client ? `Client: ${client}` : '',
+    status ? `Status: ${status}` : '',
+    cat    ? `Category: ${cat}` : '',
+  ].filter(Boolean).join(' · ') || 'All models';
+
+  const rows = data.map(m => [
+    `<code>${m.id}</code>`, m.name, m.client, m.ref, m.cat, `Rev ${m.rev}`, m.status,
+    m.cost !== null ? `€ ${m.cost.toFixed(2)}` : '—', m.updated,
+  ]);
+
+  openPrintWin(
+    'Models',
+    `${data.length} model${data.length!==1?'s':''} · ${filters}`,
+    buildTable(['Model #','Name','Client','Client Ref','Category','Revision','Status','Cost/pc','Updated'], rows)
+  );
+  showToast(`Opened ${data.length} model${data.length!==1?'s':''} for print / PDF`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODEL DETAIL — data & render
+   ══════════════════════════════════════════════════════════════ */
+
+const MD = {
+  'AM-0045': {
+
+    /* ── Tab 5 · Revisions ─────────────────────────────────── */
+    revisions: [
+      {
+        rev: 1, date: '15 Jan 2026', author: 'Fatima', latest: false,
+        summary: 'Initial tech pack received. Fabric spec confirmed as 100% poly satin duchess. Basic silhouette drafted and costed.',
+        changes: ['Tech pack uploaded — AM-0045-TP-r1.pdf', 'Fabric confirmed: satin duchess 100% poly', 'Initial SMV estimate: 22.4 min', 'BOM drafted — 8 components'],
+      },
+      {
+        rev: 2, date: '04 Feb 2026', author: 'Soufiane', latest: false,
+        summary: 'Neckline adjusted from square to subtle V following proto session. Sleeve length extended +2 cm per fit notes.',
+        changes: ['Neckline: square → subtle V (−1.5 cm depth)', 'Sleeve length +2 cm', 'SMV revised to 24.2 min', 'BOM updated — fabric consumption +0.06 m'],
+      },
+      {
+        rev: 3, date: '18 Feb 2026', author: 'Karim', latest: false,
+        summary: 'Back vent removed at client request. Zip upgraded from generic to YKK concealed 60 cm for cleaner finish.',
+        changes: ['Back vent removed', 'Zip: generic invisible → YKK concealed 60 cm', 'BOM updated — zip unit cost +€0.18', 'Seam allowance at CB zip increased to 1.5 cm'],
+      },
+      {
+        rev: 4, date: '28 Mar 2026', author: 'Soufiane', latest: true,
+        summary: 'Size grading finalised across XS–XL. PP sample approved by ASOS buyer. Production go-ahead issued.',
+        changes: ['Size grading finalised XS–XL (base M)', 'PP sample approved — ASOS ref PPAM0045-04', 'Final SMV locked: 24.6 min', 'Status changed → In Production'],
+      },
+    ],
+
+    /* ── Tab 6 · Samples ───────────────────────────────────── */
+    samples: [
+      {
+        type: 'Proto', cssClass: 's-rejected', badgeClass: 'sb-rejected', statusLabel: 'Rejected',
+        rev: 1, date: '28 Jan 2026',
+        feedback: 'Bust ease 4 cm too tight in size M. Zip placket visible — top-stitching not concealed. Neckline sits 1.5 cm too low. Full recut required before next submission.',
+      },
+      {
+        type: 'Fit Sample', cssClass: 's-changes', badgeClass: 'sb-changes', statusLabel: 'Approved with Changes',
+        rev: 2, date: '20 Feb 2026',
+        feedback: 'Good improvement overall. Approved conditional on: neckline raised 1 cm, sleeve shortened 1.5 cm, seam allowance at CB zip increased to 1.5 cm. Resubmit corrected size set.',
+      },
+      {
+        type: 'Size Set', cssClass: 's-pending', badgeClass: 'sb-pending', statusLabel: 'Pending',
+        rev: 3, date: '10 Mar 2026',
+        feedback: 'Submitted to ASOS buyer 10 Mar 2026. All sizes graded from approved Fit Sample (base M). Awaiting client sign-off — chased 24 Mar, response pending.',
+      },
+      {
+        type: 'PP Sample', cssClass: 's-noprod', badgeClass: 'sb-noprod', statusLabel: 'Not Produced',
+        rev: 4, date: null,
+        feedback: '',
+      },
+      {
+        type: 'TOP Sample', cssClass: 's-noprod', badgeClass: 'sb-noprod', statusLabel: 'Not Produced',
+        rev: 4, date: null,
+        feedback: '',
+      },
+    ],
+
+    /* ── Tab 7 · Linked Orders ─────────────────────────────── */
+    orders: [
+      {
+        po: 'ASOS-PO-44521-A',
+        issued:   '01 Apr 2026',
+        delivery: '15 May 2026',
+        qty: 2400,
+        sizes: 'XS×240 / S×540 / M×720 / L×540 / XL×360',
+        status: 'In Production',
+        value: 46296,
+      },
+      {
+        po: 'ASOS-PO-44521-B',
+        issued:   '05 Apr 2026',
+        delivery: '30 Jun 2026',
+        qty: 800,
+        sizes: 'S×200 / M×280 / L×200 / XL×120',
+        status: 'Confirmed',
+        value: 15432,
+      },
+    ],
+
+    /* ── Tab 8 · Audit ─────────────────────────────────────── */
+    audit: [
+      {
+        ts: '28 Mar 2026, 14:32', user: 'Soufiane',
+        action: 'STATUS CHANGE',
+        detail: 'Status changed: Confirmed → In Production following PP sign-off',
+      },
+      {
+        ts: '28 Mar 2026, 14:28', user: 'Soufiane',
+        action: 'APPROVED',
+        detail: 'Rev.4 PP sample approved — ASOS buyer ref PPAM0045-04',
+      },
+      {
+        ts: '18 Feb 2026, 10:15', user: 'Karim',
+        action: 'REVISION',
+        detail: 'Rev.3 created — back vent removed, zip upgraded to YKK concealed 60 cm',
+      },
+      {
+        ts: '15 Feb 2026, 16:42', user: 'Ahmed',
+        action: 'UPLOADED',
+        detail: 'Tech pack Rev.3 uploaded — AM-0045-TP-r3.pdf (2.4 MB)',
+      },
+      {
+        ts: '04 Feb 2026, 09:20', user: 'Soufiane',
+        action: 'REVISION',
+        detail: 'Rev.2 created — neckline adjusted to subtle V, sleeve +2 cm, SMV revised to 24.2 min',
+      },
+      {
+        ts: '28 Jan 2026, 11:55', user: 'Soufiane',
+        action: 'REJECTED',
+        detail: 'Proto sample (Rev.1) rejected — bust ease 4 cm too tight, zip placket visible, neckline 1.5 cm low',
+      },
+      {
+        ts: '15 Jan 2026, 08:00', user: 'Fatima',
+        action: 'CREATED',
+        detail: 'Model AM-0045 created — initial tech pack uploaded, BOM drafted (8 components)',
+      },
+    ],
+  },
+};
+
+/* ── Open model detail ────────────────────────────────────────── */
+async function openModel(id) {
+  await loadView('model-detail');
+  const m = MODELS.find(x => x.id === id);
+  if (!m) return;
+
+  /* hide models list, show detail */
+  document.getElementById('sec-models').classList.remove('active');
+  const det = document.getElementById('sec-model-detail');
+  det.classList.add('active');
+
+  /* reset to first tab */
+  document.querySelectorAll('.md-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.md-tab[data-pane="md-overview"]').classList.add('active');
+  document.querySelectorAll('.md-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('md-overview').classList.add('active');
+
+  /* topbar */
+  document.getElementById('tb-title').textContent = m.id + ' — ' + m.name;
+  document.getElementById('tb-icon').innerHTML = '<i data-lucide="shirt"></i>';
+  lucide.createIcons();
+
+  /* scroll top */
+  document.getElementById('content').scrollTop = 0;
+
+  /* header card */
+  const sm = STATUS_CLASS[m.status] || '';
+  document.getElementById('md-header').innerHTML = `
+    <div>
+      <div class="md-id-badge">${m.id}</div>
+      <div class="md-model-name">${m.name}</div>
+      <div class="md-meta-row">
+        <div><div class="md-meta-label">Client</div><div class="md-meta-value">${m.client}</div></div>
+        <div><div class="md-meta-label">Client Ref</div><div class="md-meta-value" style="font-family:'Courier New',monospace;font-size:.78rem">${m.ref}</div></div>
+        <div><div class="md-meta-label">Category</div><div class="md-meta-value">${m.cat}</div></div>
+        <div><div class="md-meta-label">Revision</div><div class="md-meta-value">Rev.${m.rev}</div></div>
+        <div><div class="md-meta-label">Status</div><div class="md-meta-value"><span class="badge ${sm}">${m.status}</span></div></div>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="md-cost-big">${m.cost !== null ? '€' + m.cost.toFixed(2) : '—'}</div>
+      <div class="md-cost-sub">cost / piece</div>
+    </div>
+  `;
+
+  /* render all panes */
+  renderMdOverview(m);
+  renderMdBom(m);
+  renderMdGamme(m);
+  renderMdPom(m);
+  renderMdRevisions(id);
+  renderMdSamples(id);
+  renderMdOrders(id);
+  renderMdAudit(id);
+  lucide.createIcons();
+}
+
+/* ── Close model detail ───────────────────────────────────────── */
+function closeModel() { navTo('models'); }
+
+/* ── Tab switcher ─────────────────────────────────────────────── */
+function setMdTab(btn) {
+  document.querySelectorAll('.md-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = btn.dataset.pane;
+  document.querySelectorAll('.md-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById(pane).classList.add('active');
+}
+
+/* ── Helper: empty pane ───────────────────────────────────────── */
+function emptyPane(msg) {
+  return `<div class="sc" style="padding:52px 0;text-align:center">
+    <p style="font-size:.82rem;color:var(--muted)">${msg}</p>
+  </div>`;
+}
+
+/* ── Tab 1 · Overview ─────────────────────────────────────────── */
+function renderMdOverview(m) {
+  document.getElementById('md-overview').innerHTML = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Description</span></div>
+      <div style="padding:18px 22px;font-size:.85rem;color:var(--text);line-height:1.8">${m.desc}</div>
+    </div>
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Quick Facts</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        ${[
+          ['Current Revision', 'Rev.' + m.rev],
+          ['Last Updated', m.updated],
+          ['Updated By', m.updatedBy],
+          ['Cost / Piece', m.cost !== null ? '€' + m.cost.toFixed(2) : '—'],
+        ].map(([l,v]) => `
+          <div style="padding:16px 22px;border-right:1px solid #F0EDE8">
+            <div style="font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">${l}</div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--text)">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* ── Tab 2 · BOM ──────────────────────────────────────────────── */
+function renderMdBom(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-bom').innerHTML = emptyPane('No BOM data available for this model.'); return; }
+  const rows = [
+    ['Main Fabric',  'Satin duchess 100% poly, ivory',   'Duchesse-Satin SA', 'm',   '1.85', '3.20',  '5.92'],
+    ['Lining',       'Poly lining, ivory',                'Poly-Tissu MA',     'm',   '0.95', '0.85',  '0.81'],
+    ['Zip',          'YKK concealed 60 cm',               'YKK Morocco',       'pcs', '1',    '0.63',  '0.63'],
+    ['Hook & Bar',   'Waist hook & bar, nickel',          'Métal Plus',        'pcs', '1',    '0.08',  '0.08'],
+    ['Label Set',    'Brand + care + size labels',        'Etiquettes SA',     'set', '1',    '0.22',  '0.22'],
+    ['Polybag',      '50 × 70 cm, self-seal',             'PackPro',           'pcs', '1',    '0.12',  '0.12'],
+    ['Hanger',       'Velvet non-slip',                   'HangMa',            'pcs', '1',    '0.18',  '0.18'],
+  ];
+  const total = rows.reduce((s, r) => s + parseFloat(r[6]), 0);
+  document.getElementById('md-bom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Bill of Materials — Rev.4 · ${rows.length} components</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">€${total.toFixed(2)} / pc</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Component</th><th>Description</th><th>Supplier</th><th style="text-align:center">Unit</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit €</th><th style="text-align:right">Total €</th></tr></thead>
+          <tbody>${rows.map(r => `<tr class="tbl-row"><td class="fw-600">${r[0]}</td><td class="muted-cell">${r[1]}</td><td>${r[2]}</td><td style="text-align:center">${r[3]}</td><td style="text-align:right">${r[4]}</td><td style="text-align:right">€${r[5]}</td><td class="cost-cell">€${r[6]}</td></tr>`).join('')}
+          <tr style="background:#FFFDF7"><td colspan="6" style="padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Materials Total</td><td class="cost-cell" style="padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">€${total.toFixed(2)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 3 · Gamme ────────────────────────────────────────────── */
+function renderMdGamme(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-gamme').innerHTML = emptyPane('No Gamme Opératoire available.'); return; }
+  const ops = [
+    ['010','Mark & Bundle','Manual','★','2.5'],
+    ['020','Shoulder seams (× 2)','Overlock 5-thread','★★','1.8'],
+    ['030','Side seams + lining side seams','Overlock 5-thread','★★','2.2'],
+    ['040','Lining attachment at neckline','Lockstitch','★★★','4.5'],
+    ['050','CB zip insertion (YKK 60 cm)','Lockstitch','★★★★','6.2'],
+    ['060','Hem — shell + lining','Blind-stitch + Overlock','★★★','3.8'],
+    ['070','Final steam press','Steam press','★★','2.1'],
+    ['080','QC inspection + tagging','Manual','★★','1.5'],
+  ];
+  const totalSMV = ops.reduce((s, r) => s + parseFloat(r[4]), 0);
+  document.getElementById('md-gamme').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Gamme Opératoire — Rev.4 · ${ops.length} operations</span>
+        <span style="font-size:.8rem;font-weight:600;color:var(--text)">Total SMV: <span style="color:var(--gold)">${totalSMV.toFixed(1)} min</span></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Op #</th><th>Operation</th><th>Machine</th><th style="text-align:center">Level</th><th style="text-align:right">SMV (min)</th></tr></thead>
+          <tbody>${ops.map(r => `<tr class="tbl-row"><td class="ref-cell">${r[0]}</td><td class="fw-600">${r[1]}</td><td class="muted-cell">${r[2]}</td><td style="text-align:center;letter-spacing:2px;color:var(--gold)">${r[3]}</td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--text)">${r[4]}</td></tr>`).join('')}
+          <tr style="background:#FFFDF7"><td colspan="4" style="padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Total SMV</td><td style="text-align:right;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${totalSMV.toFixed(1)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 4 · POM ──────────────────────────────────────────────── */
+function renderMdPom(m) {
+  if (m.id !== 'AM-0045') { document.getElementById('md-pom').innerHTML = emptyPane('No POM data available.'); return; }
+  const pts = [
+    ['Bust (at underarm)','88','92','96','100','106'],
+    ['Waist','72','76','80','84','90'],
+    ['Hip (at 18 cm below waist)','94','98','102','106','112'],
+    ['Centre front length','120','121','122','123','124'],
+    ['Shoulder width','37','38','39','40','41'],
+    ['Sleeve length (CB to cuff)','62','62.5','63','63.5','64'],
+    ['Hem circumference','140','144','148','152','158'],
+  ];
+  document.getElementById('md-pom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head"><span class="sc-title">Points of Measure — Rev.4 · All measurements in cm · Tolerance ± 1 cm</span></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Point of Measure</th>${['XS','S','M','L','XL'].map(s=>`<th style="text-align:center">${s}</th>`).join('')}</tr></thead>
+          <tbody>${pts.map(r=>`<tr class="tbl-row"><td class="fw-600">${r[0]}</td>${r.slice(1).map(v=>`<td style="text-align:center">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 5 · Revisions ────────────────────────────────────────── */
+function renderMdRevisions(id) {
+  const d = MD[id];
+  if (!d) { document.getElementById('md-revisions').innerHTML = emptyPane('No revision history recorded.'); return; }
+
+  /* reverse so latest is on top */
+  const revs = [...d.revisions].reverse();
+
+  const items = revs.map((r, i) => {
+    const isLast = i === revs.length - 1;
+    return `
+      <div class="rev-item"${isLast ? '' : ' style="padding-bottom:0"'}>
+        ${!isLast ? `<div style="position:absolute;left:17px;top:28px;bottom:0;width:2px;background:#E6E2DC;z-index:0"></div>` : ''}
+        <div class="rev-dot-col">
+          <div class="rev-dot${r.latest ? ' latest' : ''}"></div>
+        </div>
+        <div class="rev-body">
+          <div class="rev-hrow">
+            <span class="rev-num">Rev.${r.rev}</span>
+            ${r.latest ? '<span class="rev-latest-chip">Latest</span>' : ''}
+            <span class="rev-meta">${r.date} &nbsp;·&nbsp; ${r.author}</span>
+          </div>
+          <p class="rev-summary">${r.summary}</p>
+          <ul class="rev-changes">
+            ${r.changes.map(c => `<li>${c}</li>`).join('')}
+          </ul>
+          <div class="rev-btns">
+            <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+              onclick="showToast('Rev.${r.rev} tech pack viewer — coming next')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/><circle cx="12" cy="12" r="3"/></svg>
+              View
+            </button>
+            ${!r.latest ? `
+            <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+              onclick="showToast('Compare Rev.${r.rev} vs Rev.${revs[0].rev} — coming next')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+              Compare
+            </button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('md-revisions').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Revision History &mdash; ${d.revisions.length} revisions</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+          onclick="showToast('New revision form — coming next')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Revision
+        </button>
+      </div>
+      <div class="rev-list" style="position:relative">${items}</div>
+    </div>`;
+}
+
+/* ── Tab 6 · Samples ──────────────────────────────────────────── */
+function renderMdSamples(id) {
+  const d = MD[id];
+  if (!d) { document.getElementById('md-samples').innerHTML = emptyPane('No sample records found.'); return; }
+
+  const hasPPWarning = d.samples.some(s => s.type === 'PP Sample' && s.statusLabel === 'Not Produced');
+
+  const warning = hasPPWarning ? `
+    <div class="sample-warn">
+      <svg class="sample-warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <p><strong>PP Sample not yet produced.</strong> Production approval is blocked until the Pre-Production sample is submitted, reviewed, and signed off by the client buyer. No bulk cutting should begin before PP approval is on file.</p>
+    </div>` : '';
+
+  const cards = d.samples.map(s => {
+    const dateStr = s.date
+      ? `<div class="sample-datemeta">Submitted ${s.date} &nbsp;·&nbsp; Rev.${s.rev}</div>`
+      : `<div class="sample-datemeta" style="color:var(--muted2)">Not yet produced &nbsp;·&nbsp; Rev.${s.rev}</div>`;
+
+    const fbBlock = s.statusLabel === 'Not Produced' ? `
+      <div class="sample-fb-lbl">Notes</div>
+      <textarea class="sample-fb" placeholder="No sample produced yet. Add notes here…" rows="3"></textarea>` : `
+      <div class="sample-fb-lbl">Client Feedback</div>
+      <textarea class="sample-fb" rows="3">${s.feedback}</textarea>`;
+
+    return `
+      <div class="sample-card ${s.cssClass}">
+        <div class="sample-chead">
+          <span class="sample-type-lbl">${s.type}</span>
+          <span class="sbadge ${s.badgeClass}">
+            <span class="sdot"></span>${s.statusLabel}
+          </span>
+        </div>
+        ${dateStr}
+        ${fbBlock}
+      </div>`;
+  }).join('');
+
+  document.getElementById('md-samples').innerHTML = `
+    ${warning}
+    <div class="sample-grid">${cards}</div>`;
+}
+
+/* ── Tab 7 · Linked Orders (placeholder) ──────────────────────── */
+function renderMdOrders(id) {
+  const d = MD[id];
+  if (!d || !d.orders) { document.getElementById('md-orders').innerHTML = emptyPane('No linked orders for this model.'); return; }
+
+  const o = d.orders;
+  const totalQty = o.reduce((s, r) => s + r.qty, 0);
+  const totalVal = o.reduce((s, r) => s + r.value, 0);
+
+  const STATUS_CLS = {
+    'In Production': 'badge-production',
+    'Confirmed':     'badge-confirmed',
+    'Completed':     'badge-completed',
+    'Sample':        'badge-sample',
+    'Draft':         'badge-draft',
+  };
+
+  const rows = o.map(r => `
+    <tr class="tbl-row">
+      <td style="font-family:'Courier New',monospace;font-size:.78rem;color:var(--text);font-weight:600">${r.po}</td>
+      <td class="muted-cell">${r.issued}</td>
+      <td class="muted-cell">${r.delivery}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.03em;color:var(--text)">${r.qty.toLocaleString()}</td>
+      <td style="font-size:.75rem;color:var(--muted);max-width:220px;white-space:normal;line-height:1.5">${r.sizes}</td>
+      <td><span class="badge ${STATUS_CLS[r.status]||'badge-draft'}">${r.status}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.02em;color:var(--gold)">€${r.value.toLocaleString()}</td>
+    </tr>`).join('');
+
+  document.getElementById('md-orders').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Linked Orders &mdash; ${o.length} purchase orders</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px"
+          onclick="showToast('New order form — coming next')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Link Order
+        </button>
+      </div>
+
+      <!-- Summary strip -->
+      <div class="lo-summary">
+        <div>
+          <div class="lo-stat-val">${o.length}</div>
+          <div class="lo-stat-lbl">Purchase Orders</div>
+        </div>
+        <div>
+          <div class="lo-stat-val gold">${totalQty.toLocaleString()}</div>
+          <div class="lo-stat-lbl">Total Units</div>
+        </div>
+        <div>
+          <div class="lo-stat-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.02em;color:var(--gold)">€${totalVal.toLocaleString()}</div>
+          <div class="lo-stat-lbl">Total Value (ex-factory)</div>
+        </div>
+        <div>
+          <div class="lo-stat-val" style="font-size:1.75rem">${o.filter(r=>r.status==='In Production').length}</div>
+          <div class="lo-stat-lbl">In Production</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Issued</th>
+              <th>Delivery</th>
+              <th style="text-align:right">Qty</th>
+              <th>Size Breakdown</th>
+              <th>Status</th>
+              <th style="text-align:right">Value (EUR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+            <tr style="background:#FFFDF7;border-top:2px solid rgba(196,163,90,.15)">
+              <td colspan="3" style="padding:13px 20px;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Total</td>
+              <td style="padding:13px 20px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--text)">${totalQty.toLocaleString()}</td>
+              <td></td>
+              <td></td>
+              <td style="padding:13px 20px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.02em;color:var(--gold)">€${totalVal.toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab 8 · Audit ────────────────────────────────────────────── */
+function renderMdAudit(id) {
+  const d = MD[id];
+  if (!d || !d.audit) { document.getElementById('md-audit').innerHTML = emptyPane('No audit log entries.'); return; }
+
+  const BADGE = {
+    'CREATED':         'ab-created',
+    'UPDATED':         'ab-updated',
+    'UPLOADED':        'ab-uploaded',
+    'APPROVED':        'ab-approved',
+    'REJECTED':        'ab-rejected',
+    'STATUS CHANGE':   'ab-statuschange',
+    'REVISION':        'ab-revision',
+  };
+
+  const entries = d.audit.map(e => `
+    <div class="audit-entry">
+      <div class="audit-av">${e.user.charAt(0)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="audit-arow">
+          <span class="audit-badge ${BADGE[e.action]||'ab-updated'}">${e.action}</span>
+          <span style="font-size:.76rem;font-weight:600;color:var(--text)">${e.user}</span>
+        </div>
+        <div class="audit-detail">${e.detail}</div>
+        <div class="audit-ts">${e.ts}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('md-audit').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Audit Log &mdash; ${d.audit.length} entries</span>
+        <button class="btn-outline" style="font-size:.68rem;padding:5px 12px" onclick="exportAuditCSV('${id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+          </svg>
+          Print Audit
+        </button>
+      </div>
+      <div>${entries}</div>
+    </div>`;
+}
+
+/* ── Audit CSV export ─────────────────────────────────────────── */
+function exportAuditCSV(id) {
+  const d = MD[id];
+  if (!d || !d.audit) return;
+  const rows = d.audit.map(e => [e.ts, e.user, e.action, e.detail]);
+  openPrintWin(
+    `Audit Log — ${id}`,
+    `${d.audit.length} entr${d.audit.length!==1?'ies':'y'} · Model ${id}`,
+    buildTable(['Timestamp','User','Action','Detail'], rows)
+  );
+  showToast(`Opened audit log for ${id}`);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PLANNING — Monthly calendar for 20 sewing lines
+   ══════════════════════════════════════════════════════════════ */
+
+/* Working hours per day: index = day of week (0=Sun … 6=Sat) */
+let PLAN_HRS = [0, 9.5, 9.5, 9.5, 9.5, 8.5, 9.5];
+
+const PLAN_TODAY = new Date('2026-04-18T00:00:00');
+let planYear     = PLAN_TODAY.getFullYear();
+let planMonth    = PLAN_TODAY.getMonth(); // 0-based
+const PLAN_LINES = 20;
+const PLAN_MONTH_NAMES = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+const PLAN_DAY_ABBR    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+/* Seed blocks — duration auto-calculated from qty ÷ (pph × hrs/day) */
+let PLAN_BLOCKS = [
+  { id:'PB1', line:1,  model:'AM-0045', po:'ASOS-PO-44521-A', colour:'Ivory', qty:2400, pph:25, start:'2026-04-01', color:'#2455CC' },
+  { id:'PB7', line:3,  model:'AM-0039', po:'RI-PL-3301',      colour:'Navy',  qty:800,  pph:18, start:'2026-04-03', color:'#196741' },
+  { id:'PB2', line:3,  model:'AM-0045', po:'ASOS-PO-44521-A', colour:'Ivory', qty:1800, pph:25, start:'2026-04-09', color:'#2455CC' },
+  { id:'PB3', line:5,  model:'AM-0052', po:'PLT-CR-8821',     colour:'Black', qty:3000, pph:22, start:'2026-04-05', color:'#C4A35A' },
+  { id:'PB4', line:8,  model:'AM-0039', po:'RI-PL-3301',      colour:'Navy',  qty:1200, pph:20, start:'2026-04-10', color:'#196741' },
+  { id:'PB5', line:12, model:'AM-0052', po:'PLT-CR-8821',     colour:'Proto', qty:100,  pph:15, start:'2026-04-14', color:'#7B5EA7' },
+  { id:'PB6', line:15, model:'AM-0045', po:'ASOS-PO-44521-A', colour:'White', qty:1500, pph:25, start:'2026-04-16', color:'#D4626B' },
+];
+
+/* ── Helpers ──────────────────────────────────────────────────── */
+function planDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+
+function planDateStr(d) { return d.toISOString().slice(0, 10); }
+
+function planFmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* Calculate end date (inclusive) given start ISO, qty, pph */
+function planCalcEnd(startStr, qty, pph) {
+  const d = new Date(startStr + 'T00:00:00');
+  let rem = qty;
+  while (rem > 0) {
+    const hrs = PLAN_HRS[d.getDay()];
+    if (hrs > 0) rem -= pph * hrs;
+    if (rem > 0) d.setDate(d.getDate() + 1);
+  }
+  return planDateStr(d);
+}
+
+/* Count working days a block occupies */
+function planWorkDays(startStr, qty, pph) {
+  const d = new Date(startStr + 'T00:00:00');
+  let rem = qty, days = 0;
+  while (rem > 0) {
+    const hrs = PLAN_HRS[d.getDay()];
+    if (hrs > 0) { rem -= pph * hrs; days++; }
+    if (rem > 0) d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+/* Assign non-overlapping vertical lanes to blocks on a line */
+function assignLanes(lineBlocks) {
+  const sorted = [...lineBlocks].sort((a, b) => a.start.localeCompare(b.start));
+  const laneEnds = [];
+  return sorted.map(b => {
+    const endStr = planCalcEnd(b.start, b.qty, b.pph);
+    let lane = laneEnds.findIndex(e => e < b.start);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = endStr;
+    return { ...b, lane, endStr };
+  });
+}
+
+/* ── Render ───────────────────────────────────────────────────── */
+function renderPlanning() {
+  const total      = planDaysInMonth(planYear, planMonth);
+  const root       = document.getElementById('plan-root');
+  const todayIso   = planDateStr(PLAN_TODAY);
+  const mStr       = String(planMonth + 1).padStart(2, '0');
+  const monthStart = `${planYear}-${mStr}-01`;
+  const monthEnd   = `${planYear}-${mStr}-${String(total).padStart(2, '0')}`;
+
+  /* toolbar subtitle */
+  const sub = document.getElementById('plan-toolbar-sub');
+  if (sub) {
+    const cnt = PLAN_BLOCKS.filter(b => {
+      const e = planCalcEnd(b.start, b.qty, b.pph);
+      return b.start <= monthEnd && e >= monthStart;
+    }).length;
+    sub.textContent = `${PLAN_MONTH_NAMES[planMonth]} ${planYear} · ${PLAN_LINES} Lines · ${cnt} scheduled blocks`;
+  }
+
+  /* day header cells */
+  const hdrCells = Array.from({ length: total }, (_, i) => {
+    const day  = i + 1;
+    const dow  = new Date(planYear, planMonth, day).getDay();
+    const iso  = `${planYear}-${mStr}-${String(day).padStart(2, '0')}`;
+    const cls  = ['plan-dhd', dow === 0 ? 'p-sun' : (dow === 6 ? 'p-sat' : ''), iso === todayIso ? 'p-today' : ''].filter(Boolean).join(' ');
+    return `<div class="${cls}"><span class="pdnum">${day}</span><span class="pdday">${PLAN_DAY_ABBR[dow]}</span></div>`;
+  }).join('');
+
+  /* one row per sewing line */
+  const rowsHtml = Array.from({ length: PLAN_LINES }, (_, li) => {
+    const lineNum    = li + 1;
+    const raw        = PLAN_BLOCKS.filter(b => b.line === lineNum);
+    const laneBlocks = assignLanes(raw);
+
+    /* day columns — click target + background shading */
+    const dayCols = Array.from({ length: total }, (_, i) => {
+      const day = i + 1;
+      const dow = new Date(planYear, planMonth, day).getDay();
+      const iso = `${planYear}-${mStr}-${String(day).padStart(2, '0')}`;
+      const cls = ['plan-day-col', dow === 0 ? 'p-sun' : (dow === 6 ? 'p-sat' : ''), iso === todayIso ? 'p-today' : ''].filter(Boolean).join(' ');
+      const click = dow === 0 ? '' : `onclick="openAddBlock(${lineNum},'${iso}')"`;
+      return `<div class="${cls}" ${click}></div>`;
+    }).join('');
+
+    /* block elements — absolutely positioned over day columns */
+    const blocksHtml = laneBlocks.map(b => {
+      if (b.start > monthEnd || b.endStr < monthStart) return '';
+      const csStart  = b.start < monthStart ? monthStart : b.start;
+      const csEnd    = b.endStr > monthEnd   ? monthEnd   : b.endStr;
+      const startIdx = parseInt(csStart.slice(8)) - 1;
+      const endIdx   = parseInt(csEnd.slice(8)) - 1;
+      const left     = (startIdx / total * 100).toFixed(3);
+      const width    = ((endIdx - startIdx + 1) / total * 100).toFixed(3);
+      const laneCls  = b.lane >= 1 ? ' lane-1' : '';
+      const lbl      = `${b.model} · ${b.colour}`;
+      const tip      = `${b.model} · ${b.colour} · ${b.qty.toLocaleString()} pcs · ${planFmtDate(b.start)} – ${planFmtDate(b.endStr)}`;
+      return `<div class="plan-block${laneCls}"
+        style="left:${left}%;width:calc(${width}% - 3px);background:${b.color}"
+        onclick="event.stopPropagation();openPlanBlock('${b.id}')"
+        title="${tip}"><span class="plan-block-lbl">${lbl}</span></div>`;
+    }).join('');
+
+    /* label: show models active this month */
+    const active  = laneBlocks.filter(b => b.start <= monthEnd && b.endStr >= monthStart);
+    const uniq    = [...new Set(active.map(b => b.model))];
+    const modelTags = uniq.slice(0, 2).map(m => `<span class="plmodel">${m}</span>`).join('');
+
+    return `<div class="plan-row">
+      <div class="plan-row-lbl">
+        <span class="plnum">L${String(lineNum).padStart(2, '0')}</span>
+        ${modelTags}
+      </div>
+      <div class="plan-cells-wrap">${dayCols}${blocksHtml}</div>
+    </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="plan-inner">
+      <div class="plan-nav-bar plan-print-hide">
+        <button class="plan-nav-btn" onclick="planPrevMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="plan-month-lbl">${PLAN_MONTH_NAMES[planMonth].toUpperCase()} ${planYear}</span>
+        <button class="plan-nav-btn" onclick="planNextMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="plan-header-row">
+        <div class="plan-lbl-hd">Line</div>
+        <div class="plan-dhd-wrap">${hdrCells}</div>
+      </div>
+      <div class="plan-rows">${rowsHtml}</div>
+    </div>`;
+}
+
+function planPrevMonth() {
+  planMonth--; if (planMonth < 0) { planMonth = 11; planYear--; }
+  renderPlanning();
+}
+function planNextMonth() {
+  planMonth++; if (planMonth > 11) { planMonth = 0; planYear++; }
+  renderPlanning();
+}
+
+/* ── View popup ───────────────────────────────────────────────── */
+function openPlanBlock(id) {
+  const b = PLAN_BLOCKS.find(x => x.id === id);
+  if (!b) return;
+  const endStr = planCalcEnd(b.start, b.qty, b.pph);
+  const wDays  = planWorkDays(b.start, b.qty, b.pph);
+  document.getElementById('plan-view-body').innerHTML = `
+    <button class="popup-close" onclick="closePlanView()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="width:14px;height:14px;border-radius:3px;background:${b.color};flex-shrink:0"></div>
+      <div>
+        <div class="popup-model-id">${b.model}</div>
+        <div class="popup-op-lbl">Line ${b.line} &mdash; ${b.colour}</div>
+      </div>
+    </div>
+    <div class="popup-grid">
+      <div><div class="popup-item-lbl">PO / Job Ref</div><div class="popup-item-val" style="font-family:'Courier New',monospace;font-size:.76rem">${b.po}</div></div>
+      <div><div class="popup-item-lbl">Line</div><div class="popup-item-val">Line ${b.line}</div></div>
+      <div><div class="popup-item-lbl">Start</div><div class="popup-item-val">${planFmtDate(b.start)}</div></div>
+      <div><div class="popup-item-lbl">Est. End</div><div class="popup-item-val">${planFmtDate(endStr)}</div></div>
+      <div><div class="popup-item-lbl">Qty</div><div class="popup-item-val" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${b.qty.toLocaleString()} pcs</div></div>
+      <div><div class="popup-item-lbl">PPH</div><div class="popup-item-val">${b.pph} pcs/hr</div></div>
+      <div><div class="popup-item-lbl">Working Days</div><div class="popup-item-val">${wDays} days</div></div>
+      <div><div class="popup-item-lbl">Colour</div><div class="popup-item-val">${b.colour}</div></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn-outline" onclick="deletePlanBlock('${b.id}')" style="color:#C0392B;border-color:#C0392B;font-size:.78rem;padding:7px 14px">Delete</button>
+      <button class="btn-primary" onclick="closePlanView()" style="font-size:.78rem;padding:7px 14px">Close</button>
+    </div>`;
+  document.getElementById('plan-view-popup').classList.add('open');
+}
+
+function closePlanView() { document.getElementById('plan-view-popup').classList.remove('open'); }
+
+function deletePlanBlock(id) {
+  PLAN_BLOCKS = PLAN_BLOCKS.filter(b => b.id !== id);
+  closePlanView();
+  renderPlanning();
+  showToast('Block deleted');
+}
+
+/* ── Add popup ────────────────────────────────────────────────── */
+function openAddBlock(line, dateStr) {
+  const lineEl = document.getElementById('pa-line');
+  lineEl.innerHTML = '<option value="">Select line…</option>' +
+    Array.from({ length: PLAN_LINES }, (_, i) => `<option value="${i+1}">Line ${i+1}</option>`).join('');
+  lineEl.value = line;
+
+  document.getElementById('pa-model').innerHTML = '<option value="">Select model…</option>' +
+    MODELS.map(m => `<option value="${m.id}">${m.id} – ${m.name}</option>`).join('');
+
+  document.getElementById('pa-po').innerHTML = '<option value="">Select PO…</option>' +
+    ORDERS.filter(o => o.status !== 'Shipped').map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+
+  document.getElementById('pa-start').value  = dateStr;
+  document.getElementById('pa-colour').value = '';
+  document.getElementById('pa-qty').value    = '';
+  document.getElementById('pa-pph').value    = '';
+  document.getElementById('pa-end').value    = '';
+  document.getElementById('plan-add-title').textContent = `Line ${line} · ${planFmtDate(dateStr)}`;
+  document.getElementById('plan-add-popup').classList.add('open');
+}
+
+function closePlanAdd() { document.getElementById('plan-add-popup').classList.remove('open'); }
+
+function onAddBModelChange() {
+  const modelId = document.getElementById('pa-model').value;
+  const filtered = modelId
+    ? ORDERS.filter(o => o.model === modelId && o.status !== 'Shipped')
+    : ORDERS.filter(o => o.status !== 'Shipped');
+  document.getElementById('pa-po').innerHTML = '<option value="">Select PO…</option>' +
+    filtered.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+}
+
+function onAddBPoChange() {
+  const po = ORDERS.find(o => o.po === document.getElementById('pa-po').value);
+  if (!po) return;
+  if (!document.getElementById('pa-colour').value) document.getElementById('pa-colour').value = po.colours || '';
+  if (!document.getElementById('pa-qty').value)    document.getElementById('pa-qty').value    = po.qty    || '';
+  calcAddBEnd();
+}
+
+function calcAddBEnd() {
+  const qty   = parseFloat(document.getElementById('pa-qty').value);
+  const pph   = parseFloat(document.getElementById('pa-pph').value);
+  const start = document.getElementById('pa-start').value;
+  if (!qty || !pph || !start) { document.getElementById('pa-end').value = ''; return; }
+  document.getElementById('pa-end').value = planFmtDate(planCalcEnd(start, qty, pph));
+}
+
+const PO_COLORS = { 'ASOS':'#2455CC', 'PLT':'#C4A35A', 'RI-':'#196741', 'Boohoo':'#D4626B' };
+function getPOColor(po) {
+  for (const [k, v] of Object.entries(PO_COLORS)) { if (po.startsWith(k)) return v; }
+  return '#7B5EA7';
+}
+
+function saveNewBlock() {
+  const line   = parseInt(document.getElementById('pa-line').value);
+  const model  = document.getElementById('pa-model').value;
+  const po     = document.getElementById('pa-po').value;
+  const colour = document.getElementById('pa-colour').value.trim();
+  const qty    = parseFloat(document.getElementById('pa-qty').value);
+  const pph    = parseFloat(document.getElementById('pa-pph').value);
+  const start  = document.getElementById('pa-start').value;
+  if (!line || !model || !po || !colour || !qty || !pph || !start) {
+    showToast('Please fill in all fields', 'warn'); return;
+  }
+  if (new Date(start + 'T00:00:00').getDay() === 0) {
+    showToast('Cannot start on Sunday', 'warn'); return;
+  }
+  PLAN_BLOCKS.push({ id: 'PB' + Date.now(), line, model, po, colour, qty, pph, start, color: getPOColor(po) });
+  closePlanAdd();
+  renderPlanning();
+  showToast('Block added');
+}
+
+/* ── Hours panel ──────────────────────────────────────────────── */
+function togglePlanHoursPanel() {
+  const p = document.getElementById('plan-hrs-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function savePlanHours() {
+  for (let d = 0; d <= 6; d++) {
+    const el = document.getElementById(`ph-${d}`);
+    if (el && !el.disabled) PLAN_HRS[d] = parseFloat(el.value) || 0;
+  }
+  togglePlanHoursPanel();
+  renderPlanning();
+  showToast('Working hours updated');
+}
+
+/* ── Print ────────────────────────────────────────────────────── */
+function printGantt() {
+  const total    = planDaysInMonth(planYear, planMonth);
+  const mStr     = String(planMonth + 1).padStart(2, '0');
+  const mStart   = `${planYear}-${mStr}-01`;
+  const mEnd     = `${planYear}-${mStr}-${String(total).padStart(2, '0')}`;
+  const visible  = PLAN_BLOCKS.filter(b => {
+    const e = planCalcEnd(b.start, b.qty, b.pph);
+    return b.start <= mEnd && e >= mStart;
+  });
+  if (!visible.length) { showToast('No blocks this month', 'warn'); return; }
+  const rows = visible.map(b => {
+    const e = planCalcEnd(b.start, b.qty, b.pph);
+    return [`Line ${b.line}`, b.model, b.po, b.colour,
+            b.qty.toLocaleString(), `${b.pph} pph`,
+            planFmtDate(b.start), planFmtDate(e), `${planWorkDays(b.start, b.qty, b.pph)} days`];
+  });
+  openPrintWin(
+    `Planning — ${PLAN_MONTH_NAMES[planMonth]} ${planYear}`,
+    `${PLAN_MONTH_NAMES[planMonth]} ${planYear} · ${visible.length} blocks · 20 Sewing Lines`,
+    buildTable(['Line','Model','PO','Colour','Qty','PPH','Start','Est. End','Working Days'], rows)
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUTTING
+   ══════════════════════════════════════════════════════════════ */
+
+/* Standard fabric consumption per piece (metres) per model */
+const CUT_SPEC = { 'AM-0045': 0.43, 'AM-0052': 0.38, 'AM-0039': 0.41 };
+
+const CUTTING_LOG = [
+  { id:'C001', date:'07 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    qty:450, consumed:197.2, required:193.5, waste:1.88, op:'Youssef B.' },
+  { id:'C002', date:'08 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    qty:550, consumed:248.5, required:236.5, waste:4.83, op:'Youssef B.' },
+];
+
+let cutIdSeq = CUTTING_LOG.length + 1;
+
+function renderCutKPIs() {
+  const total  = CUTTING_LOG.reduce((a,r)=>a+r.qty,0);
+  const avgW   = CUTTING_LOG.length ? (CUTTING_LOG.reduce((a,r)=>a+r.waste,0)/CUTTING_LOG.length).toFixed(2) : '—';
+  const alerts = CUTTING_LOG.filter(r=>r.waste>3).length;
+  document.getElementById('cut-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Cut</div>
+      <div class="kpi-num">${total.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${CUTTING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Avg Waste %</div>
+      <div class="kpi-num${avgW>3?' gold':''}">${avgW}<span style="font-size:1.2rem">%</span></div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">High-Waste Alerts</div>
+      <div class="kpi-num${alerts?' gold':''}">${alerts}</div></div>`;
+}
+
+function renderCutTable() {
+  const el = document.getElementById('cut-log-table');
+  document.getElementById('cut-log-count').textContent = CUTTING_LOG.length + ' entries';
+  if (!CUTTING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...CUTTING_LOG].reverse().map(r=>{
+    const hi = r.waste > 3;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.model}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.qty.toLocaleString()}</td>
+      <td style="text-align:right">${r.consumed.toFixed(1)} m</td>
+      <td style="text-align:right">${r.required.toFixed(1)} m</td>
+      <td style="text-align:right" class="${hi?'cut-high':''}">${r.waste.toFixed(2)}%${hi?' ⚠':''}
+      </td>
+      <td>${r.op}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>PO</th><th>Model</th>
+      <th style="text-align:right">Qty</th>
+      <th style="text-align:right">Consumed</th>
+      <th style="text-align:right">Required</th>
+      <th style="text-align:right">Waste %</th>
+      <th>Operator</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderCutting() {
+  /* Populate order dropdown */
+  const sel = document.getElementById('cut-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+
+  renderCutKPIs();
+  renderCutTable();
+}
+
+function onCutPoChange() {
+  const po = document.getElementById('cut-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('cut-model').value = ord ? ord.model : '';
+  onCutCalc();
+}
+
+function onCutCalc() {
+  const qty      = parseFloat(document.getElementById('cut-qty').value)      || 0;
+  const consumed = parseFloat(document.getElementById('cut-consumed').value) || 0;
+  const required = parseFloat(document.getElementById('cut-required').value) || 0;
+
+  /* Auto-fill required if model has a spec and user hasn't entered it */
+  const model = document.getElementById('cut-model').value;
+  const reqInput = document.getElementById('cut-required');
+  if (!reqInput.value && qty > 0 && CUT_SPEC[model]) {
+    const autoReq = +(qty * CUT_SPEC[model]).toFixed(1);
+    reqInput.value = autoReq;
+  }
+
+  const req = parseFloat(reqInput.value) || 0;
+  const numEl = document.getElementById('cut-waste-num');
+  const alertEl = document.getElementById('cut-waste-alert');
+
+  if (consumed > 0 && req > 0) {
+    const w = ((consumed - req) / consumed * 100);
+    const wDisp = w < 0 ? '0.00' : w.toFixed(2);
+    numEl.textContent = wDisp;
+    numEl.className = 'waste-num' + (w > 3 ? ' high' : '');
+    alertEl.classList.toggle('show', w > 3);
+  } else {
+    numEl.textContent = '—';
+    numEl.className = 'waste-num';
+    alertEl.classList.remove('show');
+  }
+}
+
+function saveCutLog() {
+  const po       = document.getElementById('cut-po').value;
+  const model    = document.getElementById('cut-model').value;
+  const qty      = parseFloat(document.getElementById('cut-qty').value);
+  const consumed = parseFloat(document.getElementById('cut-consumed').value);
+  const required = parseFloat(document.getElementById('cut-required').value);
+  const op       = document.getElementById('cut-op').value.trim();
+
+  if (!po)            { showToast('Select a PO number.'); return; }
+  if (!qty || qty<1)  { showToast('Enter a valid quantity.'); return; }
+  if (!consumed)      { showToast('Enter fabric consumed.'); return; }
+  if (!required)      { showToast('Enter fabric required.'); return; }
+  if (!op)            { showToast('Enter the operator name.'); return; }
+
+  const waste = Math.max(0, (consumed - required) / consumed * 100);
+  const now   = new Date();
+  const dateStr = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id    = 'C' + String(cutIdSeq++).padStart('3','0');
+
+  CUTTING_LOG.push({ id, date:dateStr, po, model, qty, consumed, required,
+                     waste:+waste.toFixed(2), op });
+
+  /* Clear form */
+  ['cut-po','cut-model','cut-qty','cut-consumed','cut-required','cut-op'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el.tagName==='SELECT') el.value=''; else el.value='';
+  });
+  document.getElementById('cut-waste-num').textContent='—';
+  document.getElementById('cut-waste-num').className='waste-num';
+  document.getElementById('cut-waste-alert').classList.remove('show');
+
+  renderCutKPIs();
+  renderCutTable();
+  lucide.createIcons();
+  showToast(waste>3 ? '⚠ Entry saved — waste above 3%!' : 'Cutting session saved.');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SEWING
+   ══════════════════════════════════════════════════════════════ */
+
+const DEFECT_TYPES = ['Stitching','Tension','Skip Stitch','Seam Pucker','Raw Edge','Open Seam'];
+
+const SEWING_LOG = [
+  { id:'S001', date:'10 Apr 2026', line:5, period:'AM', po:'ASOS-PO-44521-A', pieces:48, defects:['Tension','Skip Stitch'] },
+  { id:'S002', date:'10 Apr 2026', line:5, period:'PM', po:'ASOS-PO-44521-A', pieces:52, defects:['Stitching'] },
+  { id:'S003', date:'11 Apr 2026', line:6, period:'AM', po:'ASOS-PO-44521-A', pieces:44, defects:[] },
+  { id:'S004', date:'11 Apr 2026', line:6, period:'PM', po:'ASOS-PO-44521-A', pieces:49, defects:['Seam Pucker'] },
+  { id:'S005', date:'12 Apr 2026', line:5, period:'AM', po:'ASOS-PO-44521-A', pieces:51, defects:[] },
+  { id:'S006', date:'12 Apr 2026', line:6, period:'AM', po:'ASOS-PO-44521-A', pieces:47, defects:['Raw Edge'] },
+];
+
+let sewIdSeq  = SEWING_LOG.length + 1;
+let sewPeriod = 'AM';
+
+function selectPeriod(p) {
+  sewPeriod = p;
+  document.getElementById('btn-AM').classList.toggle('active', p==='AM');
+  document.getElementById('btn-PM').classList.toggle('active', p==='PM');
+}
+
+function renderSewKPIs() {
+  const totalPcs   = SEWING_LOG.reduce((a,r)=>a+r.pieces,0);
+  const totalDef   = SEWING_LOG.reduce((a,r)=>a+r.defects.length,0);
+  const defRate    = totalPcs ? (totalDef/totalPcs*100).toFixed(1) : '0.0';
+  document.getElementById('sew-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Output</div>
+      <div class="kpi-num">${totalPcs.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${SEWING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Defects</div>
+      <div class="kpi-num${totalDef?'':' muted'}">${totalDef}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Defect Rate</div>
+      <div class="kpi-num${defRate>2?' gold':''}">${defRate}<span style="font-size:1.2rem">%</span></div></div>`;
+}
+
+function renderSewTable() {
+  const el = document.getElementById('sew-log-table');
+  document.getElementById('sew-log-count').textContent = SEWING_LOG.length + ' entries';
+  if (!SEWING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...SEWING_LOG].reverse().map(r=>{
+    const defRate = r.pieces ? (r.defects.length/r.pieces*100).toFixed(1) : '0.0';
+    const pills   = r.defects.map(d=>`<span class="defect-pill">${d}</span>`).join('');
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.1rem">${r.line}</td>
+      <td style="text-align:center">${r.period}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.pieces}</td>
+      <td>${pills||'<span style="color:var(--muted2);font-size:.75rem">None</span>'}</td>
+      <td style="text-align:right;color:${r.defects.length?'#9C7C2E':'var(--muted)'}">${defRate}%</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th>
+      <th style="text-align:center">Line</th>
+      <th style="text-align:center">Period</th>
+      <th>PO</th>
+      <th style="text-align:right">Pieces</th>
+      <th>Defects</th>
+      <th style="text-align:right">Rate %</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderDefectChecks() {
+  document.getElementById('defect-checks').innerHTML = DEFECT_TYPES.map(d=>
+    `<label class="defect-check">
+      <input type="checkbox" value="${d}" id="dc-${d.replace(/\s/g,'-')}">
+      ${d}
+    </label>`
+  ).join('');
+}
+
+function renderSewing() {
+  /* Order dropdown */
+  const sel = document.getElementById('sew-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+
+  /* Today as default date */
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('sew-date').value = today;
+
+  renderDefectChecks();
+  renderSewKPIs();
+  renderSewTable();
+}
+
+function saveSewLog() {
+  const po     = document.getElementById('sew-po').value;
+  const line   = parseInt(document.getElementById('sew-line').value);
+  const dateRaw= document.getElementById('sew-date').value;
+  const pieces = parseInt(document.getElementById('sew-pieces').value);
+
+  if (!po)              { showToast('Select a PO number.'); return; }
+  if (!line||line<1||line>20) { showToast('Enter a line number (1–20).'); return; }
+  if (!dateRaw)         { showToast('Select a date.'); return; }
+  if (!pieces||pieces<0){ showToast('Enter pieces completed.'); return; }
+
+  const defects = DEFECT_TYPES.filter(d=>{
+    const el = document.getElementById('dc-' + d.replace(/\s/g,'-'));
+    return el && el.checked;
+  });
+
+  const dateObj = new Date(dateRaw);
+  const dateStr = dateObj.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id      = 'S' + String(sewIdSeq++).padStart(3,'0');
+
+  SEWING_LOG.push({ id, date:dateStr, line, period:sewPeriod, po, pieces, defects });
+
+  /* Clear form */
+  document.getElementById('sew-pieces').value = '';
+  document.getElementById('sew-line').value   = '';
+  DEFECT_TYPES.forEach(d=>{
+    const el=document.getElementById('dc-'+d.replace(/\s/g,'-'));
+    if(el) el.checked=false;
+  });
+
+  renderSewKPIs();
+  renderSewTable();
+  lucide.createIcons();
+  showToast('Sewing session saved.');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FINISHING & QC
+   ══════════════════════════════════════════════════════════════ */
+
+const FINISHING_LOG = [
+  { id:'F001', date:'10 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:220, inspected:200, passed:194, failed:6,  aql:'2.5', inspector:'Fatima R.' },
+  { id:'F002', date:'11 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:180, inspected:175, passed:172, failed:3,  aql:'2.5', inspector:'Fatima R.' },
+  { id:'F003', date:'12 Apr 2026', po:'ASOS-PO-44521-A', model:'AM-0045',
+    pressed:200, inspected:195, passed:188, failed:7,  aql:'4.0', inspector:'Nadia H.'  },
+];
+
+let finIdSeq = FINISHING_LOG.length + 1;
+
+function renderFinKPIs() {
+  const totalPressed = FINISHING_LOG.reduce((a,r)=>a+r.pressed,0);
+  const totalInsp    = FINISHING_LOG.reduce((a,r)=>a+r.inspected,0);
+  const totalPass    = FINISHING_LOG.reduce((a,r)=>a+r.passed,0);
+  const totalFail    = FINISHING_LOG.reduce((a,r)=>a+r.failed,0);
+  const passRate     = totalInsp ? (totalPass/totalInsp*100).toFixed(1) : '—';
+  document.getElementById('fin-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Pressed</div>
+      <div class="kpi-num">${totalPressed.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Sessions</div>
+      <div class="kpi-num">${FINISHING_LOG.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">AQL Pass Rate</div>
+      <div class="kpi-num">${passRate}<span style="font-size:1.2rem">%</span></div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Failed</div>
+      <div class="kpi-num${totalFail?'':' muted'}">${totalFail}</div></div>`;
+}
+
+function renderFinTable() {
+  const el = document.getElementById('fin-log-table');
+  document.getElementById('fin-log-count').textContent = FINISHING_LOG.length + ' entries';
+  if (!FINISHING_LOG.length) {
+    el.innerHTML = '<div class="log-empty">No entries yet. Log a session above.</div>';
+    return;
+  }
+  const rows = [...FINISHING_LOG].reverse().map(r => {
+    const rate = r.inspected ? (r.failed / r.inspected * 100).toFixed(1) : '0.0';
+    const hi   = parseFloat(rate) > 5;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+      <td>${r.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.model}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${r.pressed.toLocaleString()}</td>
+      <td style="text-align:right">${r.inspected}</td>
+      <td style="text-align:right" class="fail-ok">${r.passed}</td>
+      <td style="text-align:right" class="${hi?'fail-high':r.failed?'':'muted'}">${r.failed}</td>
+      <td style="text-align:right" class="${hi?'fail-high':''}">${rate}%${hi?' ⚠':''}</td>
+      <td><span class="aql-chip">${r.aql}</span></td>
+      <td>${r.inspector}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>PO</th><th>Model</th>
+      <th style="text-align:right">Pressed</th>
+      <th style="text-align:right">Inspected</th>
+      <th style="text-align:right">Passed</th>
+      <th style="text-align:right">Failed</th>
+      <th style="text-align:right">Fail%</th>
+      <th>AQL</th><th>Inspector</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderFinishing() {
+  const sel = document.getElementById('fin-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('fin-date').value = new Date().toISOString().slice(0,10);
+  renderFinKPIs();
+  renderFinTable();
+}
+
+function onFinPoChange() {
+  const po  = document.getElementById('fin-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('fin-model').value = ord ? ord.model : '';
+}
+
+function onFinCalc() {
+  const inspected = parseInt(document.getElementById('fin-inspected').value) || 0;
+  const failed    = parseInt(document.getElementById('fin-failed').value)    || 0;
+  const passed    = Math.max(0, inspected - failed);
+  const dispEl    = document.getElementById('fin-passed-display');
+  const alertEl   = document.getElementById('fin-fail-alert');
+  dispEl.textContent = inspected ? passed : '—';
+  const rate = inspected ? failed / inspected * 100 : 0;
+  alertEl.classList.toggle('show', rate > 5);
+}
+
+function saveFinLog() {
+  const po        = document.getElementById('fin-po').value;
+  const model     = document.getElementById('fin-model').value;
+  const dateRaw   = document.getElementById('fin-date').value;
+  const inspector = document.getElementById('fin-inspector').value.trim();
+  const pressed   = parseInt(document.getElementById('fin-pressed').value)   || 0;
+  const inspected = parseInt(document.getElementById('fin-inspected').value) || 0;
+  const failed    = parseInt(document.getElementById('fin-failed').value)    || 0;
+  const aql       = document.getElementById('fin-aql').value;
+
+  if (!po)          { showToast('Select a PO number.'); return; }
+  if (!dateRaw)     { showToast('Select a date.'); return; }
+  if (!inspector)   { showToast('Enter the inspector name.'); return; }
+  if (inspected < 1){ showToast('Enter inspected quantity.'); return; }
+  if (failed > inspected){ showToast('Failed cannot exceed inspected.'); return; }
+
+  const passed    = Math.max(0, inspected - failed);
+  const dateStr   = new Date(dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const id        = 'F' + String(finIdSeq++).padStart(3,'0');
+
+  FINISHING_LOG.push({ id, date:dateStr, po, model, pressed, inspected, passed, failed, aql, inspector });
+
+  /* Reset */
+  ['fin-pressed','fin-inspected','fin-failed','fin-inspector'].forEach(x=>{ document.getElementById(x).value=''; });
+  document.getElementById('fin-passed-display').textContent = '—';
+  document.getElementById('fin-fail-alert').classList.remove('show');
+
+  renderFinKPIs();
+  renderFinTable();
+  lucide.createIcons();
+  const rate = inspected ? (failed/inspected*100).toFixed(1) : 0;
+  showToast(rate > 5 ? `⚠ Entry saved — fail rate ${rate}%` : 'QC session saved.');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PACKING
+   ══════════════════════════════════════════════════════════════ */
+
+const CARTONS = [
+  { id:'CTN-0001', po:'ASOS-PO-44521-A', model:'AM-0045', date:'10 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.2, net:7.8 },
+  { id:'CTN-0002', po:'ASOS-PO-44521-A', model:'AM-0045', date:'10 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.1, net:7.7 },
+  { id:'CTN-0003', po:'ASOS-PO-44521-A', model:'AM-0045', date:'11 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.3, net:7.9 },
+  { id:'CTN-0004', po:'ASOS-PO-44521-A', model:'AM-0045', date:'11 Apr 2026',
+    sizes:{S:12,M:14,L:12,XL:10}, total:48, gross:8.0, net:7.6 },
+];
+
+let ctnSeq = CARTONS.length + 1;
+
+function nextCtnId() {
+  return 'CTN-' + String(ctnSeq).padStart(4,'0');
+}
+
+function renderPackKPIs() {
+  const totalCtns  = CARTONS.length;
+  const totalPcs   = CARTONS.reduce((a,c)=>a+c.total,0);
+  const avgGross   = totalCtns ? (CARTONS.reduce((a,c)=>a+c.gross,0)/totalCtns).toFixed(1) : '—';
+  const pos        = new Set(CARTONS.map(c=>c.po)).size;
+  document.getElementById('pack-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Total Cartons</div>
+      <div class="kpi-num">${totalCtns}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Pieces Packed</div>
+      <div class="kpi-num">${totalPcs.toLocaleString()}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Avg Gross (kg)</div>
+      <div class="kpi-num">${avgGross}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">POs Covered</div>
+      <div class="kpi-num">${pos}</div></div>`;
+}
+
+function renderPackTable() {
+  const el = document.getElementById('pack-log-table');
+  document.getElementById('pack-log-count').textContent = CARTONS.length + ' cartons';
+  if (!CARTONS.length) {
+    el.innerHTML = '<div class="log-empty">No cartons yet. Create one above.</div>';
+    return;
+  }
+  const rows = [...CARTONS].reverse().map(c => {
+    const sizeSummary = Object.entries(c.sizes)
+      .filter(([,v])=>v>0)
+      .map(([k,v])=>`${k}×${v}`)
+      .join(' / ');
+    return `<tr>
+      <td class="ctn-id">${c.id}</td>
+      <td>${c.date}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${c.po}</span></td>
+      <td>${c.model}</td>
+      <td style="font-size:.76rem;color:var(--muted)">${sizeSummary}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${c.total}</td>
+      <td style="text-align:right">${c.gross.toFixed(1)} kg</td>
+      <td style="text-align:right;color:var(--muted)">${c.net ? c.net.toFixed(1)+' kg' : '—'}</td>
+      <td>
+        <button class="btn-sm" onclick="printCartonLabel('${c.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Label
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Carton #</th><th>Date</th><th>PO</th><th>Model</th>
+      <th>Sizes</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross</th>
+      <th style="text-align:right">Net</th>
+      <th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderPacking() {
+  const sel = document.getElementById('pack-po');
+  sel.innerHTML = '<option value="">Select order…</option>' +
+    ORDERS.map(o=>`<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('pack-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  renderPackKPIs();
+  renderPackTable();
+}
+
+function onPackPoChange() {
+  const po  = document.getElementById('pack-po').value;
+  const ord = ORDERS.find(o=>o.po===po);
+  document.getElementById('pack-model').value = ord ? ord.model : '';
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  const sizesWrap = document.getElementById('pack-sizes');
+  if (!ord || !ord.matrix || !ord.matrix.sizes) {
+    sizesWrap.innerHTML = '<span style="font-size:.78rem;color:var(--muted2)">No size data for this order.</span>';
+    document.getElementById('pack-total').textContent = '0';
+    return;
+  }
+  sizesWrap.innerHTML = ord.matrix.sizes.map(s=>`
+    <div class="size-inp-col">
+      <span>${s}</span>
+      <input type="number" min="0" value="0" id="psz-${s}" oninput="recalcPackTotal()">
+    </div>`).join('');
+  recalcPackTotal();
+}
+
+function recalcPackTotal() {
+  const inputs = document.querySelectorAll('#pack-sizes input[type=number]');
+  let total = 0;
+  inputs.forEach(i=>{ total += parseInt(i.value)||0; });
+  document.getElementById('pack-total').textContent = total;
+}
+
+function collectPackForm() {
+  const po    = document.getElementById('pack-po').value;
+  const model = document.getElementById('pack-model').value;
+  const dateRaw = document.getElementById('pack-date').value;
+  const gross = parseFloat(document.getElementById('pack-gross').value) || 0;
+  const net   = parseFloat(document.getElementById('pack-net').value)   || 0;
+
+  if (!po)      { showToast('Select a PO number.'); return null; }
+  if (!dateRaw) { showToast('Select a date.'); return null; }
+  if (!gross)   { showToast('Enter gross weight.'); return null; }
+
+  const sizeInputs = document.querySelectorAll('#pack-sizes input[type=number]');
+  const sizes = {};
+  let total = 0;
+  sizeInputs.forEach(inp => {
+    const sz = inp.id.replace('psz-','');
+    const v  = parseInt(inp.value)||0;
+    sizes[sz] = v;
+    total += v;
+  });
+  if (!total) { showToast('Enter at least one size quantity.'); return null; }
+
+  const dateStr = new Date(dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  return { po, model, dateStr, sizes, total, gross, net };
+}
+
+function saveCarton(n) {
+  const form = collectPackForm();
+  if (!form) return;
+  for (let i=0; i<n; i++) {
+    const id = 'CTN-' + String(ctnSeq++).padStart(4,'0');
+    CARTONS.push({ id, po:form.po, model:form.model, date:form.dateStr,
+                   sizes:Object.assign({},form.sizes), total:form.total,
+                   gross:form.gross, net:form.net });
+  }
+  document.getElementById('pack-ctn-id').value = nextCtnId();
+  renderPackKPIs();
+  renderPackTable();
+  lucide.createIcons();
+  showToast(n > 1 ? `${n} cartons created.` : 'Carton saved.');
+}
+
+function bulkCreateCartons() {
+  const n = parseInt(document.getElementById('bulk-n').value);
+  if (!n || n < 2) { showToast('Enter a number ≥ 2 for bulk create.'); return; }
+  saveCarton(n);
+}
+
+function printCartonLabel(id) {
+  const c = CARTONS.find(x=>x.id===id);
+  if (!c) return;
+  const sizeLine = Object.entries(c.sizes)
+    .filter(([,v])=>v>0)
+    .map(([k,v])=>`<td style="padding:4px 14px;text-align:center"><b>${k}</b><br>${v} pcs</td>`)
+    .join('');
+  const win = window.open('','_blank','width=420,height=560');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+    <title>Carton Label — ${c.id}</title>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Arial',sans-serif;padding:24px;border:3px solid #000;width:400px;color:#000}
+      .brand{font-size:1.4rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;text-align:center;margin-bottom:2px}
+      .sub{font-size:.65rem;text-align:center;color:#555;margin-bottom:14px;letter-spacing:.06em}
+      hr{border:none;border-top:1px solid #000;margin:10px 0}
+      .row{display:flex;justify-content:space-between;margin:6px 0;font-size:.82rem}
+      .row b{font-size:.68rem;text-transform:uppercase;color:#666;display:block;margin-bottom:1px}
+      .sizes-tbl{width:100%;border-collapse:collapse;margin:10px 0;text-align:center;font-size:.82rem}
+      .sizes-tbl td{border:1px solid #ccc;padding:6px 10px}
+      .total{text-align:center;font-size:1.6rem;font-weight:900;margin:8px 0}
+      .footer{font-size:.6rem;color:#888;text-align:center;margin-top:10px}
+    </style>
+  </head><body>
+    <div class="brand">AVA MARIE</div>
+    <div class="sub">Tangier, Morocco &mdash; Export Quality</div>
+    <hr>
+    <div class="row"><div><b>Carton #</b>${c.id}</div><div style="text-align:right"><b>Date</b>${c.date}</div></div>
+    <div class="row"><div><b>PO Number</b>${c.po}</div><div style="text-align:right"><b>Model</b>${c.model}</div></div>
+    <hr>
+    <table class="sizes-tbl"><tr>${sizeLine}</tr></table>
+    <div class="total">${c.total} PCS</div>
+    <hr>
+    <div class="row"><div><b>Gross Weight</b>${c.gross.toFixed(1)} kg</div><div style="text-align:right"><b>Net Weight</b>${c.net ? c.net.toFixed(1)+' kg' : '—'}</div></div>
+    <div class="footer">Printed ${new Date().toLocaleDateString('en-GB')}</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 300);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MATERIALS
+   ══════════════════════════════════════════════════════════════ */
+
+function setMatTab(btn, paneId) {
+  document.querySelectorAll('.mat-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mat-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.add('active');
+  lucide.createIcons();
+}
+
+function parseMtrlNum(str) {
+  return parseFloat((str || '').replace(/[^\d.]/g, '')) || 0;
+}
+
+function renderMatKPIs() {
+  const all      = ORDERS.flatMap(o => o.materials || []);
+  const inStock  = all.filter(m => m.status === 'In Stock').length;
+  const pending  = all.filter(m => m.status !== 'In Stock').length;
+  document.getElementById('mat-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-eyebrow">Material Lines</div>
+      <div class="kpi-num">${all.length}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">In Stock</div>
+      <div class="kpi-num" style="color:#196741">${inStock}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Pending / On Order</div>
+      <div class="kpi-num${pending ? ' gold' : ''}">${pending}</div></div>
+    <div class="kpi-card"><div class="kpi-eyebrow">Active POs</div>
+      <div class="kpi-num">${ORDERS.length}</div></div>`;
+}
+
+function renderReqTable() {
+  const filter = document.getElementById('req-po-filter').value;
+  const orders = filter ? ORDERS.filter(o => o.po === filter) : ORDERS;
+  const sc = {
+    'In Stock':          'chip-green',
+    'Awaiting Delivery': 'chip-amber',
+    'Partial':           'chip-blue',
+    'On Order':          'chip-grey',
+  };
+  const rows = orders.flatMap(o => (o.materials || []).map(m => {
+    const reqN  = parseMtrlNum(m.req);
+    const recvN = parseMtrlNum(m.received);
+    const unit  = ((m.req || '').match(/[a-zA-Z]+/) || [''])[0];
+    const bal   = reqN - recvN;
+    const balCell = bal > 0
+      ? `<span style="color:#DC2626;font-weight:600">−${bal.toLocaleString()}${unit ? ' ' + unit : ''}</span>`
+      : `<span style="color:#196741;font-weight:600">✓</span>`;
+    return `<tr>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${o.po}</span></td>
+      <td>${m.name}</td>
+      <td style="color:var(--muted)">${m.supplier}</td>
+      <td style="text-align:right">${m.req}</td>
+      <td style="text-align:right">${m.ordered}</td>
+      <td style="text-align:right">${m.received}</td>
+      <td style="text-align:right">${balCell}</td>
+      <td><span class="chip ${sc[m.status] || 'chip-grey'}">${m.status}</span></td>
+    </tr>`;
+  })).join('');
+
+  document.getElementById('req-table').innerHTML = rows
+    ? `<table class="tbl">
+        <thead><tr>
+          <th>PO</th><th>Material</th><th>Supplier</th>
+          <th style="text-align:right">Required</th>
+          <th style="text-align:right">Ordered</th>
+          <th style="text-align:right">Received</th>
+          <th style="text-align:right">Balance</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`
+    : '<div class="log-empty">No materials data found.</div>';
+}
+
+/* ── Incoming data ─────────────────────────────────────────────── */
+const INCOMING = [
+  { id:'INC-001', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Ivory',      qty:'1,850 m', eta:'20 Mar 2026', recvDate:'20 Mar 2026', status:'Confirmed' },
+  { id:'INC-002', po:'ASOS-PO-44521-A', supplier:'Poly-Tissu MA',     material:'Poly Lining',                qty:'2,280 m', eta:'22 Mar 2026', recvDate:'22 Mar 2026', status:'Confirmed' },
+  { id:'INC-003', po:'ASOS-PO-44521-A', supplier:'YKK Morocco',       material:'YKK Zip 60 cm (concealed)',  qty:'1,200',   eta:'05 Apr 2026', recvDate:'05 Apr 2026', status:'Partial'   },
+  { id:'INC-004', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Black',      qty:'666 m',   eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-005', po:'ASOS-PO-44521-A', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Navy',       qty:'592 m',   eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-006', po:'ASOS-PO-44521-A', supplier:'Etiquettes SA',     material:'Label Set (brand+care+sz)', qty:'2,400',   eta:'25 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-007', po:'ASOS-PO-44521-B', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Dusty Rose', qty:'296 m',  eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+  { id:'INC-008', po:'ASOS-PO-44521-B', supplier:'Duchesse-Satin SA', material:'Satin Duchess — Mauve',      qty:'555 m',  eta:'20 Apr 2026', recvDate:'',            status:'Expected'  },
+];
+let incIdSeq = INCOMING.length + 1;
+
+/* ── Outgoing data ─────────────────────────────────────────────── */
+const OUTGOING = [
+  {
+    id:'OUT-001', ref:'SHP-ASOS-0041',
+    po:'ASOS-PO-44521-A', model:'AM-0045', modelName:'Robe Satin Longue',
+    client:'ASOS',
+    dest:'ASOS Fulfilment Centre, Hemel Hempstead HP2 7EZ, UK',
+    shipper:'Ava Marie, Zone Industrielle, Tangier, Morocco',
+    dispatchDate:'11 Apr 2026', etd:'14 Apr 2026', etaClient:'19 Apr 2026',
+    status:'Dispatched', unitPrice:19.29,
+  },
+];
+let outIdSeq = OUTGOING.length + 1;
+
+/* ── Incoming ─────────────────────────────────────────────────── */
+function incChip(s) {
+  const m = { 'Confirmed':'chip-green', 'Partial':'chip-blue', 'Expected':'chip-amber' };
+  return `<span class="chip ${m[s]||'chip-grey'}">${s}</span>`;
+}
+
+function renderIncTable() {
+  const el = document.getElementById('inc-table');
+  document.getElementById('inc-count').textContent = INCOMING.length + ' shipments';
+  const rows = [...INCOMING].reverse().map(r => `<tr>
+    <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.id}</span></td>
+    <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+    <td>${r.supplier}</td>
+    <td>${r.material}</td>
+    <td style="text-align:right">${r.qty}</td>
+    <td>${r.eta}</td>
+    <td>${r.recvDate || '<span style="color:var(--muted2)">—</span>'}</td>
+    <td>${incChip(r.status)}</td>
+    <td>${r.status === 'Expected'
+      ? `<button class="btn-sm" onclick="confirmReceipt('${r.id}')"><i data-lucide="check"></i> Confirm</button>`
+      : '<span style="color:var(--muted2);font-size:.75rem">—</span>'
+    }</td>
+  </tr>`).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>ID</th><th>PO</th><th>Supplier</th><th>Material</th>
+      <th style="text-align:right">Qty</th><th>ETA</th><th>Received</th>
+      <th>Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  lucide.createIcons();
+}
+
+function confirmReceipt(id) {
+  const r = INCOMING.find(x => x.id === id);
+  if (!r) return;
+  r.status   = 'Confirmed';
+  r.recvDate = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  renderIncTable();
+  renderMatKPIs();
+  showToast(`${r.id} marked as received.`);
+}
+
+function toggleIncForm() {
+  const el = document.getElementById('inc-form-wrap');
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) lucide.createIcons();
+}
+
+function saveIncoming() {
+  const po       = document.getElementById('inc-po').value;
+  const supplier = document.getElementById('inc-supplier').value.trim();
+  const material = document.getElementById('inc-material').value.trim();
+  const qty      = document.getElementById('inc-qty').value.trim();
+  const etaRaw   = document.getElementById('inc-eta').value;
+  if (!po || !supplier || !material || !qty || !etaRaw) { showToast('Fill all fields.'); return; }
+  const eta = new Date(etaRaw).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const id  = 'INC-' + String(incIdSeq++).padStart(3, '0');
+  INCOMING.push({ id, po, supplier, material, qty, eta, recvDate:'', status:'Expected' });
+  ['inc-supplier','inc-material','inc-qty','inc-eta'].forEach(x => { document.getElementById(x).value = ''; });
+  document.getElementById('inc-po').value = '';
+  toggleIncForm();
+  renderIncTable();
+  renderMatKPIs();
+  showToast('Incoming shipment added.');
+}
+
+/* ── Outgoing ─────────────────────────────────────────────────── */
+function outChip(s) {
+  const m = { 'Dispatched':'chip-blue', 'Delivered':'chip-green', 'Preparing':'chip-amber' };
+  return `<span class="chip ${m[s]||'chip-grey'}">${s}</span>`;
+}
+
+function renderOutTable() {
+  const el = document.getElementById('out-table');
+  document.getElementById('out-count').textContent = OUTGOING.length + ' shipments';
+  if (!OUTGOING.length) {
+    el.innerHTML = '<div class="log-empty">No outgoing shipments yet.</div>';
+    return;
+  }
+  const rows = [...OUTGOING].reverse().map(r => {
+    const ctns     = CARTONS.filter(c => c.po === r.po);
+    const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+    const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(1);
+    return `<tr>
+      <td class="ctn-id" style="font-size:.9rem">${r.ref}</td>
+      <td><span style="font-family:'Courier New',monospace;font-size:.73rem">${r.po}</span></td>
+      <td>${r.client}</td>
+      <td style="font-size:.76rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.dest}</td>
+      <td style="text-align:right">${ctns.length}</td>
+      <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem">${totPcs.toLocaleString()}</td>
+      <td style="text-align:right;color:var(--muted)">${totGross} kg</td>
+      <td>${r.dispatchDate}</td>
+      <td>${outChip(r.status)}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn-sm" onclick="printPackingList('${r.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Packing List
+          </button>
+          <button class="btn-sm" onclick="printInvoice('${r.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Invoice
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Ref</th><th>PO</th><th>Client</th><th>Destination</th>
+      <th style="text-align:right">Ctns</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross</th>
+      <th>Dispatched</th><th>Status</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function toggleOutForm() {
+  const el = document.getElementById('out-form-wrap');
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) lucide.createIcons();
+}
+
+function onOutPoChange() {
+  const po  = document.getElementById('out-po').value;
+  const ord = ORDERS.find(o => o.po === po);
+  if (ord) document.getElementById('out-dest').value = ord.client + ' — UK';
+}
+
+function saveOutgoing() {
+  const po      = document.getElementById('out-po').value;
+  const ref     = document.getElementById('out-ref').value.trim();
+  const dest    = document.getElementById('out-dest').value.trim();
+  const dispRaw = document.getElementById('out-dispatch').value;
+  const etdRaw  = document.getElementById('out-etd').value;
+  const etaRaw  = document.getElementById('out-eta').value;
+  const uprice  = parseFloat(document.getElementById('out-uprice').value) || 0;
+  if (!po || !ref || !dest || !dispRaw) { showToast('Fill all required fields.'); return; }
+  const ord = ORDERS.find(o => o.po === po);
+  const fmt = v => v ? new Date(v).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+  const id  = 'OUT-' + String(outIdSeq++).padStart(3, '0');
+  OUTGOING.push({
+    id, ref, po,
+    model:     ord ? ord.model     : '',
+    modelName: ord ? ord.modelName : '',
+    client:    ord ? ord.client    : '',
+    dest, shipper:'Ava Marie, Zone Industrielle, Tangier, Morocco',
+    dispatchDate: fmt(dispRaw), etd: fmt(etdRaw), etaClient: fmt(etaRaw),
+    status:'Preparing', unitPrice:uprice,
+  });
+  toggleOutForm();
+  renderOutTable();
+  showToast('Outgoing shipment created.');
+}
+
+/* ── Print: Packing List ─────────────────────────────────────── */
+function printPackingList(id) {
+  const shp = OUTGOING.find(x => x.id === id);
+  if (!shp) return;
+  const ctns     = CARTONS.filter(c => c.po === shp.po);
+  const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+  const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(2);
+  const totNet   = ctns.reduce((a, c) => a + (c.net || 0), 0).toFixed(2);
+  const ctnRows  = ctns.map((c, i) => {
+    const sizes = Object.entries(c.sizes).filter(([, v]) => v > 0).map(([k, v]) => `${k}: ${v}`).join(', ');
+    return `<tr>
+      <td>${i + 1}</td><td>${c.id}</td><td>${sizes}</td>
+      <td style="text-align:right">${c.total}</td>
+      <td style="text-align:right">${c.gross.toFixed(1)}</td>
+      <td style="text-align:right">${c.net ? c.net.toFixed(1) : '—'}</td>
+    </tr>`;
+  }).join('');
+  const win = window.open('', '_blank', 'width=860,height=700');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>Packing List — ${shp.ref}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:32px}
+    .brand{font-size:22px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .sub{font-size:10px;color:#666;margin-bottom:6px}
+    .doc-type{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#333;margin:14px 0 4px}
+    hr{border:none;border-top:1.5px solid #000;margin:10px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:12px 0}
+    .box{border:1px solid #ccc;padding:9px 13px;border-radius:3px}
+    .lbl{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:3px}
+    .val{font-size:11px;line-height:1.55}
+    table{width:100%;border-collapse:collapse;margin:12px 0;font-size:11px}
+    thead tr{background:#f4f4f4}
+    th{padding:6px 9px;text-align:left;border:1px solid #ddd;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    td{padding:5px 9px;border:1px solid #ddd}
+    tfoot td{font-weight:700;background:#f9f9f9}
+    .footer{margin-top:18px;font-size:9px;color:#aaa;text-align:center}
+    .print-btn{margin-top:16px;padding:8px 22px;cursor:pointer;font-size:12px}
+    @media print{.print-btn{display:none}}
+  </style></head><body>
+  <div class="brand">AVA MARIE</div>
+  <div class="sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+  <hr>
+  <div class="doc-type">Packing List</div>
+  <div class="two">
+    <div class="box"><div class="lbl">Shipper</div><div class="val">${shp.shipper}</div></div>
+    <div class="box"><div class="lbl">Consignee</div><div class="val">${shp.dest}</div></div>
+  </div>
+  <div class="two" style="margin-top:0">
+    <div class="box"><div class="lbl">Ref / PO</div><div class="val"><b>${shp.ref}</b> &nbsp;/&nbsp; ${shp.po}</div></div>
+    <div class="box"><div class="lbl">Dispatch / ETD / ETA</div><div class="val">${shp.dispatchDate} &nbsp;/&nbsp; ${shp.etd||'—'} &nbsp;/&nbsp; ${shp.etaClient||'—'}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Carton</th><th>Contents</th>
+      <th style="text-align:right">Pcs</th>
+      <th style="text-align:right">Gross kg</th>
+      <th style="text-align:right">Net kg</th></tr></thead>
+    <tbody>${ctnRows}</tbody>
+    <tfoot><tr><td colspan="3"><b>TOTAL — ${ctns.length} cartons</b></td>
+      <td style="text-align:right">${totPcs}</td>
+      <td style="text-align:right">${totGross}</td>
+      <td style="text-align:right">${totNet}</td></tr></tfoot>
+  </table>
+  <div class="footer">Generated ${new Date().toLocaleDateString('en-GB')} &nbsp;—&nbsp; Ava Marie ERP</div>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+  </body></html>`);
+  win.document.close(); win.focus();
+}
+
+/* ── Print: Invoice ──────────────────────────────────────────── */
+function printInvoice(id) {
+  const shp = OUTGOING.find(x => x.id === id);
+  if (!shp) return;
+  const ctns     = CARTONS.filter(c => c.po === shp.po);
+  const totPcs   = ctns.reduce((a, c) => a + c.total, 0);
+  const totGross = ctns.reduce((a, c) => a + c.gross, 0).toFixed(2);
+  const amount   = (totPcs * shp.unitPrice).toFixed(2);
+  const fmtEur   = v => parseFloat(v).toLocaleString('en-GB', { minimumFractionDigits:2 });
+  const win = window.open('', '_blank', 'width=860,height=700');
+  win.document.write(`<!doctype html><html><head><meta charset="UTF-8">
+  <title>Invoice — ${shp.ref}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#000;padding:32px}
+    .brand{font-size:22px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .sub{font-size:10px;color:#666;margin-bottom:6px}
+    .doc-type{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#333;margin:14px 0 2px}
+    .inv-ref{font-size:12px;color:#C4A35A;font-weight:700;margin-bottom:14px}
+    hr{border:none;border-top:1.5px solid #000;margin:10px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:12px 0}
+    .box{border:1px solid #ccc;padding:9px 13px;border-radius:3px}
+    .lbl{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:3px}
+    .val{font-size:11px;line-height:1.55}
+    table{width:100%;border-collapse:collapse;margin:14px 0;font-size:11px}
+    thead tr{background:#f4f4f4}
+    th{padding:6px 9px;text-align:left;border:1px solid #ddd;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    td{padding:7px 9px;border:1px solid #ddd}
+    .totals{width:280px;margin-left:auto;margin-top:0;font-size:11px}
+    .totals td{border:none;padding:4px 9px}
+    .grand td{font-size:13px;font-weight:900;border-top:2px solid #000;padding-top:7px}
+    .terms{margin-top:18px;font-size:10px;color:#555;line-height:1.7}
+    .footer{margin-top:18px;font-size:9px;color:#aaa;text-align:center}
+    .print-btn{margin-top:16px;padding:8px 22px;cursor:pointer;font-size:12px}
+    @media print{.print-btn{display:none}}
+  </style></head><body>
+  <div class="brand">AVA MARIE</div>
+  <div class="sub">Zone Industrielle, Tangier, Morocco &nbsp;·&nbsp; contact@avamarie.co</div>
+  <hr>
+  <div class="doc-type">Commercial Invoice</div>
+  <div class="inv-ref">Ref: ${shp.ref} &nbsp;·&nbsp; Date: ${shp.dispatchDate} &nbsp;·&nbsp; PO: ${shp.po}</div>
+  <div class="two">
+    <div class="box"><div class="lbl">Seller</div><div class="val">${shp.shipper}</div></div>
+    <div class="box"><div class="lbl">Buyer</div><div class="val">${shp.dest}</div></div>
+  </div>
+  <table>
+    <thead><tr>
+      <th>Description</th><th>Model</th>
+      <th style="text-align:right">Qty (pcs)</th>
+      <th style="text-align:right">Unit Price (€)</th>
+      <th style="text-align:right">Amount (€)</th>
+    </tr></thead>
+    <tbody><tr>
+      <td>${shp.modelName}</td><td>${shp.model}</td>
+      <td style="text-align:right">${totPcs.toLocaleString()}</td>
+      <td style="text-align:right">${shp.unitPrice.toFixed(2)}</td>
+      <td style="text-align:right">${fmtEur(amount)}</td>
+    </tr></tbody>
+  </table>
+  <table class="totals">
+    <tr><td>Subtotal</td><td style="text-align:right">€ ${fmtEur(amount)}</td></tr>
+    <tr><td style="color:#888">Gross weight</td><td style="text-align:right;color:#888">${totGross} kg</td></tr>
+    <tr class="grand"><td>TOTAL</td><td style="text-align:right">€ ${fmtEur(amount)}</td></tr>
+  </table>
+  <div class="terms"><b>Payment Terms:</b> 30 days net &nbsp;|&nbsp; <b>Incoterms:</b> FOB Tangier &nbsp;|&nbsp; <b>Currency:</b> EUR</div>
+  <div class="footer">Generated ${new Date().toLocaleDateString('en-GB')} &nbsp;—&nbsp; Ava Marie ERP</div>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+  </body></html>`);
+  win.document.close(); win.focus();
+}
+
+/* ── renderMaterials (updated) ───────────────────────────────── */
+function renderMaterials() {
+  const opts = ORDERS.map(o => `<option value="${o.po}">${o.po}</option>`).join('');
+  document.getElementById('req-po-filter').innerHTML = '<option value="">All POs</option>' + opts;
+  document.getElementById('inc-po').innerHTML        = '<option value="">Select…</option>' + opts;
+  document.getElementById('out-po').innerHTML        = '<option value="">Select…</option>' + opts;
+  renderMatKPIs();
+  renderReqTable();
+  renderIncTable();
+  renderOutTable();
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS
+   ══════════════════════════════════════════════════════════════ */
+
+function setStgTab(btn, paneId) {
+  document.querySelectorAll('.stg-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stg-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.add('active');
+  lucide.createIcons();
+}
+
+function saveCompanyInfo() {
+  showToast('Company info saved.');
+}
+
+/* 20 production lines */
+const PROD_LINES = [
+  { line:1,  name:'Sewing Line 1',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Fatima R.'   },
+  { line:2,  name:'Sewing Line 2',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Khadija M.'  },
+  { line:3,  name:'Sewing Line 3',    type:'Sewing',   machines:12, operators:11, capacity:110, status:'Active',  supervisor:'Zineb H.'    },
+  { line:4,  name:'Sewing Line 4',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Fatima R.'   },
+  { line:5,  name:'Sewing Line 5',    type:'Sewing',   machines:14, operators:14, capacity:140, status:'Active',  supervisor:'Karim A.'    },
+  { line:6,  name:'Sewing Line 6',    type:'Sewing',   machines:14, operators:13, capacity:130, status:'Active',  supervisor:'Karim A.'    },
+  { line:7,  name:'Sewing Line 7',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Active',  supervisor:'Nadia H.'    },
+  { line:8,  name:'Sewing Line 8',    type:'Sewing',   machines:12, operators:10, capacity:100, status:'Active',  supervisor:'Nadia H.'    },
+  { line:9,  name:'Sewing Line 9',    type:'Sewing',   machines:12, operators:12, capacity:120, status:'Idle',    supervisor:'—'           },
+  { line:10, name:'Sewing Line 10',   type:'Sewing',   machines:12, operators:12, capacity:120, status:'Idle',    supervisor:'—'           },
+  { line:11, name:'Cutting Line A',   type:'Cutting',  machines:4,  operators:6,  capacity:600, status:'Active',  supervisor:'Youssef B.'  },
+  { line:12, name:'Cutting Line B',   type:'Cutting',  machines:4,  operators:5,  capacity:500, status:'Active',  supervisor:'Youssef B.'  },
+  { line:13, name:'Cutting Line C',   type:'Cutting',  machines:3,  operators:4,  capacity:400, status:'Idle',    supervisor:'—'           },
+  { line:14, name:'Embroidery Unit',  type:'Embroidery',machines:6, operators:6,  capacity:80,  status:'Idle',    supervisor:'—'           },
+  { line:15, name:'Printing Unit',    type:'Printing', machines:2,  operators:4,  capacity:200, status:'Idle',    supervisor:'—'           },
+  { line:16, name:'Finishing Bay A',  type:'Finishing',machines:8,  operators:8,  capacity:250, status:'Active',  supervisor:'Ahmed T.'    },
+  { line:17, name:'Finishing Bay B',  type:'Finishing',machines:8,  operators:7,  capacity:220, status:'Active',  supervisor:'Ahmed T.'    },
+  { line:18, name:'QC Station',       type:'QC',       machines:0,  operators:4,  capacity:400, status:'Active',  supervisor:'Soufiane A.' },
+  { line:19, name:'Packing Station A',type:'Packing',  machines:2,  operators:6,  capacity:300, status:'Active',  supervisor:'Sara B.'     },
+  { line:20, name:'Packing Station B',type:'Packing',  machines:2,  operators:4,  capacity:200, status:'Idle',    supervisor:'—'           },
+];
+
+const USERS = [
+  { name:'Soufiane Aberbach', role:'Admin',              email:'s.aberbach@avamarie.co',  status:'Active',   lastLogin:'14 Apr 2026' },
+  { name:'Karim El Amrani',   role:'Production Manager', email:'k.elamrani@avamarie.co',  status:'Active',   lastLogin:'13 Apr 2026' },
+  { name:'Fatima Roudani',    role:'QC Supervisor',      email:'f.roudani@avamarie.co',   status:'Active',   lastLogin:'14 Apr 2026' },
+  { name:'Nadia Hassani',     role:'QC Inspector',       email:'n.hassani@avamarie.co',   status:'Active',   lastLogin:'12 Apr 2026' },
+  { name:'Youssef Berrada',   role:'Cutting Manager',    email:'y.berrada@avamarie.co',   status:'Active',   lastLogin:'11 Apr 2026' },
+  { name:'Ahmed Tazi',        role:'Materials Manager',  email:'a.tazi@avamarie.co',      status:'Active',   lastLogin:'10 Apr 2026' },
+  { name:'Sara Benchrif',     role:'Packing Supervisor', email:'s.benchrif@avamarie.co',  status:'Inactive', lastLogin:'02 Apr 2026' },
+];
+
+function renderSettings() {
+  /* Production lines table */
+  const lrows = PROD_LINES.map(l => {
+    const isActive = l.status === 'Active';
+    return `<tr>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);text-align:center">${l.line}</td>
+      <td style="font-weight:600">${l.name}</td>
+      <td><span class="chip chip-grey" style="font-size:.65rem">${l.type}</span></td>
+      <td style="text-align:right">${l.machines}</td>
+      <td style="text-align:right">${l.operators}</td>
+      <td style="text-align:right">${l.capacity.toLocaleString()} pcs/day</td>
+      <td>
+        <span class="chip ${isActive ? 'chip-green' : 'chip-grey'}">${l.status}</span>
+      </td>
+      <td style="color:var(--muted)">${l.supervisor}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('stg-lines-table').innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th style="text-align:center">Line</th>
+      <th>Name</th><th>Type</th>
+      <th style="text-align:right">Machines</th>
+      <th style="text-align:right">Operators</th>
+      <th style="text-align:right">Capacity</th>
+      <th>Status</th><th>Supervisor</th>
+    </tr></thead>
+    <tbody>${lrows}</tbody>
+  </table>`;
+
+  /* Users table */
+  const active = USERS.filter(u => u.status === 'Active').length;
+  document.getElementById('stg-user-count').textContent =
+    `${USERS.length} users · ${active} active`;
+  const urows = USERS.map(u => `<tr>
+    <td style="font-weight:600">${u.name}</td>
+    <td><span class="role-chip">${u.role}</span></td>
+    <td style="color:var(--muted);font-size:.78rem">${u.email}</td>
+    <td><span class="chip ${u.status === 'Active' ? 'chip-green' : 'chip-grey'}">${u.status}</span></td>
+    <td style="color:var(--muted2);font-size:.76rem">${u.lastLogin}</td>
+  </tr>`).join('');
+  document.getElementById('stg-users-table').innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Name</th><th>Role</th><th>Email</th><th>Status</th><th>Last Login</th>
+    </tr></thead>
+    <tbody>${urows}</tbody>
+  </table>`;
+}
+
+
+/* ── Init ─────────────────────────────────────────────────────── */
+/* ── Wrap all .tbl tables in a scroll div after each render ─── */
+function wrapTables() {
+  document.querySelectorAll('.tbl').forEach(function(tbl) {
+    if (tbl.parentElement.classList.contains('tbl-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-scroll';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+}
+
+/* Also wrap the order-detail matrix and the od-matrix */
+function wrapMatrices() {
+  document.querySelectorAll('.od-matrix').forEach(function(tbl) {
+    if (tbl.parentElement.classList.contains('tbl-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-scroll';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+  lucide.createIcons();
+  updateDate();
+  setInterval(updateDate, 60000);
+  /* Load the initially-active section (dashboard) */
+  await loadView('dashboard');
+  /* Auto-wrap any tables injected by view loading or user actions */
+  new MutationObserver(function() {
+    wrapTables();
+    wrapMatrices();
+  }).observe(document.getElementById('main'), { childList:true, subtree:true });
+});

@@ -1,0 +1,89 @@
+<!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Total Models</div>
+          <div class="kpi-num">5</div>
+          <div class="kpi-sub">All garment styles</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Production</div>
+          <div class="kpi-num gold">1</div>
+          <div class="kpi-sub">Active on factory floor</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">In Development</div>
+          <div class="kpi-num">2</div>
+          <div class="kpi-sub">Sample &amp; Confirmed</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-eyebrow">Drafts</div>
+          <div class="kpi-num muted">1</div>
+          <div class="kpi-sub">Awaiting tech pack</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="card filter-bar">
+        <input class="f-input" type="text" id="m-search"
+          placeholder="Search by model #, name, or client ref…"
+          oninput="filterModels()">
+        <select class="f-select" id="m-client" onchange="filterModels()">
+          <option value="">All Clients</option>
+          <option>ASOS</option>
+          <option>PrettyLittleThing</option>
+          <option>River Island</option>
+        </select>
+        <select class="f-select" id="m-status" onchange="filterModels()">
+          <option value="">All Statuses</option>
+          <option>Draft</option>
+          <option>Sample</option>
+          <option>Confirmed</option>
+          <option>In Production</option>
+          <option>Completed</option>
+        </select>
+        <select class="f-select" id="m-cat" onchange="filterModels()">
+          <option value="">All Categories</option>
+          <option>Robe</option>
+          <option>Top</option>
+          <option>Pantalon</option>
+          <option>Jupe</option>
+          <option>Veste</option>
+        </select>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <span class="toolbar-count" id="m-count">5 models</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-outline" onclick="exportModelsCSV()">
+            <i data-lucide="printer"></i> Print Report
+          </button>
+          <button class="btn-primary" onclick="showToast('New Model form — coming next')">
+            <i data-lucide="plus"></i> New Model
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" id="m-table">
+          <thead>
+            <tr>
+              <th>Model #</th>
+              <th>Name</th>
+              <th>Client</th>
+              <th>Client Ref</th>
+              <th>Category</th>
+              <th style="text-align:center">Rev</th>
+              <th>Status</th>
+              <th style="text-align:right">Cost / pc</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+        <div id="m-empty" class="tbl-empty" style="display:none">
+          <i data-lucide="search-x"></i>
+          <p>No models match your filters.</p>
+        </div>
+      </div>

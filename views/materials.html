@@ -1,0 +1,117 @@
+<!-- KPI bar -->
+      <div class="cs-kpi-bar" id="mat-kpis"></div>
+
+      <!-- Tab bar -->
+      <div class="mat-tabs">
+        <button class="mat-tab active" onclick="setMatTab(this,'mat-req')">Requirements</button>
+        <button class="mat-tab" onclick="setMatTab(this,'mat-inc')">
+          <i data-lucide="arrow-down-circle" style="width:12px;height:12px;vertical-align:middle;margin-right:4px"></i>Incoming
+        </button>
+        <button class="mat-tab" onclick="setMatTab(this,'mat-out')">
+          <i data-lucide="arrow-up-circle" style="width:12px;height:12px;vertical-align:middle;margin-right:4px"></i>Outgoing
+        </button>
+      </div>
+
+      <!-- ── Requirements ─────────────────────────────────── -->
+      <div id="mat-req" class="mat-pane active">
+        <div class="mat-po-filter">
+          <select id="req-po-filter" class="f-select" style="width:280px" onchange="renderReqTable()">
+            <option value="">All POs</option>
+          </select>
+        </div>
+        <div class="cs-log-card">
+          <div id="req-table"></div>
+        </div>
+      </div>
+
+      <!-- ── Incoming ──────────────────────────────────────── -->
+      <div id="mat-inc" class="mat-pane">
+        <div class="mat-hdr">
+          <span id="inc-count" class="toolbar-count"></span>
+          <button class="btn-outline" onclick="toggleIncForm()">
+            <i data-lucide="plus"></i> Add Shipment
+          </button>
+        </div>
+
+        <div id="inc-form-wrap" class="mat-form-wrap">
+          <div class="cs-card-title">New Incoming Shipment</div>
+          <div class="mat-form-grid">
+            <div class="cs-field">
+              <label>PO Number</label>
+              <select id="inc-po"><option value="">Select…</option></select>
+            </div>
+            <div class="cs-field">
+              <label>Supplier</label>
+              <input type="text" id="inc-supplier" placeholder="e.g. Duchesse-Satin SA">
+            </div>
+            <div class="cs-field">
+              <label>Material</label>
+              <input type="text" id="inc-material" placeholder="e.g. Satin Duchess — Ivory">
+            </div>
+            <div class="cs-field">
+              <label>Quantity</label>
+              <input type="text" id="inc-qty" placeholder="e.g. 500 m">
+            </div>
+            <div class="cs-field">
+              <label>ETA</label>
+              <input type="date" id="inc-eta">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="saveIncoming()"><i data-lucide="check"></i> Save</button>
+            <button class="btn-outline" onclick="toggleIncForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="cs-log-card"><div id="inc-table"></div></div>
+      </div>
+
+      <!-- ── Outgoing ───────────────────────────────────────── -->
+      <div id="mat-out" class="mat-pane">
+        <div class="mat-hdr">
+          <span id="out-count" class="toolbar-count"></span>
+          <button class="btn-outline" onclick="toggleOutForm()">
+            <i data-lucide="plus"></i> New Shipment
+          </button>
+        </div>
+
+        <div id="out-form-wrap" class="mat-form-wrap">
+          <div class="cs-card-title">New Outgoing Shipment</div>
+          <div class="mat-form-grid">
+            <div class="cs-field">
+              <label>PO Number</label>
+              <select id="out-po" onchange="onOutPoChange()"><option value="">Select…</option></select>
+            </div>
+            <div class="cs-field">
+              <label>Shipment Ref</label>
+              <input type="text" id="out-ref" placeholder="e.g. SHP-ASOS-0042">
+            </div>
+            <div class="cs-field">
+              <label>Destination</label>
+              <input type="text" id="out-dest" placeholder="City, Country">
+            </div>
+            <div class="cs-field">
+              <label>Dispatch Date</label>
+              <input type="date" id="out-dispatch">
+            </div>
+            <div class="cs-field">
+              <label>ETD (Port)</label>
+              <input type="date" id="out-etd">
+            </div>
+            <div class="cs-field">
+              <label>ETA (Client)</label>
+              <input type="date" id="out-eta">
+            </div>
+            <div class="cs-field">
+              <label>Unit Price (€)</label>
+              <input type="number" id="out-uprice" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="saveOutgoing()"><i data-lucide="check"></i> Save</button>
+            <button class="btn-outline" onclick="toggleOutForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="cs-log-card"><div id="out-table"></div></div>
+      </div>

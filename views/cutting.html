@@ -1,0 +1,72 @@
+<!-- KPI bar -->
+      <div class="cs-kpi-bar" id="cut-kpis"></div>
+
+      <div class="cs-layout">
+
+        <!-- Form -->
+        <div class="cs-form-card">
+          <div class="cs-card-title">Log Cutting Session</div>
+
+          <!-- Waste alert -->
+          <div id="cut-waste-alert" class="waste-alert">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Waste exceeds 3% — please review fabric allocation for this batch.
+          </div>
+
+          <div class="cs-field">
+            <label>PO Number</label>
+            <select id="cut-po" onchange="onCutPoChange()">
+              <option value="">Select order…</option>
+            </select>
+          </div>
+
+          <div class="cs-field">
+            <label>Model</label>
+            <input type="text" id="cut-model" readonly placeholder="Auto-filled from order">
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Qty Cut (pcs)</label>
+              <input type="number" id="cut-qty" min="1" placeholder="0" oninput="onCutCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Fabric Consumed (m)</label>
+              <input type="number" id="cut-consumed" min="0" step="0.1" placeholder="0.0" oninput="onCutCalc()">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="cs-field">
+              <label>Fabric Required (m)</label>
+              <input type="number" id="cut-required" min="0" step="0.1" placeholder="0.0" oninput="onCutCalc()">
+            </div>
+            <div class="cs-field">
+              <label>Waste %</label>
+              <div class="waste-display">
+                <span id="cut-waste-num" class="waste-num">—</span>
+                <span class="waste-unit">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-field">
+            <label>Operator</label>
+            <input type="text" id="cut-op" placeholder="e.g. Youssef B.">
+          </div>
+
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="saveCutLog()">
+            <i data-lucide="check"></i> Save Entry
+          </button>
+        </div>
+
+        <!-- Log table -->
+        <div class="cs-log-card">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="cs-card-title" style="margin:0">Cutting Log</div>
+            <span id="cut-log-count" class="toolbar-count"></span>
+          </div>
+          <div id="cut-log-table"></div>
+        </div>
+
+      </div>
