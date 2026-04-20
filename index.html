@@ -10,6 +10,7 @@
 <link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preload" as="video" href="AVA%20MARIE/HOME%201.mp4" type="video/mp4" fetchpriority="high">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
@@ -85,7 +86,7 @@ img{display:block;max-width:100%}a{text-decoration:none}
 /* HERO */
 .hero{height:100vh;position:relative;display:flex;align-items:flex-end;overflow:hidden}
 .hero-video-wrap{position:absolute;inset:0;overflow:hidden;z-index:0}
-.hero-video-wrap video{position:absolute;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 1.4s ease}
+.hero-video-wrap video{position:absolute;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:none}
 .hero-grain{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:256px;pointer-events:none;z-index:2}
 .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,rgba(26,23,20,.5) 40%,rgba(26,23,20,.2) 100%)}
 .hero-content{position:relative;z-index:3;padding:0 4rem 5rem;width:100%;display:grid;grid-template-columns:1fr auto;align-items:flex-end;gap:2rem}
@@ -532,7 +533,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 
 <!-- ====== HOME ====== -->
 <div id="pg-home" class="page active">
-<section class="hero"><div class="hero-video-wrap"><video id="heroVid" autoplay muted playsinline preload="auto" poster="AVA%20MARIE/AVA%20MARIE%201.jpg" src="AVA%20MARIE/HOME%201.mp4"></video></div><div class="hero-grain"></div><div class="hero-overlay"></div>
+<section class="hero"><div class="hero-video-wrap"><video id="hv-a" autoplay muted playsinline preload="auto" poster="AVA%20MARIE/AVA%20MARIE%201.jpg" src="AVA%20MARIE/HOME%201.mp4"></video><video id="hv-b" muted playsinline preload="auto"></video></div><div class="hero-grain"></div><div class="hero-overlay"></div>
 <div class="hero-content"><div class="hero-left"><h1 class="hero-h1"><em>crafting</em>EXCELLENCE</h1><p class="hero-sub">Premium fashion manufacturing for the world's most prestigious global brands. From design to delivery, your vision — flawlessly executed.</p><div class="hero-btns"><button class="btn-primary" onclick="goPage('contact')"><span>Contact Us</span><i class="fas fa-arrow-right"></i></button><button class="btn-ghost" onclick="goPage('story')" style="border-color:rgba(245,241,235,.35);color:var(--cream);">Our Story</button></div></div>
 <div class="hero-right"><div class="hero-stat"><span class="hero-stat-num">250K+</span><span class="hero-stat-lbl">Monthly Capacity</span></div><div class="hero-stat"><span class="hero-stat-num">12+</span><span class="hero-stat-lbl">Global Brands</span></div><div class="hero-stat"><span class="hero-stat-num">99%</span><span class="hero-stat-lbl">On-Time Delivery</span></div><div class="hero-stat"><span class="hero-stat-num">40+</span><span class="hero-stat-lbl">Years Experience</span></div></div></div>
 <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div></section>
@@ -850,26 +851,58 @@ const origGoPage=goPage;goPage=async function(id){await origGoPage.call(this,id)
 function portShowCat(k){var d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('portCats').style.display='none';var pg=document.getElementById('portGrid');pg.style.display='block';document.getElementById('portCatTitle').innerHTML=d.title.replace(/—/g,'<span>—</span>');var items=document.getElementById('portItems');items.innerHTML='';d.imgs.forEach(function(src,i){var div=document.createElement('div');div.className='gal-grid-item';div.onclick=function(){galZoomOpen(i)};var img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';div.appendChild(img);items.appendChild(div)});window.scrollTo(0,document.getElementById('portGrid').offsetTop-72)}
 function portBack(){document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
 function submitForm(e,form){e.preventDefault();const btn=form.querySelector('button[type="submit"]');btn.disabled=true;btn.innerHTML='<span>SENDING…</span>';fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()}).then(()=>{btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';form.reset();setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color='';btn.disabled=false},4000)}).catch(()=>{btn.innerHTML='<span>ERROR — TRY AGAIN</span>';btn.disabled=false})}
-// Hero video: multi-event reveal + sequential 3-part playback
+// Hero video: double-buffer — A plays while B preloads next, then swap instantly
 (function(){
   var parts=['AVA%20MARIE/HOME%201.mp4','AVA%20MARIE/HOME%202.mp4','AVA%20MARIE/HOME%203.mp4'];
-  var i=0;
-  var v=document.querySelector('.hero-video-wrap video');
-  if(!v)return;
-  var shown=false;
-  function show(){if(shown)return;shown=true;v.style.opacity='1';}
-  // Reveal as soon as first frame is ready — no blocking wait
-  if(v.readyState>=2){show();}
-  v.addEventListener('canplay',show,{once:true});
-  v.addEventListener('loadeddata',show,{once:true});
-  setTimeout(show,1000);
-  // Advance to next part on end; loops back after part 3
-  v.addEventListener('ended',function(){
-    i=(i+1)%parts.length;
-    v.src=parts[i];
-    v.load();
-    v.play().catch(function(){});
-  });
+  var idx=0;
+  var vA=document.getElementById('hv-a');
+  var vB=document.getElementById('hv-b');
+  if(!vA||!vB)return;
+  var active=vA,standby=vB;
+
+  // Queue next part into standby so browser buffers it in the background
+  function loadStandby(){
+    standby.src=parts[(idx+1)%parts.length];
+    standby.load();
+  }
+
+  // Initial reveal: slow elegant fade-in on very first frame
+  function revealInitial(){
+    active.style.transition='opacity 1.4s ease';
+    active.style.opacity='1';
+    loadStandby(); // start buffering part 2 the moment part 1 is visible
+  }
+  if(active.readyState>=2){revealInitial();}
+  else{
+    active.addEventListener('canplay',revealInitial,{once:true});
+    active.addEventListener('loadeddata',revealInitial,{once:true});
+    setTimeout(revealInitial,800);
+  }
+
+  // Swap: standby (pre-buffered) becomes active — instant, zero-gap cut
+  function swap(){
+    idx=(idx+1)%parts.length;
+    // Instant opacity swap — no transition to hide the cut
+    standby.style.transition='none';
+    standby.style.opacity='1';
+    active.style.transition='none';
+    active.style.opacity='0';
+    // Exchange roles
+    var prev=active;active=standby;standby=prev;
+    // Ensure new active is playing (it was pre-buffered at position 0)
+    active.play().catch(function(){});
+    // Immediately queue the next-next clip
+    loadStandby();
+    // Listen for this part's end
+    active.addEventListener('ended',swap,{once:true});
+  }
+
+  // Guard: if standby isn't ready when active ends, wait for it
+  function safeSwap(){
+    if(standby.readyState>=3){swap();}
+    else{standby.addEventListener('canplay',swap,{once:true});}
+  }
+  active.addEventListener('ended',safeSwap,{once:true});
 })();
 if(window.netlifyIdentity){netlifyIdentity.on('init',u=>{if(!u){netlifyIdentity.on('login',()=>{document.location.href='/admin/'})}})}
 </script></body></html>
