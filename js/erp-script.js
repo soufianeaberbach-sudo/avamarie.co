@@ -197,6 +197,7 @@ const SECTION_META = {
   packing:   { title: 'Packing',          icon: 'box'              },
   materials: { title: 'Materials',        icon: 'warehouse'        },
   settings:  { title: 'Settings',         icon: 'settings'         },
+  'production-lines': { title: 'Production Lines', icon: 'factory' },
 };
 
 let currentSec = 'dashboard';
@@ -216,6 +217,7 @@ const VIEW_RENDERERS = {
   materials:      () => renderMaterials(),
   settings:       () => renderSettings(),
   'model-detail': () => {},
+  'production-lines': () => renderProductionLines(),
 };
 
 /* ── Lazy view loader ─────────────────────────────────────────── */
@@ -338,6 +340,485 @@ const STATUS_CLASS = {
   'Confirmed':'badge-confirmed','In Production':'badge-production',
   'Completed':'badge-completed','Cancelled':'badge-draft',
 };
+
+/* ══════════════════════════════════════════════════════════════
+   PRODUCTION LINES — data & functions
+   ══════════════════════════════════════════════════════════════ */
+
+// Production line status types
+const LINE_STATUS = {
+  RUNNING: 'Running',
+  DOWN: 'Down', 
+  MAINTENANCE: 'Maintenance',
+  IDLE: 'Idle'
+};
+
+// Production line status colors
+const LINE_STATUS_COLORS = {
+  'Running': '#22A06B',      // Green
+  'Down': '#DC2626',         // Red
+  'Maintenance': '#C47000',  // Amber
+  'Idle': '#7A756A'          // Muted
+};
+
+// Production line status background colors
+const LINE_STATUS_BG = {
+  'Running': '#E8F5EF',
+  'Down': '#FDEAEA',
+  'Maintenance': '#FFF3E0',
+  'Idle': '#F4F2EE'
+};
+
+// Production line data for 20 lines
+const PRODUCTION_LINES = Array.from({ length: 20 }, (_, i) => {
+  const lineNumber = i + 1;
+  // Random status distribution: 70% Running, 10% Down, 10% Maintenance, 10% Idle
+  const statusRand = Math.random();
+  let status = LINE_STATUS.RUNNING;
+  if (statusRand < 0.1) status = LINE_STATUS.DOWN;
+  else if (statusRand < 0.2) status = LINE_STATUS.MAINTENANCE;
+  else if (statusRand < 0.3) status = LINE_STATUS.IDLE;
+  
+  // Daily target: 400-800 pieces based on line number (higher for newer lines)
+  const dailyTarget = 400 + Math.floor((lineNumber / 20) * 400);
+  
+  // Actual output: 70-110% of target based on status
+  let actualMultiplier = 0.7;
+  if (status === LINE_STATUS.RUNNING) actualMultiplier = 0.85 + Math.random() * 0.25; // 85-110%
+  else if (status === LINE_STATUS.IDLE) actualMultiplier = 0.3 + Math.random() * 0.4; // 30-70%
+  else if (status === LINE_STATUS.MAINTENANCE) actualMultiplier = 0.1 + Math.random() * 0.3; // 10-40%
+  else actualMultiplier = 0; // Down = 0%
+  
+  const actualOutput = Math.floor(dailyTarget * actualMultiplier);
+  
+  // Efficiency: actual / target * 100%
+  const efficiency = dailyTarget > 0 ? Math.round((actualOutput / dailyTarget) * 100) : 0;
+  
+  // Assign PO if line is running
+  let currentPO = null;
+  let currentModel = null;
+  if (status === LINE_STATUS.RUNNING && lineNumber <= 8) {
+    // Assign to existing POs for first 8 lines
+    const poIndex = lineNumber % 2;
+    currentPO = poIndex === 0 ? 'ASOS-PO-44521-A' : 'ASOS-PO-44521-B';
+    currentModel = 'AM-0045';
+  }
+  
+  return {
+    id: `LINE-${lineNumber.toString().padStart(2, '0')}`,
+    number: lineNumber,
+    status: status,
+    dailyTarget: dailyTarget,
+    actualOutput: actualOutput,
+    efficiency: efficiency,
+    currentPO: currentPO,
+    currentModel: currentModel,
+    supervisor: `Supervisor ${String.fromCharCode(65 + (lineNumber % 5))}`, // A-E
+    workers: 40 + (lineNumber % 10) * 2, // 40-58 workers per line
+    lastUpdated: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  };
+});
+
+/* ── Production Line Management Functions ───────────────────── */
+function renderProductionLines() {
+  const container = document.getElementById('production-lines-container');
+  if (!container) return;
+  
+  // Calculate overall KPIs
+  const totalLines = PRODUCTION_LINES.length;
+  const runningLines = PRODUCTION_LINES.filter(line => line.status === LINE_STATUS.RUNNING).length;
+  const downLines = PRODUCTION_LINES.filter(line => line.status === LINE_STATUS.DOWN).length;
+  const maintenanceLines = PRODUCTION_LINES.filter(line => line.status === LINE_STATUS.MAINTENANCE).length;
+  const idleLines = PRODUCTION_LINES.filter(line => line.status === LINE_STATUS.IDLE).length;
+  
+  const totalTarget = PRODUCTION_LINES.reduce((sum, line) => sum + line.dailyTarget, 0);
+  const totalActual = PRODUCTION_LINES.reduce((sum, line) => sum + line.actualOutput, 0);
+  const overallEfficiency = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+  
+  // Create KPI header
+  const kpiHtml = `
+    <div class="kpi-grid" style="margin-bottom: 20px;">
+      <div class="kpi-card">
+        <div class="kpi-eyebrow">Total Lines</div>
+        <div class="kpi-num">${totalLines}</div>
+        <div class="kpi-sub">20 production lines</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-eyebrow">Running</div>
+        <div class="kpi-num" style="color: #22A06B">${runningLines}</div>
+        <div class="kpi-sub">${Math.round((runningLines / totalLines) * 100)}% active</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-eyebrow">Daily Target</div>
+        <div class="kpi-num gold">${totalTarget.toLocaleString()}</div>
+        <div class="kpi-sub">pieces across all lines</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-eyebrow">Overall Efficiency</div>
+        <div class="kpi-num ${overallEfficiency >= 85 ? 'gold' : overallEfficiency >= 70 ? '' : 'muted'}">
+          ${overallEfficiency}%
+        </div>
+        <div class="kpi-sub">${totalActual.toLocaleString()} actual output</div>
+      </div>
+    </div>
+  `;
+  
+  // Create filter controls
+  const filterHtml = `
+    <div class="filter-bar" style="margin-bottom: 16px;">
+      <input type="text" class="f-input" id="line-search" placeholder="Search lines by ID, supervisor, or PO..." oninput="filterProductionLines()">
+      <select class="f-select" id="line-status-filter" onchange="filterProductionLines()">
+        <option value="">All Status</option>
+        <option value="Running">Running</option>
+        <option value="Down">Down</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Idle">Idle</option>
+      </select>
+      <select class="f-select" id="line-efficiency-filter" onchange="filterProductionLines()">
+        <option value="">All Efficiency</option>
+        <option value="high">High (≥85%)</option>
+        <option value="medium">Medium (70-84%)</option>
+        <option value="low">Low (<70%)</option>
+      </select>
+      <button class="btn-outline" onclick="refreshProductionLines()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+  `;
+  
+  // Create production line cards grid
+  const linesHtml = PRODUCTION_LINES.map(line => {
+    const statusColor = LINE_STATUS_COLORS[line.status];
+    const statusBg = LINE_STATUS_BG[line.status];
+    const efficiencyColor = line.efficiency >= 85 ? '#22A06B' : line.efficiency >= 70 ? '#C4A35A' : '#DC2626';
+    
+    // Progress bar for target vs actual
+    const progressPercent = line.dailyTarget > 0 ? Math.min(100, (line.actualOutput / line.dailyTarget) * 100) : 0;
+    
+    return `
+      <div class="sc" data-line-id="${line.id}" data-status="${line.status}" data-efficiency="${line.efficiency}">
+        <div class="sc-head" style="border-left: 4px solid ${statusColor}; padding-left: 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor};"></div>
+            <span class="sc-title">${line.id} • Line ${line.number}</span>
+            <span style="font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; 
+                  background: ${statusBg}; color: ${statusColor}; padding: 2px 8px; border-radius: 10px;">
+              ${line.status}
+            </span>
+          </div>
+          <div style="font-size: .7rem; color: var(--muted);">
+            Updated: ${line.lastUpdated}
+          </div>
+        </div>
+        <div style="padding: 18px 20px;">
+          <!-- Line Info Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+                Supervisor
+              </div>
+              <div style="font-size: .85rem; font-weight: 600; color: var(--text);">
+                ${line.supervisor}
+              </div>
+            </div>
+            <div>
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+                Workers
+              </div>
+              <div style="font-size: .85rem; font-weight: 600; color: var(--text);">
+                ${line.workers} operators
+              </div>
+            </div>
+          </div>
+          
+          <!-- Current Assignment -->
+          ${line.currentPO ? `
+            <div style="margin-bottom: 16px; padding: 10px 12px; background: rgba(196, 163, 90, 0.05); border-radius: 6px; border-left: 3px solid var(--gold);">
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+                Current Assignment
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-family: 'Courier New', monospace; font-size: .75rem; color: var(--gold); font-weight: 600;">
+                    ${line.currentPO}
+                  </div>
+                  <div style="font-size: .7rem; color: var(--muted);">
+                    ${line.currentModel || 'Model not specified'}
+                  </div>
+                </div>
+                <button class="btn-sm" onclick="showToast('View details for ${line.currentPO}')">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  View
+                </button>
+              </div>
+            </div>
+          ` : `
+            <div style="margin-bottom: 16px; padding: 10px 12px; background: rgba(122, 117, 106, 0.05); border-radius: 6px; border-left: 3px solid var(--muted2);">
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+                Current Assignment
+              </div>
+              <div style="font-size: .75rem; color: var(--muted2); font-style: italic;">
+                No active assignment
+              </div>
+            </div>
+          `}
+          
+          <!-- Production Metrics -->
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2);">
+                Daily Production
+              </div>
+              <div style="font-size: .7rem; color: var(--muted);">
+                Target: <span style="font-weight: 600; color: var(--text);">${line.dailyTarget.toLocaleString()}</span> pcs
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div style="height: 8px; background: #F0EDE8; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
+              <div style="height: 100%; width: ${progressPercent}%; background: ${efficiencyColor}; border-radius: 4px; transition: width 0.3s ease;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--text);">
+                ${line.actualOutput.toLocaleString()} <span style="font-family: 'DM Sans', sans-serif; font-size: .7rem; color: var(--muted);">pcs</span>
+              </div>
+              <div style="font-size: .75rem; font-weight: 600; color: ${efficiencyColor};">
+                ${progressPercent.toFixed(1)}% of target
+              </div>
+            </div>
+          </div>
+          
+          <!-- Efficiency & Actions -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #F0EDE8;">
+            <div>
+              <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 2px;">
+                Efficiency
+              </div>
+              <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: ${efficiencyColor};">
+                ${line.efficiency}%
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-sm" onclick="updateLineStatus('${line.id}')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+                Update
+              </button>
+              <button class="btn-sm" onclick="showLineDetails('${line.id}')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4"/>
+                  <path d="M12 8h.01"/>
+                </svg>
+                Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Create responsive grid layout
+  const gridHtml = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+      ${linesHtml}
+    </div>
+  `;
+  
+  // Combine all parts
+  container.innerHTML = kpiHtml + filterHtml + gridHtml;
+  
+  // Initialize icons
+  lucide.createIcons();
+}
+
+function filterProductionLines() {
+  const searchTerm = document.getElementById('line-search').value.toLowerCase();
+  const statusFilter = document.getElementById('line-status-filter').value;
+  const efficiencyFilter = document.getElementById('line-efficiency-filter').value;
+  
+  const lines = document.querySelectorAll('[data-line-id]');
+  
+  lines.forEach(line => {
+    const lineId = line.getAttribute('data-line-id').toLowerCase();
+    const status = line.getAttribute('data-status');
+    const efficiency = parseInt(line.getAttribute('data-efficiency'));
+    
+    let matchesSearch = !searchTerm || 
+      lineId.includes(searchTerm) || 
+      line.textContent.toLowerCase().includes(searchTerm);
+    
+    let matchesStatus = !statusFilter || status === statusFilter;
+    
+    let matchesEfficiency = true;
+    if (efficiencyFilter === 'high') matchesEfficiency = efficiency >= 85;
+    else if (efficiencyFilter === 'medium') matchesEfficiency = efficiency >= 70 && efficiency < 85;
+    else if (efficiencyFilter === 'low') matchesEfficiency = efficiency < 70;
+    
+    line.style.display = (matchesSearch && matchesStatus && matchesEfficiency) ? 'block' : 'none';
+  });
+}
+
+function refreshProductionLines() {
+  // Simulate real-time update by randomizing some values
+  PRODUCTION_LINES.forEach(line => {
+    // Update actual output with some variation
+    const variation = Math.random() * 0.2 - 0.1; // -10% to +10%
+    line.actualOutput = Math.max(0, Math.floor(line.actualOutput * (1 + variation)));
+    
+    // Recalculate efficiency
+    line.efficiency = line.dailyTarget > 0 ? Math.round((line.actualOutput / line.dailyTarget) * 100) : 0;
+    
+    // Update timestamp
+    line.lastUpdated = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    
+    // Randomly change status (small chance)
+    if (Math.random() < 0.05) { // 5% chance to change status
+      const statuses = Object.values(LINE_STATUS);
+      line.status = statuses[Math.floor(Math.random() * statuses.length)];
+    }
+  });
+  
+  renderProductionLines();
+  showToast('Production lines refreshed with latest data');
+}
+
+function updateLineStatus(lineId) {
+  const line = PRODUCTION_LINES.find(l => l.id === lineId);
+  if (!line) return;
+  
+  const statuses = Object.values(LINE_STATUS);
+  const currentIndex = statuses.indexOf(line.status);
+  const nextIndex = (currentIndex + 1) % statuses.length;
+  line.status = statuses[nextIndex];
+  
+  // Update actual output based on new status
+  let actualMultiplier = 0.7;
+  if (line.status === LINE_STATUS.RUNNING) actualMultiplier = 0.85 + Math.random() * 0.25;
+  else if (line.status === LINE_STATUS.IDLE) actualMultiplier = 0.3 + Math.random() * 0.4;
+  else if (line.status === LINE_STATUS.MAINTENANCE) actualMultiplier = 0.1 + Math.random() * 0.3;
+  else actualMultiplier = 0;
+  
+  line.actualOutput = Math.floor(line.dailyTarget * actualMultiplier);
+  line.efficiency = line.dailyTarget > 0 ? Math.round((line.actualOutput / line.dailyTarget) * 100) : 0;
+  line.lastUpdated = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  
+  renderProductionLines();
+  showToast(`${line.id} status updated to ${line.status}`);
+}
+
+function showLineDetails(lineId) {
+  const line = PRODUCTION_LINES.find(l => l.id === lineId);
+  if (!line) return;
+  
+  const detailsHtml = `
+    <div style="padding: 20px;">
+      <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--text); margin-bottom: 16px;">
+        ${line.id} - Detailed View
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Line Number
+          </div>
+          <div style="font-size: 1rem; font-weight: 600; color: var(--text);">
+            Line ${line.number}
+          </div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Status
+          </div>
+          <div style="font-size: 1rem; font-weight: 600; color: ${LINE_STATUS_COLORS[line.status]}">
+            ${line.status}
+          </div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Supervisor
+          </div>
+          <div style="font-size: 1rem; font-weight: 600; color: var(--text);">
+            ${line.supervisor}
+          </div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Workers
+          </div>
+          <div style="font-size: 1rem; font-weight: 600; color: var(--text);">
+            ${line.workers} operators
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: rgba(196, 163, 90, 0.05); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+        <h4 style="font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 12px;">
+          Production Performance
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+          <div>
+            <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+              Daily Target
+            </div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold);">
+              ${line.dailyTarget.toLocaleString()}
+            </div>
+            <div style="font-size: .7rem; color: var(--muted);">pieces</div>
+          </div>
+          <div>
+            <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+              Actual Output
+            </div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--text);">
+              ${line.actualOutput.toLocaleString()}
+            </div>
+            <div style="font-size: .7rem; color: var(--muted);">pieces</div>
+          </div>
+          <div>
+            <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+              Efficiency
+            </div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: ${line.efficiency >= 85 ? '#22A06B' : line.efficiency >= 70 ? '#C4A35A' : '#DC2626'};">
+              ${line.efficiency}%
+            </div>
+            <div style="font-size: .7rem; color: var(--muted);">of target</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn-outline" onclick="showToast('Detailed analytics for ${line.id} - coming soon')">
+          Analytics
+        </button>
+        <button class="btn-primary" onclick="showToast('Closing details view')">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  
+  // Create a modal or use existing popup structure
+  const popup = document.getElementById('plan-view-popup');
+  const popupBody = document.getElementById('plan-view-body');
+  
+  if (popup && popupBody) {
+    popupBody.innerHTML = detailsHtml;
+    popup.classList.add('open');
+  } else {
+    // Fallback to alert if popup not available
+    alert(`Line ${line.id} Details:\nStatus: ${line.status}\nSupervisor: ${line.supervisor}\nWorkers: ${line.workers}\nTarget: ${line.dailyTarget.toLocaleString()} pcs\nActual: ${line.actualOutput.toLocaleString()} pcs\nEfficiency: ${line.efficiency}%`);
+  }
+}
 
 /* ══════════════════════════════════════════════════════════════
    ORDERS — data & functions

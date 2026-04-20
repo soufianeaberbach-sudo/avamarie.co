@@ -1,0 +1,226 @@
+<div class="sec" id="sec-production-lines">
+  <div class="sec-inner">
+    <!-- KPI Header -->
+    <div class="kpi-grid" id="production-lines-kpis">
+      <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="filter-bar" style="margin-bottom: 16px;">
+      <input type="text" class="f-input" id="line-search" placeholder="Search lines by ID, supervisor, or PO..." oninput="filterProductionLines()">
+      <select class="f-select" id="line-status-filter" onchange="filterProductionLines()">
+        <option value="">All Status</option>
+        <option value="Running">Running</option>
+        <option value="Down">Down</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Idle">Idle</option>
+      </select>
+      <select class="f-select" id="line-efficiency-filter" onchange="filterProductionLines()">
+        <option value="">All Efficiency</option>
+        <option value="high">High (≥85%)</option>
+        <option value="medium">Medium (70-84%)</option>
+        <option value="low">Low (<70%)</option>
+      </select>
+      <button class="btn-outline" onclick="refreshProductionLines()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Production Lines Grid -->
+    <div id="production-lines-container">
+      <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- Popup for detailed view (reusing planning popup) -->
+    <div class="popup" id="plan-view-popup">
+      <div class="popup-body" id="plan-view-body">
+        <!-- Content will be inserted by JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Production Lines specific styles */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-card {
+    background: #fff;
+    border: 1px solid #F0EDE8;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: #E8D5A3;
+    box-shadow: 0 4px 12px rgba(196, 163, 90, 0.08);
+  }
+
+  .kpi-eyebrow {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 4px;
+  }
+
+  .kpi-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-num.gold {
+    color: var(--gold);
+  }
+
+  .kpi-num.muted {
+    color: var(--muted2);
+  }
+
+  .kpi-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .f-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1px solid #E6E2DC;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    background: #fff;
+    transition: border-color 0.2s ease;
+  }
+
+  .f-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .f-select {
+    padding: 8px 12px;
+    border: 1px solid #E6E2DC;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .f-select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .btn-outline {
+    padding: 8px 16px;
+    border: 1px solid #E6E2DC;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    border: 1px solid #E6E2DC;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--text);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-sm:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .sc {
+    background: #fff;
+    border: 1px solid #F0EDE8;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .sc:hover {
+    border-color: #E8D5A3;
+    box-shadow: 0 4px 12px rgba(196, 163, 90, 0.08);
+  }
+
+  .sc-head {
+    padding: 14px 20px;
+    border-bottom: 1px solid #F0EDE8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FAFAF8;
+  }
+
+  .sc-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Responsive grid */
+  @media (max-width: 768px) {
+    .kpi-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .f-input, .f-select, .btn-outline {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
