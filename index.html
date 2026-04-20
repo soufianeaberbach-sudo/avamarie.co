@@ -112,8 +112,8 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .marquee-track{display:flex;width:max-content;animation:marquee 40s linear infinite;will-change:transform;transform:translateZ(0)}
 .marquee-track:hover{animation-play-state:paused}
 @keyframes marquee{0%{transform:translateZ(0) translateX(0)}100%{transform:translateZ(0) translateX(-50%)}}
-.m-logo{display:flex;align-items:center;justify-content:center;padding:0 3.5rem;flex-shrink:0;width:240px;height:96px}
-.m-logo img{width:auto;height:56px;max-width:180px;object-fit:contain;filter:brightness(0) invert(1);opacity:.5;transition:opacity .35s;flex-shrink:0}
+.m-logo{display:flex;align-items:center;justify-content:center;padding:0 4rem;flex-shrink:0;width:280px;height:112px}
+.m-logo img{width:auto;height:76px;max-width:220px;object-fit:contain;filter:brightness(0) invert(1);opacity:.55;transition:opacity .35s;flex-shrink:0}
 .m-logo:hover img{opacity:.9}
 
 /* SPLIT SECTION */
@@ -850,22 +850,16 @@ const origGoPage=goPage;goPage=async function(id){await origGoPage.call(this,id)
 function portShowCat(k){var d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('portCats').style.display='none';var pg=document.getElementById('portGrid');pg.style.display='block';document.getElementById('portCatTitle').innerHTML=d.title.replace(/—/g,'<span>—</span>');var items=document.getElementById('portItems');items.innerHTML='';d.imgs.forEach(function(src,i){var div=document.createElement('div');div.className='gal-grid-item';div.onclick=function(){galZoomOpen(i)};var img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';div.appendChild(img);items.appendChild(div)});window.scrollTo(0,document.getElementById('portGrid').offsetTop-72)}
 function portBack(){document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
 function submitForm(e,form){e.preventDefault();const btn=form.querySelector('button[type="submit"]');btn.disabled=true;btn.innerHTML='<span>SENDING…</span>';fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()}).then(()=>{btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';form.reset();setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color='';btn.disabled=false},4000)}).catch(()=>{btn.innerHTML='<span>ERROR — TRY AGAIN</span>';btn.disabled=false})}
-// Hero video: lightweight sequential 3-part playback
+// Hero video: multi-event reveal — works across all browsers/devices
 (function(){
-  var parts=['AVA%20MARIE/home%201.mp4','AVA%20MARIE/home%202.mp4','AVA%20MARIE/home%203.mp4'];
-  var i=0;
   var v=document.querySelector('.hero-video-wrap video');
   if(!v)return;
-  // Fade in on first frame ready — no blocking wait for full buffer
-  v.addEventListener('canplay',function(){v.style.opacity='1'},{once:true});
-  setTimeout(function(){v.style.opacity='1'},2000);
-  // Sequential: advance to next part when current ends, loops back after part 3
-  v.addEventListener('ended',function(){
-    i=(i+1)%parts.length;
-    v.src=parts[i];
-    v.load();
-    v.play().catch(function(){});
-  });
+  var shown=false;
+  function show(){if(shown)return;shown=true;v.style.opacity='1';}
+  if(v.readyState>=2){show();return;}
+  v.addEventListener('canplay',show,{once:true});
+  v.addEventListener('loadeddata',show,{once:true});
+  setTimeout(show,1000);
 })();
 if(window.netlifyIdentity){netlifyIdentity.on('init',u=>{if(!u){netlifyIdentity.on('login',()=>{document.location.href='/admin/'})}})}
 </script></body></html>
