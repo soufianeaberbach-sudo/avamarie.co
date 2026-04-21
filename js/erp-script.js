@@ -1,7 +1,259 @@
 
-/* ── Auth guard ───────────────────────────────────────────────── */
+/* ── Auth guard & RBAC ───────────────────────────────────────── */
 if (!sessionStorage.getItem('erp_auth')) {
   window.location.replace('login.html');
+}
+
+// Role-Based Access Control (RBAC) System
+const RBAC = {
+  // User roles with permissions
+  roles: {
+    'Director': ['view_financial', 'edit_financial', 'view_audit', 'edit_all', 'delete_all'],
+    'Owner': ['view_financial', 'edit_financial', 'view_audit', 'edit_all', 'delete_all'],
+    'Admin': ['view_financial', 'edit_financial', 'view_audit', 'edit_all', 'delete_all'],
+    'Manager': ['view_audit', 'edit_limited', 'view_limited'],
+    'Supervisor': ['view_limited', 'edit_own'],
+    'Operator': ['view_own', 'edit_own'],
+    'Viewer': ['view_limited']
+  },
+  
+  // Current user (default to Manager for demo)
+  currentUser: {
+    id: 'user001',
+    name: 'Soufiane',
+    role: 'Manager',
+    department: 'Production'
+  },
+  
+  // Initialize user from session storage
+  init: function() {
+    const userData = sessionStorage.getItem('erp_user');
+    if (userData) {
+      try {
+        this.currentUser = JSON.parse(userData);
+      } catch (e) {
+        console.warn('Failed to parse user data, using default');
+      }
+    }
+    // Update UI with user info
+    this.updateUserUI();
+  },
+  
+  // Check if user has specific permission
+  hasPermission: function(permission) {
+    const rolePermissions = this.roles[this.currentUser.role] || [];
+    return rolePermissions.includes(permission);
+  },
+  
+  // Check if user can view financial data
+  canViewFinancial: function() {
+    return this.hasPermission('view_financial');
+  },
+  
+  // Check if user can edit financial data
+  canEditFinancial: function() {
+    return this.hasPermission('edit_financial');
+  },
+  
+  // Update user info in sidebar
+  updateUserUI: function() {
+    const avatar = document.querySelector('.sb-avatar');
+    const name = document.querySelector('.sb-uname');
+    const role = document.querySelector('.sb-urole');
+    
+    if (avatar) {
+      avatar.textContent = this.currentUser.name.charAt(0).toUpperCase();
+    }
+    if (name) {
+      name.textContent = this.currentUser.name;
+    }
+    if (role) {
+      role.textContent = this.currentUser.role;
+    }
+  },
+  
+  // Get current user for audit logging
+  getCurrentUser: function() {
+    return this.currentUser;
+  }
+};
+
+// Initialize RBAC
+RBAC.init();
+
+// Audit Trail System
+const AuditTrail = {
+  logs: JSON.parse(localStorage.getItem('erp_audit_logs') || '[]'),
+  
+  // Log an action
+  log: function(action, entity, entityId, details, before = null, after = null) {
+    const timestamp = new Date().toISOString();
+    const user = RBAC.getCurrentUser();
+    
+    const logEntry = {
+      id: 'AUDIT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+      timestamp: timestamp,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role
+      },
+      action: action,
+      entity: entity,
+      entityId: entityId,
+      details: details,
+      before: before,
+      after: after,
+      ip: '127.0.0.1', // In production, this would be captured from request
+      userAgent: navigator.userAgent
+    };
+    
+    this.logs.unshift(logEntry);
+    
+    // Keep only last 1000 logs
+    if (this.logs.length > 1000) {
+      this.logs = this.logs.slice(0, 1000);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('erp_audit_logs', JSON.stringify(this.logs));
+    
+    // Real-time update if audit UI is open
+    this.updateAuditUI();
+    
+    return logEntry;
+  },
+  
+  // Get logs for specific entity
+  getLogsForEntity: function(entity, entityId) {
+    return this.logs.filter(log => 
+      log.entity === entity && log.entityId === entityId
+    );
+  },
+  
+  // Get logs for current user
+  getLogsForUser: function(userId) {
+    return this.logs.filter(log => log.user.id === userId);
+  },
+  
+  // Update audit UI if open
+  updateAuditUI: function() {
+    const auditPane = document.getElementById('md-audit');
+    if (auditPane && auditPane.classList.contains('active')) {
+      const modelId = document.querySelector('.md-id-badge')?.textContent;
+      if (modelId) {
+        this.renderAuditLogs(modelId);
+      }
+    }
+  },
+  
+  // Render audit logs for a model
+  renderAuditLogs: function(modelId) {
+    const logs = this.getLogsForEntity('Model', modelId);
+    const container = document.getElementById('md-audit');
+    if (!container) return;
+    
+    if (logs.length === 0) {
+      container.innerHTML = `<div class="sc" style="padding:52px 0;text-align:center">
+        <p style="font-size:.82rem;color:var(--muted)">No audit log entries.</p>
+      </div>`;
+      return;
+    }
+    
+    const BADGE = {
+      'CREATED': 'ab-created',
+      'UPDATED': 'ab-updated',
+      'UPLOADED': 'ab-uploaded',
+      'APPROVED': 'ab-approved',
+      'REJECTED': 'ab-rejected',
+      'STATUS CHANGE': 'ab-statuschange',
+      'REVISION': 'ab-revision',
+      'DELETED': 'ab-rejected',
+      'VIEWED': 'ab-updated',
+      'EXPORTED': 'ab-uploaded'
+    };
+    
+    const entries = logs.map(e => {
+      const date = new Date(e.timestamp).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      });
+      const time = new Date(e.timestamp).toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit'
+      });
+      
+      let detailHtml = `<div class="audit-detail">${e.details}</div>`;
+      
+      // Show before/after comparison for updates
+      if (e.before && e.after) {
+        detailHtml += `<div style="margin-top:8px;font-size:.7rem;color:var(--muted2)">
+          <div><strong>Before:</strong> ${JSON.stringify(e.before)}</div>
+          <div><strong>After:</strong> ${JSON.stringify(e.after)}</div>
+        </div>`;
+      }
+      
+      return `
+        <div class="audit-entry">
+          <div class="audit-av">${e.user.name.charAt(0)}</div>
+          <div style="flex:1">
+            <div class="audit-arow">
+              <span class="audit-badge ${BADGE[e.action] || 'ab-updated'}">${e.action}</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--text)">${e.user.name}</span>
+              <span style="font-size:.6rem;color:var(--muted2);background:rgba(122,117,106,.08);padding:1px 6px;border-radius:3px">${e.user.role}</span>
+            </div>
+            ${detailHtml}
+            <div class="audit-ts">${date} · ${time}</div>
+          </div>
+        </div>`;
+    }).join('');
+    
+    container.innerHTML = `
+      <div class="sc">
+        <div class="sc-head">
+          <span class="sc-title">Audit Trail — ${logs.length} entries</span>
+          ${RBAC.hasPermission('view_audit') ? `
+            <button class="btn-outline" style="font-size:.68rem;padding:5px 12px" onclick="exportAuditLogs('${modelId}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export
+            </button>
+          ` : ''}
+        </div>
+        <div class="audit-list">${entries}</div>
+      </div>`;
+  }
+};
+
+// Initialize audit trail with some sample data if empty
+if (AuditTrail.logs.length === 0) {
+  // Add sample audit entries for existing models
+  const sampleLogs = [
+    {
+      id: 'AUDIT-001',
+      timestamp: new Date('2026-03-28T14:32:00').toISOString(),
+      user: { id: 'user001', name: 'Soufiane', role: 'Manager' },
+      action: 'STATUS CHANGE',
+      entity: 'Model',
+      entityId: 'AM-0045',
+      details: 'Status changed: Confirmed → In Production following PP sign-off',
+      before: 'Confirmed',
+      after: 'In Production'
+    },
+    {
+      id: 'AUDIT-002',
+      timestamp: new Date('2026-03-28T14:28:00').toISOString(),
+      user: { id: 'user001', name: 'Soufiane', role: 'Manager' },
+      action: 'APPROVED',
+      entity: 'Model',
+      entityId: 'AM-0045',
+      details: 'Rev.4 PP sample approved — ASOS buyer ref PPAM0045-04',
+      before: null,
+      after: 'Approved'
+    }
+  ];
+  
+  sampleLogs.forEach(log => AuditTrail.logs.push(log));
+  localStorage.setItem('erp_audit_logs', JSON.stringify(AuditTrail.logs));
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1411,8 +1663,28 @@ function renderModels(data) {
   }
   empty.style.display = 'none';
 
-  tbody.innerHTML = data.map(m => `
+  // Image mapping for models
+  const modelImages = {
+    'AM-0045': '../Manufacturing/1.webp',
+    'AM-0052': '../Manufacturing/2.png',
+    'AM-0039': '../Manufacturing/3.jpg',
+    'AM-0060': '../Manufacturing/4.jpeg',
+    'AM-0061': '../Manufacturing/5.jpg'
+  };
+
+  tbody.innerHTML = data.map(m => {
+    const imageUrl = modelImages[m.id] || '../Manufacturing/1.webp';
+    const costDisplay = m.cost !== null ? 
+      (RBAC.canViewFinancial() ? '€' + m.cost.toFixed(2) : '<span style="color:var(--muted2)">Restricted</span>') : 
+      '<span style="color:var(--muted2)">—</span>';
+    
+    return `
     <tr class="tbl-row" onclick="openModel('${m.id}')">
+      <td style="padding:8px 14px;vertical-align:middle">
+        <div style="width:60px;height:60px;border-radius:4px;overflow:hidden;border:1px solid var(--border);background:#FAFAF8;display:flex;align-items:center;justify-content:center">
+          <img src="${imageUrl}" alt="${m.name}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUYzRUYiLz48cGF0aCBkPSJNMzAgMjJDMjYuMTM0IDIyIDIzIDI1LjEzNCAyMyAyOVMyNi4xMzQgMzYgMzAgMzZTMzcgMzIuODY2IDM3IDI5UzMzLjg2NiAyMiAzMCAyMlpNMzAgMzRDMjcuMjM5IDM0IDI1IDMxLjc2MSAyNSAyOVMyNy4yMzkgMjQgMzAgMjRTMzUgMjYuMjM5IDM1IDI5UzMyLjc2MSAzNCAzMCAzNFpNNDAgNDJIMjBDMTcuNzkxIDQyIDE2IDQwLjIwOSAxNiAzOFYyMEMxNiAxNy43OTEgMTcuNzkxIDE2IDIwIDE2SDQwQzQyLjIwOSAxNiA0NCAxNy43OTEgNDQgMjBWMzhDNDQgNDAuMjA5IDQyLjIwOSA0MiA0MCA0MlpNMjAgMThDMTguODk2IDE4IDE4IDE4Ljg5NiAxOCAyMFYzOEMxOCAzOS4xMDQgMTguODk2IDQwIDIwIDQwSDQwQzQxLjEwNCA0MCA0MiAzOS4xMDQgNDIgMzhWMjBDNDIgMTguODk2IDQxLjEwNCAxOCA0MCAxOEgyMFoiIGZpbGw9IiNEN0Q0Q0MiLz48L3N2Zz4='">
+        </div>
+      </td>
       <td><span class="model-id">${m.id}</span></td>
       <td class="fw-600">${m.name}</td>
       <td>${m.client}</td>
@@ -1420,10 +1692,11 @@ function renderModels(data) {
       <td>${m.cat}</td>
       <td style="text-align:center" class="fw-600">${m.rev}</td>
       <td><span class="badge ${STATUS_CLASS[m.status]||''}">${m.status}</span></td>
-      <td class="cost-cell">${m.cost !== null ? '€'+m.cost.toFixed(2) : '<span style="color:var(--muted2)">—</span>'}</td>
+      <td class="cost-cell">${costDisplay}</td>
       <td class="muted-cell">${m.updated}</td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
 }
 
 /* ── Filter ───────────────────────────────────────────────────── */
@@ -1607,6 +1880,106 @@ const MD = {
   },
 };
 
+/* ── Image Gallery Functions ──────────────────────────────────── */
+const ImageGallery = {
+  currentIndex: 0,
+  images: [
+    { src: '../Manufacturing/1.webp', title: 'Front view - Main sample', description: 'Primary sample showing front silhouette' },
+    { src: '../Manufacturing/2.png', title: 'Back view', description: 'Back view with zip detail' },
+    { src: '../Manufacturing/3.jpg', title: 'Side view', description: 'Side profile showing drape' },
+    { src: '../Manufacturing/4.jpeg', title: 'Detail - Neckline', description: 'Close-up of neckline construction' },
+    { src: '../Manufacturing/5.jpg', title: 'Detail - Sleeve', description: 'Sleeve attachment and finish' },
+    { src: '../Manufacturing/6.jfif', title: 'Technical sketch', description: 'Technical flat sketch' },
+    { src: '../Manufacturing/7.png', title: 'Fabric swatch', description: 'Fabric sample and texture' },
+    { src: '../Manufacturing/8.jpg', title: 'Label detail', description: 'Brand and care label placement' }
+  ],
+  
+  init: function() {
+    this.renderThumbnails();
+    this.updateMainImage();
+  },
+  
+  renderThumbnails: function() {
+    const container = document.getElementById('thumbnail-strip');
+    if (!container) return;
+    
+    container.innerHTML = this.images.map((img, index) => `
+      <div class="thumbnail ${index === this.currentIndex ? 'active' : ''}" onclick="ImageGallery.selectImage(${index})">
+        <img src="${img.src}" alt="${img.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IiNGNUYzRUYiLz48cGF0aCBkPSJNMzAgMzJDMjYuMTM0IDMyIDIzIDM1LjEzNCAyMyAzOVMyNi4xMzQgNDYgMzAgNDZTMzcgNDIuODY2IDM3IDM5UzMzLjg2NiAzMiAzMCAzMlpNMzAgNDRDMjcuMjM5IDQ0IDI1IDQxLjc2MSAyNSAzOVMyNy4yMzkgMzQgMzAgMzRTMzUgMzYuMjM5IDM1IDM5UzMyLjc2MSA0NCAzMCA0NFpNNTAgNTJIMzBDMjcuNzkxIDUyIDI2IDUwLjIwOSAyNiA0OFYzMEMyNiAyNy43OTEgMjcuNzkxIDI2IDMwIDI2SDUwQzUyLjIwOSAyNiA1NCAyNy43OTEgNTQgMzBWNDhDNTQgNTAuMjA5IDUyLjIwOSA1MiA1MCA1MlpNMzAgMjhDMjguODk2IDI4IDI4IDI4Ljg5NiAyOCAzMFY0OEMyOCA0OS4xMDQgMjguODk2IDUwIDMwIDUwSDUwQzUxLjEwNCA1MCA1MiA0OS4xMDQgNTIgNDhWMzBDNTIgMjguODk2IDUxLjEwNCAyOCA1MCAyOEgzMFoiIGZpbGw9IiNEN0Q0Q0MiLz48L3N2Zz4='">
+      </div>
+    `).join('');
+  },
+  
+  updateMainImage: function() {
+    const mainImg = document.getElementById('main-image');
+    const counter = document.getElementById('gallery-counter');
+    const description = document.getElementById('image-description');
+    const loading = document.getElementById('image-loading');
+    
+    if (!mainImg || !counter || !description) return;
+    
+    const currentImg = this.images[this.currentIndex];
+    counter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
+    description.textContent = currentImg.title;
+    
+    // Show loading
+    if (loading) loading.style.display = 'flex';
+    
+    // Load image
+    const img = new Image();
+    img.onload = () => {
+      mainImg.src = currentImg.src;
+      mainImg.alt = currentImg.title;
+      if (loading) loading.style.display = 'none';
+    };
+    img.onerror = () => {
+      mainImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiNGNUYzRUYiLz48cGF0aCBkPSJNMjAwIDE2MEMxNjUuMzcyIDE2MCAxMzggMTg3LjM3MiAxMzggMjIyUzE2NS4zNzIgMjg0IDIwMCAyODRTMjYyIDI1Ni42MjggMjYyIDIyMlMyMzQuNjI4IDE2MCAyMDAgMTYwWk0yMDAgMjcyQzE3Mi4zODYgMjcyIDE1MCAyNDkuNjE0IDE1MCAyMjJTMTcyLjM4NiAxNzIgMjAwIDE3MlMyNTAgMTk0LjM4NiAyNTAgMjIyUzIyNy42MTQgMjcyIDIwMCAyNzJaTTQwMCAzMjBIMjAwQzE2NS4zNzIgMzIwIDEzOCAyOTIuNjI4IDEzOCAyNThWMjIyQzEzOCAxODcuMzcyIDE2NS4zNzIgMTYwIDIwMCAxNjBINDAwQzQzNC42MjggMTYwIDQ2MiAxODcuMzcyIDQ2MiAyMjJWMjU4QzQ2MiAyOTIuNjI4IDQzNC42MjggMzIwIDQwMCAzMjBaTTIwMCAxODJDMTc0LjM4NiAxODIgMTU0IDIwMi4zODYgMTU0IDIyOFYyNThDMTU0IDI4My42MTQgMTc0LjM4NiAzMDQgMjAwIDMwNEg0MDBDNDI1LjYxNCAzMDQgNDQ2IDI4My42MTQgNDQ2IDI1OFYyMjhDNDQ2IDIwMi4zODYgNDI1LjYxNCAxODIgNDAwIDE4MkgyMDBaIiBmaWxsPSIjRDdENENCIi8+PC9zdmc+';
+      mainImg.alt = 'Image not available';
+      if (loading) loading.style.display = 'none';
+    };
+    img.src = currentImg.src;
+    
+    // Update thumbnails
+    this.renderThumbnails();
+  },
+  
+  selectImage: function(index) {
+    this.currentIndex = index;
+    this.updateMainImage();
+  },
+  
+  next: function() {
+    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    this.updateMainImage();
+  },
+  
+  prev: function() {
+    this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+    this.updateMainImage();
+  }
+};
+
+// Global functions for button clicks
+function nextImage() { ImageGallery.next(); }
+function prevImage() { ImageGallery.prev(); }
+function rotateImage() {
+  const img = document.getElementById('main-image');
+  if (!img) return;
+  
+  const currentRotation = parseInt(img.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
+  const newRotation = currentRotation + 90;
+  img.style.transform = `rotate(${newRotation}deg)`;
+  img.style.transition = 'transform 0.3s ease';
+  
+  showToast(`Image rotated ${newRotation}°`);
+}
+function downloadImage() {
+  const currentImg = ImageGallery.images[ImageGallery.currentIndex];
+  showToast(`Downloading: ${currentImg.title}`);
+  // In a real implementation, this would trigger a download
+  // For now, we'll just show a toast
+}
+
 /* ── Open model detail ────────────────────────────────────────── */
 async function openModel(id) {
   await loadView('model-detail');
@@ -1632,8 +2005,15 @@ async function openModel(id) {
   /* scroll top */
   document.getElementById('content').scrollTop = 0;
 
+  /* Initialize image gallery */
+  ImageGallery.init();
+
   /* header card */
   const sm = STATUS_CLASS[m.status] || '';
+  const costDisplay = m.cost !== null ? 
+    (RBAC.canViewFinancial() ? '€' + m.cost.toFixed(2) : '<span style="color:var(--muted2)">Restricted</span>') : 
+    '<span style="color:var(--muted2)">—</span>';
+  
   document.getElementById('md-header').innerHTML = `
     <div>
       <div class="md-id-badge">${m.id}</div>
@@ -1647,7 +2027,7 @@ async function openModel(id) {
       </div>
     </div>
     <div style="text-align:right;flex-shrink:0">
-      <div class="md-cost-big">${m.cost !== null ? '€' + m.cost.toFixed(2) : '—'}</div>
+      <div class="md-cost-big">${costDisplay}</div>
       <div class="md-cost-sub">cost / piece</div>
     </div>
   `;
@@ -1657,9 +2037,7 @@ async function openModel(id) {
   renderMdBom(m);
   renderMdGamme(m);
   renderMdPom(m);
-  renderMdRevisions(id);
   renderMdSamples(id);
-  renderMdOrders(id);
   renderMdAudit(id);
   lucide.createIcons();
 }
@@ -1697,7 +2075,7 @@ function renderMdOverview(m) {
           ['Current Revision', 'Rev.' + m.rev],
           ['Last Updated', m.updated],
           ['Updated By', m.updatedBy],
-          ['Cost / Piece', m.cost !== null ? '€' + m.cost.toFixed(2) : '—'],
+          ['Cost / Piece', m.cost !== null ? (RBAC.canViewFinancial() ? '€' + m.cost.toFixed(2) : '<span style="color:var(--muted2)">Restricted</span>') : '—'],
         ].map(([l,v]) => `
           <div style="padding:16px 22px;border-right:1px solid #F0EDE8">
             <div style="font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px">${l}</div>
@@ -1705,6 +2083,731 @@ function renderMdOverview(m) {
           </div>`).join('')}
       </div>
     </div>`;
+}
+
+/* ── Tab 2 · BOM (Bill of Materials) ─────────────────────────── */
+function renderMdBom(m) {
+  // Sample BOM data for AM-0045
+  const bomData = {
+    'AM-0045': {
+      sections: [
+        {
+          name: 'Main Fabric',
+          items: [
+            { id: 'FAB-001', name: 'Satin Duchess Ivory', supplier: 'Duchesse-Satin SA', unit: 'm', qty: 1.85, unitCost: 3.20, totalCost: 5.92, notes: '100% poly, 140 gsm' },
+            { id: 'FAB-002', name: 'Poly Lining Ivory', supplier: 'Poly-Tissu MA', unit: 'm', qty: 0.95, unitCost: 0.85, totalCost: 0.81, notes: '100% poly, 80 gsm' }
+          ]
+        },
+        {
+          name: 'Trims & Notions',
+          items: [
+            { id: 'TRM-001', name: 'YKK Zip 60cm Concealed', supplier: 'YKK Morocco', unit: 'pcs', qty: 1, unitCost: 0.63, totalCost: 0.63, notes: 'Color: Ivory' },
+            { id: 'TRM-002', name: 'Hook & Bar Set', supplier: 'Métal Plus', unit: 'pcs', qty: 1, unitCost: 0.08, totalCost: 0.08, notes: 'Nickel finish' },
+            { id: 'TRM-003', name: 'Label Set (Brand+Care+Size)', supplier: 'Etiquettes SA', unit: 'set', qty: 1, unitCost: 0.22, totalCost: 0.22, notes: 'Woven, Ivory thread' }
+          ]
+        },
+        {
+          name: 'Packaging',
+          items: [
+            { id: 'PKG-001', name: 'Polybag 50x70cm', supplier: 'PackPro', unit: 'pcs', qty: 1, unitCost: 0.12, totalCost: 0.12, notes: 'Self-seal, clear' },
+            { id: 'PKG-002', name: 'Velvet Hanger', supplier: 'HangMa', unit: 'pcs', qty: 1, unitCost: 0.18, totalCost: 0.18, notes: 'Non-slip, gold hook' }
+          ]
+        }
+      ]
+    }
+  };
+
+  const bom = bomData[m.id] || { sections: [] };
+  
+  if (bom.sections.length === 0) {
+    document.getElementById('md-bom').innerHTML = emptyPane('No BOM data available for this model.');
+    return;
+  }
+
+  // Calculate total cost
+  let totalCost = 0;
+  bom.sections.forEach(section => {
+    section.items.forEach(item => {
+      totalCost += item.totalCost;
+    });
+  });
+
+  const sectionsHtml = bom.sections.map(section => {
+    const itemsHtml = section.items.map(item => {
+      const costDisplay = RBAC.canViewFinancial() ? 
+        `€${item.totalCost.toFixed(2)}` : 
+        '<span style="color:var(--muted2)">Restricted</span>';
+      
+      return `
+        <tr class="tbl-row" data-item-id="${item.id}">
+          <td style="padding-left: 24px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="btn-sm" onclick="deleteBomItem('${item.id}')" style="padding: 2px 6px; font-size: .6rem;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+              <span class="fw-600">${item.name}</span>
+            </div>
+          </td>
+          <td class="muted-cell">${item.supplier}</td>
+          <td style="text-align:center">${item.unit}</td>
+          <td style="text-align:right">
+            <input type="number" min="0" step="0.01" value="${item.qty}" 
+                   style="width: 70px; text-align: right; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+                   onchange="updateBomItem('${item.id}', 'qty', this.value)">
+          </td>
+          <td style="text-align:right">
+            ${RBAC.canViewFinancial() ? 
+              `<input type="number" min="0" step="0.01" value="${item.unitCost}" 
+                     style="width: 70px; text-align: right; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+                     onchange="updateBomItem('${item.id}', 'unitCost', this.value)">` :
+              '<span style="color:var(--muted2)">Restricted</span>'}
+          </td>
+          <td class="cost-cell">${costDisplay}</td>
+          <td class="muted-cell" style="font-size: .7rem;">${item.notes}</td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <tr style="background: #FAFAF8;">
+        <td colspan="7" style="padding: 10px 20px; border-bottom: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span class="sc-title">${section.name}</span>
+            <button class="btn-sm" onclick="addBomItem('${section.name}')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Item
+            </button>
+          </div>
+        </td>
+      </tr>
+      ${itemsHtml}`;
+  }).join('');
+
+  const totalDisplay = RBAC.canViewFinancial() ? 
+    `€${totalCost.toFixed(2)}` : 
+    '<span style="color:var(--muted2)">Restricted</span>';
+
+  document.getElementById('md-bom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Bill of Materials — Dynamic Table</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold)">${totalDisplay}</span>
+          <button class="btn-primary" onclick="exportBom('${m.id}')" style="font-size: .7rem; padding: 6px 12px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export BOM
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Supplier</th>
+              <th style="text-align:center">Unit</th>
+              <th style="text-align:right">Qty</th>
+              <th style="text-align:right">Unit Cost</th>
+              <th style="text-align:right">Total Cost</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sectionsHtml}
+            <tr style="background: #FFFDF7; border-top: 2px solid rgba(196,163,90,.15);">
+              <td colspan="5" style="padding: 12px 20px; font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);">
+                Total Materials Cost
+              </td>
+              <td class="cost-cell" style="padding: 12px 20px; font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">
+                ${totalDisplay}
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// BOM helper functions
+function updateBomItem(itemId, field, value) {
+  showToast(`Updated ${field} for item ${itemId}: ${value}`);
+  // In a real implementation, this would update the data store
+}
+
+function deleteBomItem(itemId) {
+  if (confirm('Delete this BOM item?')) {
+    showToast(`Deleted BOM item ${itemId}`);
+    // In a real implementation, this would remove from data store
+  }
+}
+
+function addBomItem(sectionName) {
+  showToast(`Add new item to ${sectionName} section`);
+  // In a real implementation, this would show a form to add new item
+}
+
+function exportBom(modelId) {
+  showToast(`Exporting BOM for ${modelId}...`);
+  // In a real implementation, this would generate and download CSV/PDF
+}
+
+/* ── Tab 3 · GAMME (Operations Routing) ──────────────────────── */
+function renderMdGamme(m) {
+  // Sample GAMME data for AM-0045
+  const gammeData = {
+    'AM-0045': {
+      operations: [
+        { op: '010', name: 'Mark & Bundle', machine: 'Manual', level: '★', smv: 2.5, pph: 24, operators: 1, machines: 0, notes: 'Manual marking and bundling' },
+        { op: '020', name: 'Shoulder seams (× 2)', machine: 'Overlock 5-thread', level: '★★', smv: 1.8, pph: 33, operators: 1, machines: 1, notes: 'SNLS machine' },
+        { op: '030', name: 'Side seams + lining side seams', machine: 'Overlock 5-thread', level: '★★', smv: 2.2, pph: 27, operators: 1, machines: 1, notes: 'SNLS machine' },
+        { op: '040', name: 'Lining attachment at neckline', machine: 'Lockstitch', level: '★★★', smv: 4.5, pph: 13, operators: 1, machines: 1, notes: 'Single needle' },
+        { op: '050', name: 'CB zip insertion (YKK 60 cm)', machine: 'Lockstitch', level: '★★★★', smv: 6.2, pph: 10, operators: 1, machines: 1, notes: 'Concealed zip foot' },
+        { op: '060', name: 'Hem — shell + lining', machine: 'Blind-stitch + Overlock', level: '★★★', smv: 3.8, pph: 16, operators: 2, machines: 2, notes: 'Dual operation' },
+        { op: '070', name: 'Final steam press', machine: 'Steam press', level: '★★', smv: 2.1, pph: 29, operators: 1, machines: 1, notes: 'Steam finishing' },
+        { op: '080', name: 'QC inspection + tagging', machine: 'Manual', level: '★★', smv: 1.5, pph: 40, operators: 1, machines: 0, notes: 'Final inspection' }
+      ],
+      machineTypes: ['SNLS', 'Overlock 3T', 'Overlock 4T', 'Overlock 5T', 'Lockstitch', 'Blind-stitch', 'Buttonhole', 'Steam Press', 'Manual']
+    }
+  };
+
+  const gamme = gammeData[m.id] || { operations: [], machineTypes: [] };
+  
+  if (gamme.operations.length === 0) {
+    document.getElementById('md-gamme').innerHTML = emptyPane('No GAMME data available for this model.');
+    return;
+  }
+
+  // Calculate totals
+  const totalSMV = gamme.operations.reduce((sum, op) => sum + op.smv, 0);
+  const totalOperators = gamme.operations.reduce((sum, op) => sum + op.operators, 0);
+  const totalMachines = gamme.operations.reduce((sum, op) => sum + op.machines, 0);
+  const hourlyOutput = Math.floor(60 / totalSMV * 60); // pieces per hour
+
+  const operationsHtml = gamme.operations.map(op => {
+    const levelStars = op.level.replace(/★/g, '<span style="color:var(--gold);margin-right:1px">★</span>');
+    
+    return `
+      <tr class="tbl-row">
+        <td class="ref-cell">${op.op}</td>
+        <td class="fw-600">${op.name}</td>
+        <td>
+          <select style="width: 100%; padding: 4px 8px; border: 1px solid var(--border); border-radius: 3px; font-size: .8rem;"
+                  onchange="updateGammeOperation('${op.op}', 'machine', this.value)">
+            ${gamme.machineTypes.map(mt => 
+              `<option value="${mt}" ${mt === op.machine ? 'selected' : ''}>${mt}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td style="text-align:center;letter-spacing:2px;">${levelStars}</td>
+        <td style="text-align:right">
+          <input type="number" min="0" step="0.1" value="${op.smv}" 
+                 style="width: 60px; text-align: right; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+                 onchange="updateGammeOperation('${op.op}', 'smv', this.value)">
+        </td>
+        <td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--text)">
+          ${op.pph}
+        </td>
+        <td style="text-align:center">
+          <input type="number" min="0" value="${op.operators}" 
+                 style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+                 onchange="updateGammeOperation('${op.op}', 'operators', this.value)">
+        </td>
+        <td style="text-align:center">
+          <input type="number" min="0" value="${op.machines}" 
+                 style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+                 onchange="updateGammeOperation('${op.op}', 'machines', this.value)">
+        </td>
+        <td class="muted-cell" style="font-size: .7rem;">${op.notes}</td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('md-gamme').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">GAMME Opératoire — Line Balancing & SAM Calculation</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn-primary" onclick="printGamme('${m.id}')" style="font-size: .7rem; padding: 6px 12px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print GAMME
+          </button>
+        </div>
+      </div>
+      
+      <!-- Summary KPIs -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 20px; border-bottom: 1px solid #F0EDE8;">
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Total SMV
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1">
+            ${totalSMV.toFixed(1)}
+          </div>
+          <div style="font-size: .7rem; color: var(--muted);">minutes</div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Hourly Output
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--text);line-height:1">
+            ${hourlyOutput}
+          </div>
+          <div style="font-size: .7rem; color: var(--muted);">pieces/hour</div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Operators Required
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--text);line-height:1">
+            ${totalOperators}
+          </div>
+          <div style="font-size: .7rem; color: var(--muted);">total operators</div>
+        </div>
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px;">
+            Machines Required
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--text);line-height:1">
+            ${totalMachines}
+          </div>
+          <div style="font-size: .7rem; color: var(--muted);">total machines</div>
+        </div>
+      </div>
+      
+      <!-- Operations Table -->
+      <div style="overflow-x: auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Op #</th>
+              <th>Operation</th>
+              <th>Machine Type</th>
+              <th style="text-align:center">Level</th>
+              <th style="text-align:right">SMV (min)</th>
+              <th style="text-align:right">PPH</th>
+              <th style="text-align:center">Operators</th>
+              <th style="text-align:center">Machines</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${operationsHtml}
+            <tr style="background: #FFFDF7; border-top: 2px solid rgba(196,163,90,.15);">
+              <td colspan="4" style="padding: 12px 20px; font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);">
+                Totals
+              </td>
+              <td style="text-align:right;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">
+                ${totalSMV.toFixed(1)}
+              </td>
+              <td></td>
+              <td style="text-align:center;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--text);">
+                ${totalOperators}
+              </td>
+              <td style="text-align:center;padding:12px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--text);">
+                ${totalMachines}
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Add Operation Button -->
+      <div style="padding: 16px 20px; border-top: 1px solid #F0EDE8; text-align: center;">
+        <button class="btn-outline" onclick="addGammeOperation()" style="font-size: .7rem; padding: 6px 16px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Operation
+        </button>
+      </div>
+    </div>
+    
+    <!-- Print-friendly CSS (hidden by default) -->
+    <style id="gamme-print-style" media="print">
+      @media print {
+        #sidebar, #topbar, .md-back, .btn-primary, .btn-outline, .btn-sm,
+        input, select, button { display: none !important; }
+        #main { margin-left: 0 !important; }
+        #content { padding: 16px !important; overflow: visible !important; }
+        .sc { break-inside: avoid; border: 1px solid #000 !important; }
+        .tbl { border: 1px solid #000 !important; }
+        .tbl th, .tbl td { border: 1px solid #000 !important; padding: 6px 8px !important; }
+        .sc-head { background: #f0f0f0 !important; border-bottom: 2px solid #000 !important; }
+      }
+    </style>`;
+}
+
+// GAMME helper functions
+function updateGammeOperation(opCode, field, value) {
+  showToast(`Updated ${field} for operation ${opCode}: ${value}`);
+  // In a real implementation, this would update the data store and recalculate totals
+}
+
+function addGammeOperation() {
+  showToast('Add new operation to GAMME');
+  // In a real implementation, this would show a form to add new operation
+}
+
+function printGamme(modelId) {
+  // Show print dialog with print-friendly styling
+  window.print();
+  showToast(`Printing GAMME for ${modelId}...`);
+}
+
+/* ── Tab 4 · POM (Point of Measure) ─────────────────────────── */
+function renderMdPom(m) {
+  // Sample POM data for AM-0045
+  const pomData = {
+    'AM-0045': {
+      points: [
+        { point: 'Bust (at underarm)', xs: 88, s: 92, m: 96, l: 100, xl: 106, tolerance: '± 1 cm', notes: 'Measured 1cm below armhole' },
+        { point: 'Waist', xs: 72, s: 76, m: 80, l: 84, xl: 90, tolerance: '± 1 cm', notes: 'Natural waistline' },
+        { point: 'Hip (at 18 cm below waist)', xs: 94, s: 98, m: 102, l: 106, xl: 112, tolerance: '± 1 cm', notes: 'Fullest part' },
+        { point: 'Centre front length', xs: 120, s: 121, m: 122, l: 123, xl: 124, tolerance: '± 1.5 cm', notes: 'HPS to hem' },
+        { point: 'Shoulder width', xs: 37, s: 38, m: 39, l: 40, xl: 41, tolerance: '± 0.5 cm', notes: 'Shoulder point to point' },
+        { point: 'Sleeve length (CB to cuff)', xs: 62, s: 62.5, m: 63, l: 63.5, xl: 64, tolerance: '± 1 cm', notes: 'Centre back to cuff edge' },
+        { point: 'Hem circumference', xs: 140, s: 144, m: 148, l: 152, xl: 158, tolerance: '± 2 cm', notes: 'Bottom opening' }
+      ],
+      uploadedFiles: [
+        { name: 'ASOS_Measurement_Chart.xlsx', size: '2.4 MB', date: '15 Jan 2026', type: 'Excel' },
+        { name: 'Tech_Pack_POM.pdf', size: '3.1 MB', date: '28 Mar 2026', type: 'PDF' }
+      ]
+    }
+  };
+
+  const pom = pomData[m.id] || { points: [], uploadedFiles: [] };
+  
+  const pointsHtml = pom.points.map(p => `
+    <tr class="tbl-row">
+      <td class="fw-600">${p.point}</td>
+      <td style="text-align:center">
+        <input type="number" value="${p.xs}" style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+               onchange="updatePomPoint('${p.point}', 'xs', this.value)">
+      </td>
+      <td style="text-align:center">
+        <input type="number" value="${p.s}" style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+               onchange="updatePomPoint('${p.point}', 's', this.value)">
+      </td>
+      <td style="text-align:center">
+        <input type="number" value="${p.m}" style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+               onchange="updatePomPoint('${p.point}', 'm', this.value)">
+      </td>
+      <td style="text-align:center">
+        <input type="number" value="${p.l}" style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+               onchange="updatePomPoint('${p.point}', 'l', this.value)">
+      </td>
+      <td style="text-align:center">
+        <input type="number" value="${p.xl}" style="width: 50px; text-align: center; padding: 4px 6px; border: 1px solid var(--border); border-radius: 3px;"
+               onchange="updatePomPoint('${p.point}', 'xl', this.value)">
+      </td>
+      <td style="text-align:center; color: var(--muted); font-size: .7rem;">${p.tolerance}</td>
+      <td class="muted-cell" style="font-size: .7rem;">${p.notes}</td>
+    </tr>`).join('');
+
+  const filesHtml = pom.uploadedFiles.map(f => `
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #F0EDE8;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 32px; height: 32px; border-radius: 4px; background: rgba(196,163,90,.1); display: flex; align-items: center; justify-content: center; color: var(--gold);">
+          ${f.type === 'Excel' ? 
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg>' :
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'}
+        </div>
+        <div>
+          <div style="font-size: .8rem; font-weight: 600; color: var(--text);">${f.name}</div>
+          <div style="font-size: .7rem; color: var(--muted);">${f.size} · ${f.date}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button class="btn-sm" onclick="previewFile('${f.name}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          Preview
+        </button>
+        <button class="btn-sm" onclick="parseExcelFile('${f.name}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Parse
+        </button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('md-pom').innerHTML = `
+    <div class="sc">
+      <div class="sc-head">
+        <span class="sc-title">Point of Measure — Interactive Table</span>
+        <button class="btn-primary" onclick="exportPom('${m.id}')" style="font-size: .7rem; padding: 6px 12px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export POM
+        </button>
+      </div>
+      
+      <!-- File Upload Section -->
+      <div style="padding: 20px; border-bottom: 1px solid #F0EDE8;">
+        <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px;">
+          Upload Measurement Chart
+        </div>
+        <div style="border: 2px dashed var(--border); border-radius: 8px; padding: 30px; text-align: center; background: #FAFAF8; cursor: pointer;"
+             onclick="document.getElementById('pom-file-input').click()"
+             ondrop="handleFileDrop(event)" ondragover="event.preventDefault()">
+          <div style="margin-bottom: 10px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div style="font-size: .85rem; color: var(--text); margin-bottom: 4px;">
+            Drop Excel or PDF files here, or click to browse
+          </div>
+          <div style="font-size: .7rem; color: var(--muted2);">
+            Supports .xlsx, .xls, .pdf (Max 10MB)
+          </div>
+        </div>
+        <input type="file" id="pom-file-input" accept=".xlsx,.xls,.pdf" style="display: none;" onchange="handleFileUpload(this.files)">
+        
+        <!-- Uploaded Files -->
+        ${pom.uploadedFiles.length > 0 ? `
+          <div style="margin-top: 20px;">
+            <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px;">
+              Uploaded Files (${pom.uploadedFiles.length})
+            </div>
+            <div style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden;">
+              ${filesHtml}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+      
+      <!-- POM Table -->
+      <div style="overflow-x: auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Point of Measure</th>
+              <th style="text-align:center">XS</th>
+              <th style="text-align:center">S</th>
+              <th style="text-align:center">M</th>
+              <th style="text-align:center">L</th>
+              <th style="text-align:center">XL</th>
+              <th style="text-align:center">Tolerance</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pointsHtml}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Add Point Button -->
+      <div style="padding: 16px 20px; border-top: 1px solid #F0EDE8; text-align: center;">
+        <button class="btn-outline" onclick="addPomPoint()" style="font-size: .7rem; padding: 6px 16px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Measurement Point
+        </button>
+      </div>
+    </div>`;
+}
+
+// POM helper functions
+function updatePomPoint(point, size, value) {
+  showToast(`Updated ${point} (${size.toUpperCase()}): ${value} cm`);
+  // In a real implementation, this would update the data store
+}
+
+function addPomPoint() {
+  showToast('Add new measurement point');
+  // In a real implementation, this would show a form to add new point
+}
+
+function exportPom(modelId) {
+  showToast(`Exporting POM for ${modelId}...`);
+  // In a real implementation, this would generate and download CSV/PDF
+}
+
+function handleFileDrop(event) {
+  event.preventDefault();
+  const files = event.dataTransfer.files;
+  handleFileUpload(files);
+}
+
+function handleFileUpload(files) {
+  if (files.length > 0) {
+    const file = files[0];
+    showToast(`Uploading ${file.name}...`);
+    // In a real implementation, this would upload to server
+    setTimeout(() => {
+      showToast(`${file.name} uploaded successfully`);
+    }, 1000);
+  }
+}
+
+function previewFile(filename) {
+  showToast(`Previewing ${filename}...`);
+  // In a real implementation, this would open a preview modal
+}
+
+function parseExcelFile(filename) {
+  showToast(`Parsing Excel file: ${filename}...`);
+  // In a real implementation, this would use SheetJS to parse Excel and populate POM table
+  // Placeholder for SheetJS integration
+  if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
+    showToast('Excel parsing would populate the POM table automatically');
+  }
+}
+
+/* ── Tab 5 · Samples & Revision ─────────────────────────────── */
+function renderMdSamples(id) {
+  const d = MD[id];
+  if (!d) { 
+    document.getElementById('md-samples').innerHTML = emptyPane('No sample records found.'); 
+    return; 
+  }
+
+  const hasPPWarning = d.samples.some(s => s.type === 'PP Sample' && s.statusLabel === 'Not Produced');
+
+  const warning = hasPPWarning ? `
+    <div class="sample-warn">
+      <svg class="sample-warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <p><strong>PP Sample not yet produced.</strong> Production approval is blocked until the Pre-Production sample is submitted, reviewed, and signed off by the client buyer. No bulk cutting should begin before PP approval is on file.</p>
+    </div>` : '';
+
+  // Status toggle component
+  const statusToggle = `
+    <div class="sc" style="margin-bottom: 16px;">
+      <div class="sc-head">
+        <span class="sc-title">Sample Status</span>
+      </div>
+      <div style="padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div style="font-size: .7rem; font-weight: 600; color: var(--muted);">Current Status:</div>
+          <div style="display: flex; gap: 8px;">
+            <button class="period-btn ${d.samples.some(s => s.statusLabel === 'Approved') ? 'active' : ''}" 
+                    onclick="updateSampleStatus('approved')">Approved for Cutting</button>
+            <button class="period-btn ${d.samples.some(s => s.statusLabel === 'Pending') ? 'active' : ''}" 
+                    onclick="updateSampleStatus('pending')">Pending Review</button>
+            <button class="period-btn ${d.samples.some(s => s.statusLabel === 'Rejected') ? 'active' : ''}" 
+                    onclick="updateSampleStatus('rejected')">Rejected</button>
+          </div>
+        </div>
+        <div style="font-size: .8rem; color: var(--text); line-height: 1.6;">
+          ${d.samples.some(s => s.statusLabel === 'Approved') ? 
+            '✅ <strong>Approved for Cutting</strong> — All samples approved. Bulk production can proceed.' :
+            d.samples.some(s => s.statusLabel === 'Pending') ?
+            '⏳ <strong>Pending Review</strong> — Awaiting client feedback on submitted samples.' :
+            '❌ <strong>Rejected</strong> — Samples require corrections before proceeding.'}
+        </div>
+      </div>
+    </div>`;
+
+  // QC Reports section
+  const qcReports = `
+    <div class="sc" style="margin-bottom: 16px;">
+      <div class="sc-head">
+        <span class="sc-title">QC Reports & Production Notes</span>
+        <button class="btn-outline" onclick="addQcReport()" style="font-size: .7rem; padding: 5px 12px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Report
+        </button>
+      </div>
+      <div style="padding: 20px;">
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px;">
+            Defect History Log
+          </div>
+          <div style="background: #FAFAF8; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: .8rem; color: var(--text); line-height: 1.6;">
+            <div><strong>Proto Sample (Rev.1):</strong> Bust ease 4cm too tight • Zip placket visible • Neckline 1.5cm low</div>
+            <div><strong>Fit Sample (Rev.2):</strong> Neckline raised 1cm • Sleeve shortened 1.5cm • Seam allowance increased</div>
+            <div><strong>Current Status:</strong> Size set submitted, awaiting client sign-off</div>
+          </div>
+        </div>
+        
+        <div>
+          <div style="font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px;">
+            Production Notes
+          </div>
+          <textarea id="production-notes" style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .8rem; color: var(--text); line-height: 1.6; resize: vertical;"
+                    placeholder="Add production notes, challenges, or special instructions for future re-orders...">${d.samples.find(s => s.type === 'Proto')?.feedback || ''}</textarea>
+          <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+            <button class="btn-primary" onclick="saveProductionNotes()" style="font-size: .7rem; padding: 6px 16px;">
+              Save Notes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // Sample cards (existing)
+  const cards = d.samples.map(s => {
+    const dateStr = s.date
+      ? `<div class="sample-datemeta">Submitted ${s.date} &nbsp;·&nbsp; Rev.${s.rev}</div>`
+      : `<div class="sample-datemeta" style="color:var(--muted2)">Not yet produced &nbsp;·&nbsp; Rev.${s.rev}</div>`;
+
+    const fbBlock = s.statusLabel === 'Not Produced' ? `
+      <div class="sample-fb-lbl">Notes</div>
+      <textarea class="sample-fb" placeholder="No sample produced yet. Add notes here…" rows="3"></textarea>` : `
+      <div class="sample-fb-lbl">Client Feedback</div>
+      <textarea class="sample-fb" rows="3">${s.feedback}</textarea>`;
+
+    return `
+      <div class="sample-card ${s.cssClass}">
+        <div class="sample-chead">
+          <span class="sample-type-lbl">${s.type}</span>
+          <span class="sbadge ${s.badgeClass}">
+            <span class="sdot"></span>${s.statusLabel}
+          </span>
+        </div>
+        ${dateStr}
+        ${fbBlock}
+      </div>`;
+  }).join('');
+
+  document.getElementById('md-samples').innerHTML = `
+    ${warning}
+    ${statusToggle}
+    ${qcReports}
+    <div class="sample-grid">${cards}</div>`;
+}
+
+// Samples helper functions
+function updateSampleStatus(status) {
+  const statusMap = {
+    'approved': 'Approved for Cutting',
+    'pending': 'Pending Review', 
+    'rejected': 'Rejected'
+  };
+  showToast(`Sample status updated to: ${statusMap[status]}`);
+  // In a real implementation, this would update the data store
+}
+
+function addQcReport() {
+  showToast('Add new QC report');
+  // In a real implementation, this would show a form to add QC report
+}
+
+function saveProductionNotes() {
+  const notes = document.getElementById('production-notes').value;
+  showToast('Production notes saved to knowledge base');
+  // In a real implementation, this would save to database
+  AuditTrail.log('UPDATED', 'Model', document.querySelector('.md-id-badge')?.textContent, 
+    'Production notes updated in Samples & Revision tab', null, { notes: notes.substring(0, 100) + '...' });
 }
 
 /* ── Tab 2 · BOM ──────────────────────────────────────────────── */
