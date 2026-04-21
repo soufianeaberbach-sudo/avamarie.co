@@ -52,10 +52,30 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .ham span{display:block;width:24px;height:1.5px;background:var(--white);transition:.3s}
 
 /* MOBILE MENU */
-#mobileMenu{position:fixed;inset:0;background:var(--dark);z-index:8999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.8rem;transform:translateY(-100%);transition:transform .5s var(--ease-out)}
+#mobileMenu{position:fixed;inset:0;background:var(--dark);z-index:8999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0 2rem;transform:translateY(-100%);transition:transform .6s cubic-bezier(.76,0,.24,1);overflow:hidden}
+#mobileMenu::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(212,175,55,.08) 0%,transparent 70%);pointer-events:none}
 #mobileMenu.open{transform:translateY(0)}
-.mob-link{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.12em;color:rgba(255,255,255,.3);cursor:pointer;transition:color .3s}
-.mob-link:hover{color:var(--white)}
+.mob-nav-items{display:flex;flex-direction:column;align-items:center;gap:.15rem;width:100%}
+.mob-link{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,8vw,3.2rem);letter-spacing:.1em;color:rgba(255,255,255,.18);cursor:pointer;padding:.4rem 0;width:100%;text-align:center;opacity:0;transform:translateY(24px);transition:color .35s,letter-spacing .35s,opacity .5s cubic-bezier(.76,0,.24,1),transform .5s cubic-bezier(.76,0,.24,1)}
+#mobileMenu.open .mob-link{opacity:1;transform:translateY(0)}
+#mobileMenu.open .mob-link:nth-child(1){transition-delay:.08s}
+#mobileMenu.open .mob-link:nth-child(2){transition-delay:.13s}
+#mobileMenu.open .mob-link:nth-child(3){transition-delay:.18s}
+#mobileMenu.open .mob-link:nth-child(4){transition-delay:.23s}
+#mobileMenu.open .mob-link:nth-child(5){transition-delay:.28s}
+#mobileMenu.open .mob-link:nth-child(6){transition-delay:.33s}
+#mobileMenu.open .mob-link:nth-child(7){transition-delay:.38s}
+.mob-link:hover{color:var(--white);letter-spacing:.14em}
+.mob-link:active{color:var(--gold)}
+.mob-divider{width:40px;height:1px;background:linear-gradient(to right,transparent,rgba(212,175,55,.4),transparent);margin:.8rem auto}
+.mob-erp-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.4rem;padding:.65rem 2rem;border:1px solid rgba(212,175,55,.35);background:transparent;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;opacity:0;transform:translateY(16px);transition:background .3s,color .3s,border-color .3s,opacity .5s cubic-bezier(.76,0,.24,1),transform .5s cubic-bezier(.76,0,.24,1)}
+#mobileMenu.open .mob-erp-btn{opacity:1;transform:translateY(0);transition-delay:.44s}
+.mob-erp-btn:hover{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.mob-close{position:absolute;top:1.4rem;right:1.6rem;background:none;border:none;cursor:pointer;padding:8px;opacity:.5;transition:opacity .25s}
+.mob-close:hover{opacity:1}
+.mob-close span{display:block;width:22px;height:1.5px;background:var(--white);transition:transform .3s}
+.mob-close span:first-child{transform:rotate(45deg) translate(0,0.75px)}
+.mob-close span:last-child{transform:rotate(-45deg) translate(0,-0.75px)}
 
 .page{display:none}.page.active{display:block}
 
@@ -139,7 +159,7 @@ img{display:block;max-width:100%}a{text-decoration:none}
 /* SPECIALTIES */
 .spec-section{padding:8rem 4rem;background:var(--cream)}
 .spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:4rem}
-.spec-card{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:3/4}
+.spec-card{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:4/5;max-height:min(520px,60vw)}
 .spec-card img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .8s var(--ease-out)}
 .spec-card:hover img{transform:scale(1.07)}
 .spec-info{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,transparent 55%);padding:2.5rem 2rem;display:flex;flex-direction:column;justify-content:flex-end}
@@ -149,6 +169,14 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .spec-card:hover .spec-desc{transform:translateY(0);opacity:1}
 .spec-arrow{width:36px;height:36px;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;margin-top:1.5rem;font-size:.85rem;color:var(--white);transform:translateX(-10px);opacity:0;transition:.4s var(--ease-out)}
 .spec-card:hover .spec-arrow{transform:translateX(0);opacity:1;background:var(--gold);border-color:var(--gold)}
+@media(max-width:768px){
+  .spec-card{aspect-ratio:3/4;max-height:none}
+  .spec-info{background:linear-gradient(to top,rgba(10,8,6,.95) 0%,rgba(10,8,6,.55) 50%,transparent 75%);padding:1.5rem 1.25rem}
+  .spec-name{font-size:1.6rem}
+  .spec-desc{transform:translateY(0);opacity:1;font-size:.8rem}
+  .spec-arrow{transform:translateX(0);opacity:1;margin-top:1rem;width:30px;height:30px}
+  .spec-grid{gap:2px}
+}
 
 /* PAGE HEADER */
 .pg-header{padding:10rem 4rem 5rem;background:var(--dark);position:relative;overflow:hidden}
@@ -428,7 +456,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 @media(max-width:1100px){
   #nav{padding:0 2rem;background:rgba(245,241,235,.97);backdrop-filter:blur(12px)}
   #nav.solid{background:rgba(245,241,235,.97);box-shadow:0 1px 0 var(--border)}
-  .nav-logo{color:var(--dark)}.nav-links{display:none}.erp-btn{display:inline-flex!important;opacity:.85;font-size:.72rem;padding:.5rem 1.2rem}.ham{display:flex}.ham span{background:var(--dark)}
+  .nav-logo{color:var(--dark)}.nav-links{display:none}.erp-btn{display:none!important}.ham{display:flex}.ham span{background:var(--dark)}
   .hero-content{grid-template-columns:1fr;padding:0 2rem 6rem}
   .hero-right{flex-direction:row;flex-wrap:wrap;align-items:center}
   .hero-stat{text-align:left;border-right:none;border-left:2px solid var(--gold);padding:0 0 0 1rem}
@@ -522,13 +550,18 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   <button class="ham" id="ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
 </nav>
 <div id="mobileMenu">
-  <span class="mob-link" onclick="goPage('home');toggleMob()">HOME</span>
-  <span class="mob-link" onclick="goPage('story');toggleMob()">OUR STORY</span>
-  <span class="mob-link" onclick="goPage('journey');toggleMob()">MANUFACTURING</span>
-  <span class="mob-link" onclick="goPage('services');toggleMob()">SERVICES</span>
-  <span class="mob-link" onclick="goPage('portfolio');toggleMob()">PORTFOLIO</span>
-  <span class="mob-link" onclick="goPage('partners');toggleMob()">PARTNERS</span>
-  <span class="mob-link" onclick="goPage('contact');toggleMob()">CONTACT</span>
+  <button class="mob-close" onclick="toggleMob()" aria-label="Close menu"><span></span><span></span></button>
+  <div class="mob-nav-items">
+    <span class="mob-link" onclick="goPage('home');toggleMob()">HOME</span>
+    <span class="mob-link" onclick="goPage('story');toggleMob()">OUR STORY</span>
+    <span class="mob-link" onclick="goPage('journey');toggleMob()">MANUFACTURING</span>
+    <span class="mob-link" onclick="goPage('services');toggleMob()">SERVICES</span>
+    <span class="mob-link" onclick="goPage('portfolio');toggleMob()">PORTFOLIO</span>
+    <span class="mob-link" onclick="goPage('partners');toggleMob()">PARTNERS</span>
+    <span class="mob-link" onclick="goPage('contact');toggleMob()">CONTACT</span>
+  </div>
+  <div class="mob-divider"></div>
+  <button class="mob-erp-btn" onclick="window.location.href='login.html';toggleMob()"><i class="fas fa-lock" style="font-size:.65rem;opacity:.8"></i> ERP Login</button>
 </div>
 
 <!-- ====== HOME ====== -->
@@ -678,7 +711,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <div class="spec-card sr sr-d2" onclick="portShowCat('jersey')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755843/1_p0wvot.png" alt="Jersey"><div class="spec-info"><p class="spec-cat">Knitwear</p><h3 class="spec-name">JERSEY &amp; KNITS</h3><p class="spec-desc">Versatile knit garments combining comfort with elegance</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
 <div class="spec-card sr sr-d3" onclick="portShowCat('evening')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755790/1_kritnu.png" alt="Evening"><div class="spec-info"><p class="spec-cat">Formal Wear</p><h3 class="spec-name">EVENING &amp; OCCASION</h3><p class="spec-desc">Luxurious formal wear with intricate details and premium finishes</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
 <div class="spec-card sr sr-d4" onclick="portShowCat('sportswear')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755903/1_bpeafl.png" alt="Sport"><div class="spec-info"><p class="spec-cat">Performance</p><h3 class="spec-name">SPORTSWEAR &amp; ACTIVEWEAR</h3><p class="spec-desc">High-performance activewear engineered for movement</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
-<div class="spec-card sr sr-d5" style="grid-column:1/-1;max-width:calc(50% - 1.5px);margin:0 auto;" onclick="portShowCat('swimwear')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755933/1_e8jqa3.png" alt="Swimwear"><div class="spec-info"><p class="spec-cat">Resort</p><h3 class="spec-name">SWIMWEAR</h3><p class="spec-desc">Resort and swim collections crafted for style and comfort</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div></div></div></div></div></div>
+<div class="spec-card sr sr-d5" style="grid-column:1/-1;max-width:calc(50% - 1.5px);margin:0 auto;" onclick="portShowCat('swimwear')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755933/1_e8jqa3.png" alt="Swimwear"><div class="spec-info"><p class="spec-cat">Resort</p><h3 class="spec-name">SWIMWEAR</h3><p class="spec-desc">Resort and swim collections crafted for style and comfort</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
 </div>
 </section>
 </div>
@@ -807,7 +840,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 let current='home';const curtain=document.getElementById('curtain');function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function goPage(id){if(id===current)return;curtain.classList.remove('slide-out');curtain.classList.add('slide-in');await sleep(560);document.getElementById('pg-'+current).classList.remove('active');document.getElementById('pg-'+id).classList.add('active');current=id;window.scrollTo(0,0);document.querySelectorAll('.nav-link').forEach(l=>l.classList.toggle('active',l.dataset.pg===id));setTimeout(doReveal,50);curtain.classList.remove('slide-in');curtain.classList.add('slide-out');await sleep(560);curtain.classList.remove('slide-out')}
 window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('solid',window.scrollY>50);doReveal()},{passive:true});
-function toggleMob(){const m=document.getElementById('mobileMenu');m.classList.toggle('open');const s=document.querySelectorAll('.ham span');if(m.classList.contains('open')){s[0].style.transform='rotate(45deg) translate(5px,5px)';s[1].style.opacity='0';s[2].style.transform='rotate(-45deg) translate(5px,-5px)'}else{s[0].style.transform='';s[1].style.opacity='';s[2].style.transform=''}}
+function toggleMob(){const m=document.getElementById('mobileMenu');const isOpen=m.classList.toggle('open');const s=document.querySelectorAll('.ham span');if(isOpen){s[0].style.transform='rotate(45deg) translate(5px,5px)';s[1].style.opacity='0';s[2].style.transform='rotate(-45deg) translate(5px,-5px)';document.body.style.overflow='hidden'}else{s[0].style.transform='';s[1].style.opacity='';s[2].style.transform='';document.body.style.overflow=''}}
 const obs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -60px 0px'});function doReveal(){document.querySelectorAll('.page.active .sr').forEach(el=>obs.observe(el))}doReveal();
 const counterObs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting&&!e.target.dataset.counted){e.target.dataset.counted='1';const t=parseInt(e.target.dataset.count);if(!t)return;let s=0;const st=Math.ceil(t/60);const tm=setInterval(()=>{s+=st;if(s>=t){s=t;clearInterval(tm)}if(t>999)e.target.textContent=s.toLocaleString()+(t===250000?'+':t===2021?'':'+');else e.target.textContent=s+(t===99?'%':t>=10?'+':'')},30)}})},{threshold:.5});document.querySelectorAll('[data-count]').forEach(el=>counterObs.observe(el));
 const mq=document.getElementById('mqt');if(mq)mq.innerHTML+=mq.innerHTML;
@@ -844,7 +877,7 @@ markers.forEach(m=>{const mk=L.marker([m.lat,m.lng],{icon:goldIcon}).addTo(pMap)
 setTimeout(()=>pMap.invalidateSize(),300)}
 const origGoPage=goPage;goPage=async function(id){await origGoPage.call(this,id);if(id==='partners')setTimeout(initPartnersMap,200)};
 function portShowCat(k){var d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('portCats').style.display='none';var pg=document.getElementById('portGrid');pg.style.display='block';document.getElementById('portCatTitle').innerHTML=d.title.replace(/—/g,'<span>—</span>');var items=document.getElementById('portItems');items.innerHTML='';d.imgs.forEach(function(src,i){var div=document.createElement('div');div.className='gal-grid-item';div.onclick=function(){galZoomOpen(i)};var img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';div.appendChild(img);items.appendChild(div)});window.scrollTo(0,document.getElementById('portGrid').offsetTop-72)}
-function portBack(){document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
+function portBack(){var items=document.getElementById('portItems');if(items)items.innerHTML='';document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
 function submitForm(e,form){e.preventDefault();const btn=form.querySelector('button[type="submit"]');btn.disabled=true;btn.innerHTML='<span>SENDING…</span>';fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()}).then(()=>{btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';form.reset();setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color='';btn.disabled=false},4000)}).catch(()=>{btn.innerHTML='<span>ERROR — TRY AGAIN</span>';btn.disabled=false})}
 // Hero video: double-buffer — A plays while B preloads next, then swap instantly
 (function(){
