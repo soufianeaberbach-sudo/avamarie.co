@@ -1,26 +1,5 @@
-<!-- KPIs -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-eyebrow">Total Models</div>
-          <div class="kpi-num">5</div>
-          <div class="kpi-sub">All garment styles</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-eyebrow">In Production</div>
-          <div class="kpi-num gold">1</div>
-          <div class="kpi-sub">Active on factory floor</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-eyebrow">In Development</div>
-          <div class="kpi-num">2</div>
-          <div class="kpi-sub">Sample &amp; Confirmed</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-eyebrow">Drafts</div>
-          <div class="kpi-num muted">1</div>
-          <div class="kpi-sub">Awaiting tech pack</div>
-        </div>
-      </div>
+<!-- KPIs (dynamic) -->
+      <div class="kpi-grid" id="m-kpi-grid"></div>
 
       <!-- Filter bar -->
       <div class="card filter-bar">
@@ -58,7 +37,7 @@
           <button class="btn-outline" onclick="exportModelsCSV()">
             <i data-lucide="printer"></i> Print Report
           </button>
-          <button class="btn-primary" onclick="showToast('New Model form — coming next')">
+          <button class="btn-primary" onclick="showNewModelModal()">
             <i data-lucide="plus"></i> New Model
           </button>
         </div>
@@ -69,14 +48,16 @@
         <table class="tbl" id="m-table">
           <thead>
             <tr>
+              <th style="width:56px"></th>
               <th>Model #</th>
               <th>Name</th>
               <th>Client</th>
               <th>Client Ref</th>
               <th>Category</th>
+              <th>Season</th>
               <th style="text-align:center">Rev</th>
               <th>Status</th>
-              <th style="text-align:right">Cost / pc</th>
+              <th class="cost-col" style="text-align:right">Cost / pc</th>
               <th>Updated</th>
             </tr>
           </thead>
@@ -85,5 +66,68 @@
         <div id="m-empty" class="tbl-empty" style="display:none">
           <i data-lucide="search-x"></i>
           <p>No models match your filters.</p>
+        </div>
+      </div>
+
+      <!-- New Model Modal -->
+      <div class="modal-overlay" id="new-model-modal" style="display:none">
+        <div class="modal-box" style="width:540px">
+          <div class="modal-head">
+            <span class="modal-title">New Model</span>
+            <button class="modal-close" onclick="closeNewModelModal()">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="field-row">
+              <div class="cs-field">
+                <label>Model Name *</label>
+                <input type="text" id="nm-name" placeholder="e.g. Robe Satin Longue">
+              </div>
+              <div class="cs-field">
+                <label>Category *</label>
+                <select id="nm-cat">
+                  <option value="">— Select —</option>
+                  <option>Robe</option><option>Top</option><option>Pantalon</option>
+                  <option>Jupe</option><option>Veste</option><option>Ensemble</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="cs-field">
+                <label>Client *</label>
+                <select id="nm-client">
+                  <option value="">— Select —</option>
+                  <option>ASOS</option><option>PrettyLittleThing</option><option>River Island</option>
+                </select>
+              </div>
+              <div class="cs-field">
+                <label>Client Style Ref</label>
+                <input type="text" id="nm-ref" placeholder="e.g. ASOS-ST-12345">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="cs-field">
+                <label>Season</label>
+                <select id="nm-season">
+                  <option>SS26</option><option>AW26</option><option>SS27</option><option>AW27</option>
+                </select>
+              </div>
+              <div class="cs-field">
+                <label>Fabric / Composition</label>
+                <input type="text" id="nm-fabric" placeholder="e.g. 100% Poly Satin Duchess">
+              </div>
+            </div>
+            <div class="cs-field">
+              <label>Description</label>
+              <textarea id="nm-desc" rows="3" class="note-add-input" placeholder="Silhouette, key construction details…"></textarea>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn-outline" onclick="closeNewModelModal()">Cancel</button>
+            <button class="btn-primary" onclick="saveNewModel()">
+              <i data-lucide="save"></i> Create Model
+            </button>
+          </div>
         </div>
       </div>
