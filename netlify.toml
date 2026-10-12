@@ -2,3 +2,9 @@
   from   = "/admin/*"
   to     = "/admin/index.html"
   status = 200
+
+# SPA fallback — serves index.html for all page routes (files take priority over this rule)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
