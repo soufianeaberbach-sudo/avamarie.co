@@ -439,7 +439,11 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
   .gal-cats{grid-template-columns:1fr 1fr}
   .partners-stats{grid-template-columns:1fr 1fr}
   .pm-mob-row{display:flex}
-  .pm-panel{display:none!important}
+  .pm-fw-wrap .pm-panel{display:none!important}
+  .pm-spot{width:36px;height:36px}
+}
+@media(max-width:480px){
+  .pm-spot{pointer-events:none}
 }
 </style>
 </head>
@@ -634,7 +638,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <!-- ====== PARTNERS ====== -->
 <div id="pg-partners" class="page"><div style="height:72px;background:var(--dark);"></div>
 <div class="pg-header"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">Our Network</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>PARTNERS</span></h1></div>
-<div class="partners-intro"><div class="eyebrow sr">Global Manufacturing Group</div><h2 class="display-title sr sr-d1" style="font-size:clamp(2.5rem,4.5vw,4.5rem);">A FAMILY OF<br><span>MANUFACTURING</span><br>EXCELLENCE</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3">Together with our strategic partners, we form one of the world’s most powerful fashion manufacturing networks — combined monthly capacity exceeding 390,000 garments across England, Morocco and Pakistan.</p><button class="btn-primary sr sr-d4" onclick="goPage('contact')"><span>Get In Touch</span><i class="fas fa-arrow-right"></i></button></div>
+<div class="partners-intro"><div class="eyebrow sr">Global Manufacturing Group</div><h2 class="display-title sr sr-d1" style="font-size:clamp(2.5rem,4.5vw,4.5rem);">A FAMILY OF<br><span>MANUFACTURING</span><br>EXCELLENCE</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3">Together with our strategic partners, we form one of the world’s most powerful fashion manufacturing networks — combined monthly capacity exceeding 390,000 garments across England, Morocco and Pakistan.</p><button class="btn-primary sr sr-d4" onclick="goPage('contact')"><span>Join Our Network</span><i class="fas fa-arrow-right"></i></button></div>
 <div class="pm-fw-section">
 <div class="pm-fw-wrap" role="region" aria-label="Interactive partner location map">
 <img src="../img/partners-map.png" alt="World map showing three partner manufacturing locations: Ava Marie in Tangier Morocco, Sweet Threads in Leicester England, and Jaguar Apparel in Lahore Pakistan" class="pm-fw-img">
@@ -717,27 +721,31 @@ function portBack(){document.getElementById('portCats').style.display='block';do
 function submitForm(btn){btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color=''},3000)}
 // Partners image map interaction
 (function(){
-  var DELAY=200,_timer=null,_active=null;
-  function closeAll(){document.querySelectorAll('.pm-panel.open').forEach(function(p){p.classList.remove('open')});document.querySelectorAll('.pm-spot[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false')});_active=null;}
-  function openPanel(id,spot){if(_timer){clearTimeout(_timer);_timer=null;}closeAll();var p=document.getElementById(id);if(p){p.classList.add('open');_active=id;if(spot)spot.setAttribute('aria-expanded','true');}}
-  function schedClose(){_timer=setTimeout(closeAll,DELAY);}
+  var DELAY=200,_timer=null,_active=null,_openedBy=null;
+  function closeAll(){document.querySelectorAll('.pm-panel.open').forEach(function(p){p.classList.remove('open')});document.querySelectorAll('.pm-spot[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false')});_active=null;_openedBy=null;}
+  function openPanel(id,spot,via){if(_timer){clearTimeout(_timer);_timer=null;}closeAll();var p=document.getElementById(id);if(p){p.classList.add('open');_active=id;_openedBy=via||'hover';if(spot)spot.setAttribute('aria-expanded','true');}}
+  function schedClose(){if(_openedBy==='click')return;_timer=setTimeout(closeAll,DELAY);}
   function cancelClose(){if(_timer){clearTimeout(_timer);_timer=null;}}
+  function triggerMobile(pid){
+    var mInfo=document.getElementById('pm-mobile-info');var panel=document.getElementById(pid);
+    if(!mInfo||!panel)return;
+    var alreadyOpen=mInfo.getAttribute('data-open')===pid;
+    document.querySelectorAll('.pm-mob-btn').forEach(function(b){b.classList.remove('active')});
+    if(alreadyOpen){mInfo.innerHTML='';mInfo.classList.remove('open');mInfo.removeAttribute('data-open');}
+    else{var btn=document.querySelector('.pm-mob-btn[data-panel="'+pid+'"]');if(btn)btn.classList.add('active');mInfo.innerHTML='<div class="pm-panel">'+panel.innerHTML+'</div>';mInfo.classList.add('open');mInfo.setAttribute('data-open',pid);mInfo.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  }
   document.querySelectorAll('.pm-spot').forEach(function(spot){
     var pid=spot.dataset.panel;var panel=document.getElementById(pid);
-    spot.addEventListener('mouseenter',function(){cancelClose();openPanel(pid,spot);});
-    spot.addEventListener('mouseleave',schedClose);
-    if(panel){panel.addEventListener('mouseenter',cancelClose);panel.addEventListener('mouseleave',schedClose);}
-    spot.addEventListener('click',function(e){e.stopPropagation();if(_active===pid){closeAll();}else{openPanel(pid,spot);}});
-    spot.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();if(_active===pid){closeAll();}else{openPanel(pid,spot);}}if(e.key==='Escape')closeAll();});
+    spot.addEventListener('mouseenter',function(){if(window.innerWidth<=640)return;cancelClose();openPanel(pid,spot,'hover');});
+    spot.addEventListener('mouseleave',function(){if(window.innerWidth<=640)return;schedClose();});
+    if(panel){panel.addEventListener('mouseenter',function(){if(window.innerWidth<=640)return;cancelClose();});panel.addEventListener('mouseleave',function(){if(window.innerWidth<=640)return;schedClose();});}
+    spot.addEventListener('click',function(e){e.stopPropagation();if(window.innerWidth<=640){triggerMobile(pid);}else{if(_active===pid&&_openedBy==='click'){closeAll();}else{openPanel(pid,spot,'click');}}});
+    spot.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();if(window.innerWidth<=640){triggerMobile(pid);}else{if(_active===pid&&_openedBy==='click'){closeAll();}else{openPanel(pid,spot,'click');}}}if(e.key==='Escape')closeAll();});
   });
   document.addEventListener('click',function(e){if(!e.target.closest('.pm-panel')&&!e.target.closest('.pm-spot'))closeAll();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll();});
   document.querySelectorAll('.pm-mob-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var pid=btn.dataset.panel;var mInfo=document.getElementById('pm-mobile-info');var panel=document.getElementById(pid);
-      if(!mInfo||!panel)return;
-      if(btn.classList.contains('active')){btn.classList.remove('active');mInfo.innerHTML='';mInfo.classList.remove('open');}
-      else{document.querySelectorAll('.pm-mob-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');mInfo.innerHTML='<div class="pm-panel">'+panel.innerHTML+'</div>';mInfo.classList.add('open');}
-    });
+    btn.addEventListener('click',function(){triggerMobile(btn.dataset.panel);});
   });
 })();
 </script></body></html>
