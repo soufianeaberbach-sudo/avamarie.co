@@ -2,3 +2,22 @@
   from   = "/admin/*"
   to     = "/admin/index.html"
   status = 200
+
+# Redirect legacy /index/ to root
+[[redirects]]
+  from   = "/index"
+  to     = "/"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from   = "/index/"
+  to     = "/"
+  status = 301
+  force  = true
+
+# 404 for everything else
+[[redirects]]
+  from   = "/*"
+  to     = "/404.html"
+  status = 404
