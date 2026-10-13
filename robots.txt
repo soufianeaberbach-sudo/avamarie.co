@@ -1,0 +1,36 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /erp.html
+Disallow: /login.html
+Disallow: /views/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://avamarie.co/sitemap.xml
+
+# Search crawlers — full access to public marketing content
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Training crawlers — disallow; search retrieval access above is sufficient
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /

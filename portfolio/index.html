@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Ava Marie Fashion Manufacturing</title>
+<meta name="description" content="Browse Ava Marie's fashion manufacturing portfolio: womenswear woven, jersey & knits, evening & occasion wear, sportswear & activewear, and swimwear — crafted in Tangier, Morocco.">
+<link rel="canonical" href="https://avamarie.co/portfolio/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://avamarie.co/portfolio/">
+<meta property="og:title" content="Portfolio — Ava Marie Fashion Manufacturing">
+<meta property="og:description" content="Browse Ava Marie's fashion manufacturing portfolio: womenswear woven, jersey & knits, evening & occasion wear, sportswear & activewear, and swimwear — crafted in Tangier, Morocco.">
+<meta property="og:image" content="https://avamarie.co/AVA%20MARIE/AVA%20MARIE%201.jpg">
+<meta property="og:site_name" content="Ava Marie">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Portfolio — Ava Marie Fashion Manufacturing">
+<meta name="twitter:description" content="Browse Ava Marie's fashion manufacturing portfolio: womenswear woven, jersey & knits, evening & occasion wear, sportswear & activewear, and swimwear — crafted in Tangier, Morocco.">
+<meta name="twitter:image" content="https://avamarie.co/AVA%20MARIE/AVA%20MARIE%201.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://avamarie.co/#website","url":"https://avamarie.co/","name":"Ava Marie","publisher":{"@id":"https://avamarie.co/#organization"}},{"@type":"Organization","@id":"https://avamarie.co/#organization","name":"Ava Marie","alternateName":"Ava Marie SARL","url":"https://avamarie.co/","logo":"https://avamarie.co/AVA%20MARIE/icon.png","foundingDate":"2021","description":"Premium fashion manufacturer based in Tangier, Morocco.","address":{"@type":"PostalAddress","addressLocality":"Tangier","addressCountry":"MA"},"contactPoint":[{"@type":"ContactPoint","telephone":"+447845847104","contactType":"sales","email":"Anwar@sweetthreadsltd.com"},{"@type":"ContactPoint","telephone":"+212666945417","contactType":"customer support","email":"sara@avamarie.ma"}],"sameAs":["https://www.instagram.com/ava_marie_sarl","https://www.facebook.com/share/1DYx1vYUug/","https://www.linkedin.com/company/ava-marie-sarl/"]},{"@type":"CollectionPage","@id":"https://avamarie.co/portfolio/","url":"https://avamarie.co/portfolio/","name":"Portfolio \u2014 Ava Marie Fashion Manufacturing","description":"Browse Ava Marie's fashion manufacturing portfolio: womenswear woven, jersey & knits, evening & occasion wear, sportswear & activewear, and swimwear \u2014 crafted in Tangier, Morocco.","isPartOf":{"@id":"https://avamarie.co/#website"},"about":{"@id":"https://avamarie.co/#organization"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://avamarie.co/"},{"@type":"ListItem","position":2,"name":"Portfolio","item":"https://avamarie.co/portfolio/"}]}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="AVA%20MARIE/icon.png" type="image/png">
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<style>
+:root {
+  --cream:#F5F1EB;--cream2:#EDE8DF;--cream3:#E3DDD3;
+  --dark:#1A1714;--dark2:#252119;--dark3:#312E27;
+  --gold:#D4AF37;--gold2:#E0C35C;--gold3:#A88B2A;
+  --text:#2A2720;--muted:#7A756A;--border:#D9D4CA;--white:#FFFFFF;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);--ease-in-out:cubic-bezier(0.76,0,0.24,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}a{text-decoration:none}
+
+/* CURTAIN */
+#curtain{position:fixed;inset:0;z-index:99999;background:var(--dark);display:flex;align-items:center;justify-content:center;transform:scaleX(0);transform-origin:right center;will-change:transform}
+#curtain.slide-in{animation:curtainIn .55s var(--ease-in-out) forwards}
+#curtain.slide-out{animation:curtainOut .55s var(--ease-in-out) forwards}
+@keyframes curtainIn{from{transform:scaleX(0);transform-origin:right center}to{transform:scaleX(1);transform-origin:right center}}
+@keyframes curtainOut{from{transform:scaleX(1);transform-origin:left center}to{transform:scaleX(0);transform-origin:left center}}
+.curtain-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,12vw,10rem);letter-spacing:.15em;color:var(--white);opacity:0;transition:opacity .2s}
+#curtain.slide-in .curtain-logo{opacity:1}
+
+/* NAV — transparent default, solid on scroll */
+#nav{position:fixed;top:0;left:0;right:0;z-index:9000;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 3.5rem;transition:background .4s,box-shadow .4s,backdrop-filter .4s;background:transparent}
+#nav.solid{background:rgba(26,23,20,.94);box-shadow:0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.1em;color:var(--white);cursor:pointer;transition:color .2s}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;list-style:none;gap:2rem;align-items:center}
+.nav-link{font-size:.8rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,241,235,.55);cursor:pointer;position:relative;padding-bottom:3px;transition:color .25s}
+.nav-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s var(--ease-out)}
+.nav-link:hover,.nav-link.active{color:var(--white)}
+.nav-link:hover::after,.nav-link.active::after{width:100%}
+.nav-cta{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--white);border:1.5px solid rgba(255,255,255,.3);padding:.6rem 1.6rem;cursor:pointer;transition:background .25s,color .25s,border-color .25s;background:transparent}
+.nav-cta:hover{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.erp-btn{opacity:.85;cursor:pointer}
+.erp-btn:hover{background:var(--gold)!important;color:var(--dark)!important;border-color:var(--gold)!important;opacity:1}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.ham span{display:block;width:24px;height:1.5px;background:var(--white);transition:.3s}
+
+/* MOBILE MENU */
+#mobileMenu{position:fixed;inset:0;background:var(--dark);z-index:8999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0 2rem;transform:translateY(-100%);transition:transform .6s cubic-bezier(.76,0,.24,1);overflow:hidden}
+#mobileMenu::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(212,175,55,.08) 0%,transparent 70%);pointer-events:none}
+#mobileMenu.open{transform:translateY(0)}
+.mob-nav-items{display:flex;flex-direction:column;align-items:center;gap:.15rem;width:100%}
+.mob-link{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,8vw,3.2rem);letter-spacing:.1em;color:rgba(255,255,255,.18);cursor:pointer;padding:.4rem 0;width:100%;text-align:center;opacity:0;transform:translateY(24px);transition:color .35s,letter-spacing .35s,opacity .5s cubic-bezier(.76,0,.24,1),transform .5s cubic-bezier(.76,0,.24,1)}
+#mobileMenu.open .mob-link{opacity:1;transform:translateY(0)}
+#mobileMenu.open .mob-link:nth-child(1){transition-delay:.08s}
+#mobileMenu.open .mob-link:nth-child(2){transition-delay:.13s}
+#mobileMenu.open .mob-link:nth-child(3){transition-delay:.18s}
+#mobileMenu.open .mob-link:nth-child(4){transition-delay:.23s}
+#mobileMenu.open .mob-link:nth-child(5){transition-delay:.28s}
+#mobileMenu.open .mob-link:nth-child(6){transition-delay:.33s}
+#mobileMenu.open .mob-link:nth-child(7){transition-delay:.38s}
+.mob-link:hover{color:var(--white);letter-spacing:.14em}
+.mob-link:active{color:var(--gold)}
+.mob-divider{width:40px;height:1px;background:linear-gradient(to right,transparent,rgba(212,175,55,.4),transparent);margin:.8rem auto}
+.mob-erp-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.4rem;padding:.65rem 2rem;border:1px solid rgba(212,175,55,.35);background:transparent;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;opacity:0;transform:translateY(16px);transition:background .3s,color .3s,border-color .3s,opacity .5s cubic-bezier(.76,0,.24,1),transform .5s cubic-bezier(.76,0,.24,1)}
+#mobileMenu.open .mob-erp-btn{opacity:1;transform:translateY(0);transition-delay:.44s}
+.mob-erp-btn:hover{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.mob-close{position:absolute;top:1.4rem;right:1.6rem;background:none;border:none;cursor:pointer;padding:8px;opacity:.5;transition:opacity .25s}
+.mob-close:hover{opacity:1}
+.mob-close span{display:block;width:22px;height:1.5px;background:var(--white);transition:transform .3s}
+.mob-close span:first-child{transform:rotate(45deg) translate(0,0.75px)}
+.mob-close span:last-child{transform:rotate(-45deg) translate(0,-0.75px)}
+
+.page{display:none}.page.active{display:block}
+
+/* SCROLL REVEAL */
+.sr{opacity:0;transform:translateY(50px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+.sr.vis{opacity:1;transform:translateY(0)}
+.sr-d1{transition-delay:.1s}.sr-d2{transition-delay:.2s}.sr-d3{transition-delay:.3s}.sr-d4{transition-delay:.4s}.sr-d5{transition-delay:.5s}
+
+/* SHARED */
+.eyebrow{display:inline-flex;align-items:center;gap:.75rem;font-size:.85rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.eyebrow::before{content:'';width:32px;height:1px;background:var(--gold);display:block}
+.display-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,7vw,7.5rem);letter-spacing:.03em;line-height:.92;color:var(--dark)}
+.display-title span{color:var(--gold)}
+.display-title.on-dark{color:var(--white)}
+.serif-accent{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2vw,1.4rem);font-style:italic;font-weight:400;color:var(--muted);line-height:1.6}
+.body-text{font-size:1rem;line-height:1.85;color:var(--muted);max-width:560px}
+.body-text.wide{max-width:720px}
+.btn-primary{display:inline-flex;align-items:center;gap:.75rem;background:var(--dark);color:var(--white);padding:1rem 2.4rem;font-size:.8rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer;transition:background .25s;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .4s var(--ease-out)}
+.btn-primary:hover::before{transform:translateX(0)}
+.btn-primary span{position:relative;z-index:1}
+.btn-primary i{position:relative;z-index:1;transition:transform .3s}
+.btn-primary:hover i{transform:translateX(4px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:.75rem;color:var(--dark);border:1.5px solid var(--dark);padding:1rem 2.4rem;font-size:.8rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;background:transparent;cursor:pointer;transition:background .25s,color .25s}
+.btn-ghost:hover{background:var(--dark);color:var(--white)}
+.gold-line{width:48px;height:2px;background:var(--gold);margin:1.5rem 0}
+
+/* HERO */
+.hero{height:100vh;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.hero-video-wrap{position:absolute;inset:0;overflow:hidden;z-index:0}
+.hero-video-wrap video{position:absolute;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:none}
+.hero-grain{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");background-size:256px;pointer-events:none;z-index:2}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,rgba(26,23,20,.5) 40%,rgba(26,23,20,.2) 100%)}
+.hero-content{position:relative;z-index:3;padding:0 4rem 5rem;width:100%;display:grid;grid-template-columns:1fr auto;align-items:flex-end;gap:2rem}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,12vw,12rem);letter-spacing:.02em;line-height:.87;color:var(--white);animation:fadeUp 1s var(--ease-out) .5s both}
+.hero-h1 em{font-style:italic;font-family:'Playfair Display',serif;font-size:.65em;letter-spacing:0;color:var(--gold2);display:block}
+.hero-sub{font-size:1rem;line-height:1.8;color:rgba(245,241,235,.6);max-width:460px;margin-top:1.5rem;animation:fadeUp 1s var(--ease-out) .7s both}
+.hero-btns{display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap;animation:fadeUp 1s var(--ease-out) .9s both}
+.hero-right{display:flex;flex-direction:column;gap:1.5rem;align-items:flex-end;animation:fadeUp 1s var(--ease-out) 1.1s both}
+.hero-stat{text-align:right;border-right:2px solid var(--gold);padding-right:1.25rem}
+.hero-stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.04em;color:var(--white);line-height:1;display:block}
+.hero-stat-lbl{font-size:.68rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,241,235,.5)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:fadeUp 1s var(--ease-out) 1.3s both}
+.hero-scroll span{font-size:.65rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,241,235,.4)}
+.scroll-line{width:1px;height:60px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollLine 2s ease-in-out infinite}
+@keyframes scrollLine{0%,100%{transform:scaleY(.3);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+
+/* BRANDS MARQUEE */
+.marquee-section{background:var(--dark);border-top:1px solid rgba(212,175,55,.12);border-bottom:1px solid rgba(212,175,55,.12);padding:4rem 0;overflow:hidden;text-align:center}
+.marquee-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.06em;color:var(--white);margin-bottom:.4rem;padding:0 2rem}
+.marquee-title span{color:var(--gold)}
+.marquee-sub{font-size:.75rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,241,235,.3);margin-bottom:2.5rem}
+.marquee-wrap{overflow:hidden;width:100%}
+.marquee-track{display:flex;width:max-content;animation:marquee 40s linear infinite;will-change:transform;transform:translateZ(0)}
+.marquee-track:hover{animation-play-state:paused}
+@keyframes marquee{0%{transform:translateZ(0) translateX(0)}100%{transform:translateZ(0) translateX(-50%)}}
+.m-logo{display:flex;align-items:center;justify-content:center;padding:0 4rem;flex-shrink:0;width:280px;height:112px}
+.m-logo img{width:auto;height:76px;max-width:220px;object-fit:contain;filter:brightness(0) invert(1);opacity:.55;transition:opacity .35s;flex-shrink:0}
+.m-logo:hover img{opacity:.9}
+
+/* SPLIT SECTION */
+.split-section{display:grid;grid-template-columns:1fr 1fr;min-height:600px}
+.split-img{position:relative;overflow:hidden}
+.split-img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
+.split-section:hover .split-img img{transform:scale(1.04)}
+.split-img-overlay{position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,var(--dark) 100%);opacity:.4}
+.split-text{background:var(--white);padding:6rem 5rem;display:flex;flex-direction:column;justify-content:center}
+.split-text blockquote{font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic;font-weight:400;color:var(--text);border-left:3px solid var(--gold);padding-left:1.5rem;margin:2rem 0;line-height:1.7}
+
+/* NUMBERS BAR */
+.numbers-bar{background:var(--dark);display:grid;grid-template-columns:repeat(5,1fr)}
+.nb-item{padding:3.5rem 2rem;text-align:center;border-right:1px solid rgba(255,255,255,.06);transition:background .3s}
+.nb-item:last-child{border-right:none}
+.nb-item:hover{background:var(--gold)}
+.nb-num{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:.04em;color:var(--white);line-height:1;display:block;transition:color .3s}
+.nb-item:hover .nb-num{color:var(--dark)}
+.nb-lbl{font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,241,235,.4);transition:color .3s}
+.nb-item:hover .nb-lbl{color:rgba(26,23,20,.7)}
+
+/* SPECIALTIES */
+.spec-section{padding:8rem 4rem;background:var(--cream)}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:4rem}
+.spec-card{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:3/4}
+.spec-card img{width:100%;height:100%;object-fit:cover;object-position:top center!important;transition:transform .8s var(--ease-out)}
+.spec-card:hover img{transform:scale(1.07)}
+.spec-info{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,transparent 55%);padding:2.5rem 2rem;display:flex;flex-direction:column;justify-content:flex-end}
+.spec-cat{font-size:.68rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--gold2);margin-bottom:.5rem}
+.spec-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.05em;color:var(--white);line-height:1}
+.spec-desc{font-size:.85rem;color:rgba(245,241,235,.55);margin-top:.5rem;line-height:1.6;transform:translateY(10px);opacity:0;transition:.4s var(--ease-out)}
+.spec-card:hover .spec-desc{transform:translateY(0);opacity:1}
+.spec-arrow{width:36px;height:36px;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;margin-top:1.5rem;font-size:.85rem;color:var(--white);transform:translateX(-10px);opacity:0;transition:.4s var(--ease-out)}
+.spec-card:hover .spec-arrow{transform:translateX(0);opacity:1;background:var(--gold);border-color:var(--gold)}
+@media(max-width:768px){
+  .spec-info{background:linear-gradient(to top,rgba(10,8,6,.95) 0%,rgba(10,8,6,.55) 50%,transparent 75%);padding:1.5rem 1.25rem}
+  .spec-name{font-size:1.6rem}
+  .spec-desc{transform:translateY(0);opacity:1;font-size:.8rem}
+  .spec-arrow{transform:translateX(0);opacity:1;margin-top:1rem;width:30px;height:30px}
+  .spec-grid{gap:2px}
+}
+
+/* PAGE HEADER */
+.pg-header{padding:10rem 4rem 5rem;background:var(--dark);position:relative;overflow:hidden}
+.pg-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(to right,var(--gold),transparent)}
+.pg-header-bg{position:absolute;inset:0;opacity:.06;background:repeating-linear-gradient(90deg,var(--white) 0,var(--white) 1px,transparent 0,transparent 60px),repeating-linear-gradient(180deg,var(--white) 0,var(--white) 1px,transparent 0,transparent 60px)}
+.pg-header .display-title{font-size:clamp(5rem,10vw,10rem)}
+.pg-header.with-img{min-height:380px;display:flex;flex-direction:column;justify-content:flex-end}
+.pg-header.with-img .pg-header-bg{opacity:1;background:url('https://i.postimg.cc/DFYrz2Sh/2d21dbd5-ea94-40d8-929b-34d6723b1757.jpg') center/cover}
+.pg-header.with-img::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(26,23,20,.92),rgba(26,23,20,.6));z-index:1}
+.pg-header.with-img>*{position:relative;z-index:2}
+
+/* STORY EDITORIAL — MAGAZINE STYLE */
+.story-editorial{padding:0;background:var(--white)}
+.story-chapter{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;margin-bottom:0;border-bottom:1px solid var(--border)}
+.story-chapter:last-child{border-bottom:none}
+.story-chapter:nth-child(even){direction:rtl}
+.story-chapter:nth-child(even)>*{direction:ltr}
+.story-chapter-img{overflow:hidden;aspect-ratio:auto;min-height:560px}
+.story-chapter-img img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-out)}
+.story-chapter:hover .story-chapter-img img{transform:scale(1.03)}
+.story-chapter-text{display:flex;flex-direction:column;justify-content:center;padding:5rem 5rem;border-left:1px solid var(--border)}
+.story-chapter:nth-child(even) .story-chapter-text{border-left:none;border-right:1px solid var(--border)}
+.story-chapter-eyebrow{font-size:.68rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem}
+.story-chapter-eyebrow::before{content:'';width:32px;height:2px;background:var(--gold)}
+.story-chapter-num{font-size:.7rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem}
+.story-chapter-num::before{content:'';width:28px;height:2px;background:var(--gold)}
+.story-chapter-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,3.5vw,3rem);letter-spacing:.04em;line-height:1;color:var(--dark);margin-bottom:1.25rem}
+.story-chapter-title span{color:var(--gold)}
+/* Magazine intro paragraph — larger, bold lead-in */
+.story-chapter-body{font-size:1rem;line-height:1.8;color:#3d3a35}
+.story-chapter-body+.story-chapter-body{margin-top:.85rem}
+.story-chapter-text>.story-chapter-body:first-of-type{font-size:1.15rem;font-weight:500;color:var(--dark);line-height:1.65;padding-bottom:1.25rem;margin-bottom:1.25rem;border-bottom:2px solid var(--gold);max-width:none}
+/* Magazine column rule for multi-para chapters */
+.story-chapter-text.multi-col .story-chapter-body:not(:first-of-type){column-count:1}
+
+/* TIMELINE */
+.timeline-section{padding:8rem 0;background:var(--white)}
+.timeline-head{padding:0 5rem;margin-bottom:6rem}
+.timeline-container{position:relative}
+.tl-center-line{position:absolute;top:0;bottom:0;left:50%;width:1px;background:linear-gradient(to bottom,var(--border),transparent);transform:translateX(-50%)}
+.tl-step{display:grid;grid-template-columns:1fr 80px 1fr;margin-bottom:8rem;align-items:start}
+.tl-step:last-child{margin-bottom:0}
+.tl-left-content{padding-right:4rem;padding-top:.5rem}
+.tl-right-content{padding-left:4rem;padding-top:.5rem}
+.tl-right-content.text-end{text-align:right}
+.tl-center-node{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:0}
+.tl-node{width:56px;height:56px;background:var(--dark);border:2px solid var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2;transition:background .3s}
+.tl-node-num{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--white);letter-spacing:.05em}
+.tl-step:hover .tl-node{background:var(--gold);border-color:var(--gold)}
+.tl-step-num{font-size:.7rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.tl-step-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:var(--dark);line-height:1;margin-bottom:.75rem}
+.tl-step-body{font-size:.92rem;line-height:1.85;color:var(--muted)}
+.tl-step-img{margin-top:1.5rem;overflow:hidden;position:relative}
+.tl-step-img img{width:100%;height:380px;object-fit:cover;transition:transform .7s var(--ease-out)}
+.tl-step:hover .tl-step-img img{transform:scale(1.04)}
+.tl-step-img::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,var(--gold),transparent);opacity:0;transition:opacity .4s}
+.tl-step:hover .tl-step-img::before{opacity:.15}
+
+/* CLIENTS */
+.clients-section{padding:6rem 5rem;background:var(--cream2)}
+.clients-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;margin-top:3.5rem}
+.client-item{flex:0 0 calc(16.5% - 2px);min-width:130px;background:var(--cream);display:flex;align-items:center;justify-content:center;padding:2.5rem 2rem;height:140px;transition:background .3s,box-shadow .3s;cursor:default;border:1px solid var(--border)}
+.client-item:hover{background:var(--dark);border-color:var(--dark);box-shadow:0 4px 18px rgba(0,0,0,.12)}
+.client-item img{height:44px;width:auto;max-width:140px;object-fit:contain;filter:grayscale(1) opacity(.55);transition:filter .3s,transform .3s;flex-shrink:0}
+.client-item:hover img{filter:brightness(0) invert(1);opacity:1;transform:scale(1.05)}
+
+/* SERVICES */
+.services-intro{padding:6rem 5rem;background:var(--cream);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border)}
+.svc-card{background:var(--white);padding:3.5rem 3rem;position:relative;overflow:hidden;transition:background .4s;cursor:default}
+.svc-card::before{content:'';position:absolute;bottom:0;left:0;width:0;height:3px;background:var(--gold);transition:width .5s var(--ease-out)}
+.svc-card:hover::before{width:100%}
+.svc-card:hover{background:var(--cream)}
+.svc-n{font-family:'Bebas Neue',sans-serif;font-size:5.5rem;letter-spacing:.03em;color:var(--cream2);line-height:1;position:absolute;top:1rem;right:2rem;transition:color .4s}
+.svc-card:hover .svc-n{color:var(--gold2);opacity:.3}
+.svc-icon-wrap{width:52px;height:52px;display:flex;align-items:center;justify-content:center;margin-bottom:2rem;position:relative;z-index:1;color:var(--gold);transition:color .3s}
+.svc-card:hover .svc-icon-wrap{color:var(--dark)}
+.svc-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:var(--dark);margin-bottom:1rem;position:relative;z-index:1}
+.svc-body{font-size:.9rem;line-height:1.85;color:var(--muted);position:relative;z-index:1}
+
+/* WHY CHOOSE US — 8 cards in 2 rows */
+.why-section{padding:8rem 5rem;background:var(--dark)}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);margin-top:4rem}
+.why-card{padding:2.5rem 2rem;background:var(--dark2);text-align:center;transition:background .3s}
+.why-card:hover{background:var(--gold)}
+.why-icon{font-size:1.8rem;color:var(--gold);margin-bottom:1.25rem;display:block;transition:color .3s}
+.why-card:hover .why-icon{color:var(--dark)}
+.why-title{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.06em;color:var(--white);margin-bottom:.6rem;transition:color .3s}
+.why-card:hover .why-title{color:var(--dark)}
+.why-body{font-size:.8rem;line-height:1.75;color:rgba(245,241,235,.4);transition:color .3s}
+.why-card:hover .why-body{color:rgba(26,23,20,.7)}
+
+.svc-cta{padding:6rem 5rem;background:var(--cream2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem}
+.svc-cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,4vw,4.5rem);letter-spacing:.04em;color:var(--dark);line-height:1}
+.svc-cta-sub{font-size:1rem;color:var(--muted);margin-top:.75rem;line-height:1.7}
+
+/* PORTFOLIO */
+.filter-wrap{background:var(--white);padding:1.5rem 4rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;border-bottom:1px solid var(--border);position:sticky;top:72px;z-index:500}
+.filter-label{font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-right:1rem}
+.f-btn{padding:.5rem 1.4rem;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:transparent;border:1.5px solid var(--border);cursor:pointer;transition:all .25s}
+.f-btn.on,.f-btn:hover{background:var(--dark);border-color:var(--dark);color:var(--white)}
+.port-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:var(--border)}
+.p-item{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:3/4;background:var(--cream2)}
+.p-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
+.p-item:hover img{transform:scale(1.07)}
+.p-hover{position:absolute;inset:0;background:rgba(26,23,20,0);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:1.75rem;transition:background .4s}
+.p-item:hover .p-hover{background:rgba(26,23,20,.6)}
+.p-cat{font-size:.65rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold2);transform:translateY(8px);opacity:0;transition:.35s var(--ease-out)}
+.p-name{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.05em;color:var(--white);transform:translateY(12px);opacity:0;transition:.4s var(--ease-out) .05s}
+.p-item:hover .p-cat,.p-item:hover .p-name{transform:translateY(0);opacity:1}
+
+/* LIGHTBOX */
+.lb-wrap{position:fixed;inset:0;background:rgba(26,23,20,.97);z-index:9800;display:none;align-items:center;justify-content:center}
+.lb-wrap.open{display:flex}
+.lb-img{max-width:88vw;max-height:88vh;object-fit:contain}
+.lb-close{position:absolute;top:2rem;right:2.5rem;width:52px;height:52px;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:1.4rem;cursor:pointer;transition:.25s;background:rgba(26,23,20,.7);z-index:10}
+.lb-close:hover{background:var(--gold);color:var(--dark)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:var(--white);cursor:pointer;background:none;transition:.25s}
+.lb-nav:hover{border-color:var(--gold);color:var(--gold)}
+.lb-prev{left:2rem}.lb-next{right:2rem}
+
+/* GALLERY MODAL */
+.gal-modal{position:fixed;inset:0;background:rgba(26,23,20,.97);z-index:9600;display:none;flex-direction:column;overflow:hidden}
+.gal-modal.open{display:flex}
+.gal-topbar{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 3rem;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.gal-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--white);margin:0}
+.gal-counter{font-size:.72rem;letter-spacing:.2em;color:rgba(245,241,235,.4);margin-left:1rem}
+.gal-close{width:40px;height:40px;border:none;display:flex;align-items:center;justify-content:center;color:rgba(245,241,235,.5);cursor:pointer;transition:.25s;background:none;font-size:1.1rem}
+.gal-close:hover{color:var(--gold)}
+.gal-body{flex:1;overflow-y:auto;padding:2rem 3rem 3rem}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.gal-grid-item{aspect-ratio:3/4;overflow:hidden;cursor:pointer;position:relative;background:var(--dark3)}
+.gal-grid-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease-out)}
+.gal-grid-item:hover img{transform:scale(1.05)}
+.gal-back{display:inline-flex;align-items:center;gap:.5rem;margin-bottom:1.5rem;font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,241,235,.4);cursor:pointer;transition:color .25s;background:none;border:none;padding:0}
+.gal-back:hover{color:var(--gold)}
+.spec-section .gal-back{color:var(--muted)}
+.spec-section .gal-back:hover{color:var(--gold)}
+.gal-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:5px}
+.gal-cat-card{position:relative;aspect-ratio:3/4;overflow:hidden;cursor:pointer}
+.gal-cat-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.gal-cat-card:hover img{transform:scale(1.06)}
+.gal-cat-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(26,23,20,.75) 0%,rgba(26,23,20,.1) 60%);pointer-events:none}
+.gal-cat-label{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:1.5rem;pointer-events:none}
+.gal-cat-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;color:var(--white)}
+.gal-cat-count{font-size:.7rem;letter-spacing:.15em;color:rgba(245,241,235,.4);margin-top:.25rem}
+/* Zoom overlay */
+.gal-zoom{position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.97);display:none;align-items:center;justify-content:center}
+.gal-zoom.open{display:flex}
+.gal-zoom-img-wrap{position:relative;max-width:92vw;max-height:92vh;overflow:hidden;cursor:grab}
+.gal-zoom-img-wrap.dragging{cursor:grabbing}
+.gal-zoom-img-wrap img{max-width:92vw;max-height:92vh;object-fit:contain;transition:transform .25s var(--ease-out);transform-origin:center center}
+.gal-zoom-nav{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:none;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);cursor:pointer;transition:.25s;background:none;font-size:1.3rem}
+.gal-zoom-nav:hover{color:var(--gold)}
+.gal-zoom-nav.prev{left:1.5rem}
+.gal-zoom-nav.next{right:1.5rem}
+.gal-zoom-close{position:absolute;top:1.5rem;right:1.5rem;width:44px;height:44px;border:none;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);cursor:pointer;transition:.25s;background:none;font-size:1.2rem}
+.gal-zoom-close:hover{color:var(--gold)}
+.gal-zoom-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.72rem;letter-spacing:.2em;color:rgba(255,255,255,.3)}
+.gal-zoom-hint{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);font-size:.6rem;letter-spacing:.15em;color:rgba(255,255,255,.15);text-transform:uppercase}
+
+/* PARTNERS MAP — FULL-WIDTH IMAGE */
+.partners-intro{background:var(--cream);padding:5rem;text-align:center;border-bottom:1px solid var(--border)}
+.partners-intro .body-text{max-width:640px;margin:1.5rem auto 2rem}
+.pm-fw-section{background:var(--cream)}
+.pm-fw-wrap{position:relative;display:block;line-height:0}
+.pm-fw-img{width:100%;height:auto;display:block}
+.pm-spot{position:absolute;width:54px;height:54px;border:none;background:transparent;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);padding:0;outline:none;-webkit-tap-highlight-color:transparent}
+.pm-spot:focus-visible{box-shadow:0 0 0 3px var(--gold),0 0 0 5px rgba(212,175,55,.3)}
+.pm-panel{position:absolute;width:230px;background:var(--dark);border:1px solid rgba(212,175,55,.25);padding:1.4rem 1.6rem;display:none;z-index:10;pointer-events:auto}
+.pm-panel.open{display:block}
+.pm-panel-badge{display:inline-block;background:var(--gold);color:var(--dark);padding:.15rem .6rem;margin-bottom:.6rem;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.pm-panel-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;color:var(--white);line-height:1;margin-bottom:.5rem}
+.pm-panel-line{width:32px;height:2px;background:var(--gold);margin-bottom:1rem}
+.pm-panel p{font-size:.8rem;line-height:1.6;color:rgba(245,241,235,.5);margin-bottom:.2rem}
+.pm-panel p strong{color:var(--cream);font-weight:600}
+.pm-panel-desc{margin-top:.6rem;font-size:.78rem;color:rgba(245,241,235,.35)!important;line-height:1.6;font-style:italic}
+.pm-mob-row{display:none;padding:1.5rem 1rem;gap:.75rem;justify-content:center;flex-wrap:wrap;background:var(--cream);border-top:1px solid var(--border)}
+.pm-mob-btn{background:none;border:1.5px solid var(--border);color:var(--dark);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;padding:.55rem 1.25rem;cursor:pointer;transition:border-color .2s,background .2s}
+.pm-mob-btn:hover,.pm-mob-btn.active{border-color:var(--gold);background:var(--gold);color:var(--dark)}
+.pm-mobile-info{display:none;padding:2rem;background:var(--dark)}
+.pm-mobile-info.open{display:block}
+.pm-mobile-info .pm-panel{position:static;width:100%;display:block;border:none;padding:0;background:none}
+.pm-mobile-info .pm-panel-name{font-size:2rem}
+
+/* LOCATION CARDS (Contact Page) */
+.location-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+.loc-card{border:1.5px solid var(--border);padding:1.4rem 1.6rem;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.loc-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transform-origin:bottom;transition:transform .35s var(--ease-out)}
+.loc-card:hover{border-color:var(--gold);box-shadow:0 6px 24px rgba(0,0,0,.07)}
+.loc-card:hover::after{transform:scaleY(1)}
+.loc-card-num{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
+.loc-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.06em;color:var(--dark);margin-bottom:.5rem}
+.loc-card-addr{font-size:.82rem;color:var(--muted);line-height:1.55;margin-bottom:.85rem}
+.loc-card-link{display:inline-flex;align-items:center;gap:.45rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;transition:color .2s,gap .2s}
+.loc-card-link i{font-size:.65rem;transition:transform .25s}
+.loc-card-link:hover{color:var(--dark)}
+.loc-card-link:hover i{transform:translateX(3px)}
+
+.partners-stats{background:var(--gold);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--gold3)}
+.ps-item{padding:3rem 2rem;text-align:center;border-right:1px solid var(--gold3);transition:background .3s}
+.ps-item:last-child{border-right:none}
+.ps-item:hover{background:var(--dark)}
+.ps-num{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--dark);line-height:1;display:block;transition:color .3s}
+.ps-item:hover .ps-num{color:var(--gold)}
+.ps-lbl{font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(26,23,20,.55);transition:color .3s}
+.ps-item:hover .ps-lbl{color:rgba(212,175,55,.6)}
+
+.partner-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border)}
+.pc{background:var(--white);padding:3rem 2.5rem;transition:background .35s}
+.pc:hover{background:var(--dark)}
+.pc-badge{display:inline-block;background:var(--gold);color:var(--dark);padding:.2rem .7rem;margin-bottom:.75rem;font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.pc-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.06em;color:var(--dark);margin-bottom:.5rem;transition:color .35s}
+.pc:hover .pc-name{color:var(--white)}
+.pc-line{width:40px;height:2px;background:var(--gold);margin-bottom:1.5rem}
+.pc p{font-size:.85rem;line-height:1.85;color:var(--muted);transition:color .35s}
+.pc:hover p{color:rgba(245,241,235,.5)}
+.pc p strong{color:var(--dark);transition:color .35s}
+.pc:hover p strong{color:var(--cream)}
+.pc-desc{margin-top:.75rem;color:var(--muted);font-size:.85rem;line-height:1.7;transition:color .35s}
+.pc:hover .pc-desc{color:rgba(245,241,235,.4)}
+
+/* CONTACT — 3-COLUMN PREMIUM LAYOUT */
+.contact-3col{display:grid;grid-template-columns:1fr 1fr;min-height:calc(80vh - 72px)}
+.contact-col-form{background:var(--white);padding:5rem 4rem;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border)}
+.contact-col-team{background:var(--dark);padding:5rem 4rem;display:flex;flex-direction:column;justify-content:center}
+.contact-col-map{height:520px;overflow:hidden;background:var(--cream2)}
+.contact-col-map iframe{width:100%;height:100%;border:none;display:block}
+.contact-branch-bar{background:var(--dark);padding:1.5rem 5rem;display:flex;align-items:center;gap:3.5rem;flex-wrap:wrap;border-top:2px solid rgba(212,175,55,.18)}
+.contact-branch-item{display:flex;align-items:center;gap:.85rem}
+.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);flex-shrink:0;white-space:nowrap}
+.contact-branch-sep{color:rgba(212,175,55,.3);font-size:1rem}
+.contact-branch-link{font-size:.88rem;color:rgba(245,241,235,.55);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.5rem;white-space:nowrap}
+.contact-branch-link i{font-size:.72rem;transition:transform .2s}
+.contact-branch-link:hover{color:var(--gold)}
+.contact-branch-link:hover i{transform:translateX(3px)}
+.contact-map-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.25rem 1.5rem;background:linear-gradient(to top,rgba(26,23,20,.88) 0%,transparent 100%);display:flex;flex-direction:column;gap:.6rem;z-index:2}
+.contact-branch{display:flex;align-items:center;gap:.7rem}
+.contact-branch-num{font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+.contact-branch-link{font-size:.8rem;color:rgba(245,241,235,.7);text-decoration:none;transition:color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-branch-link:hover{color:var(--gold)}
+.team-card{border:1px solid rgba(255,255,255,.09);padding:1.4rem 1.5rem;margin-bottom:.85rem;transition:border-color .3s,background .3s}
+.team-card:last-child{margin-bottom:0}
+.team-card:hover{border-color:var(--gold);background:rgba(212,175,55,.04)}
+.tc-role{font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
+.tc-name{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.06em;color:var(--white);margin-bottom:.65rem;line-height:1}
+.tc-contact{display:flex;align-items:center;gap:.65rem;font-size:.8rem;color:rgba(245,241,235,.45);text-decoration:none;margin-bottom:.3rem;transition:color .2s}
+.tc-contact:last-child{margin-bottom:0}
+.tc-contact:hover{color:var(--gold)}
+.tc-contact i{color:var(--gold);width:13px;font-size:.72rem;flex-shrink:0}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.05em;color:var(--dark);margin-bottom:.4rem;line-height:1}
+.form-sub{font-size:.88rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+.fg{margin-bottom:1rem}
+.fg label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.fg input,.fg textarea{width:100%;padding:.8rem 1rem;background:var(--cream);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .25s,background .25s}
+.fg input:focus,.fg textarea:focus{border-color:var(--gold);background:var(--white)}
+.fg textarea{height:90px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.btn-submit{width:100%;padding:1.05rem;margin-top:.4rem;background:var(--dark);color:var(--white);border:none;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.1em;cursor:pointer;position:relative;overflow:hidden;transition:background .3s}
+.btn-submit::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateX(-101%);transition:transform .4s var(--ease-out)}
+.btn-submit:hover::before{transform:translateX(0)}
+.btn-submit span{position:relative;z-index:1}
+
+/* FOOTER */
+footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:3rem;border-top:1px solid rgba(255,255,255,.06)}
+.ft-logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.1em;color:var(--white);margin-bottom:1rem;cursor:pointer}
+.ft-logo span{color:var(--gold)}
+.ft-desc{font-size:.88rem;line-height:1.75;color:rgba(245,241,235,.35);max-width:260px}
+.ft-col-h{font-size:.68rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
+.ft-links a{display:block;font-size:.88rem;color:rgba(245,241,235,.35);margin-bottom:.65rem;cursor:pointer;transition:color .2s}
+.ft-links a:hover{color:var(--white)}
+.ft-bottom{background:var(--dark2);padding:1.5rem 5rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.04)}
+.ft-copy{font-size:.78rem;color:rgba(245,241,235,.25)}
+.ft-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:.88rem;color:rgba(212,175,55,.5)}
+.ft-social{display:flex;gap:1.25rem;margin-top:1.5rem}
+.ft-social a{color:rgba(245,241,235,.35);transition:color .25s;font-size:1.1rem;display:flex;align-items:center}
+.ft-social a:hover{color:var(--gold)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  #nav{padding:0 2rem;background:rgba(245,241,235,.97);backdrop-filter:blur(12px)}
+  #nav.solid{background:rgba(245,241,235,.97);box-shadow:0 1px 0 var(--border)}
+  .nav-logo{color:var(--dark)}.nav-links{display:none}.erp-btn{display:none!important}.ham{display:flex}.ham span{background:var(--dark)}
+  .hero-content{grid-template-columns:1fr;padding:0 2rem 6rem}
+  .hero-right{flex-direction:row;flex-wrap:wrap;align-items:center}
+  .hero-stat{text-align:left;border-right:none;border-left:2px solid var(--gold);padding:0 0 0 1rem}
+  .split-section,.story-wrap,.story-chapter{grid-template-columns:1fr}
+  .contact-3col{grid-template-columns:1fr}
+  .contact-col-map{height:380px}
+  .split-img{height:380px}
+  .story-chapter-img{min-height:320px;height:320px}
+  .story-chapter:nth-child(even){direction:ltr}
+  .story-chapter:nth-child(even) .story-chapter-text{border-right:none;border-left:none}
+  .story-chapter-text{padding:3.5rem 2.5rem;border-left:none!important;border-right:none!important;border-top:1px solid var(--border)}
+  .contact-col-form,.contact-col-team{padding:3.5rem 2.5rem}
+  .numbers-bar{grid-template-columns:repeat(3,1fr)}
+  .spec-grid{grid-template-columns:1fr 1fr}
+  .svc-grid,.why-grid{grid-template-columns:1fr 1fr}
+  .pg-header{padding:8rem 2rem 4rem}
+  .timeline-head{padding:0 2rem}
+  .clients-section{padding:5rem 2rem}
+  .clients-grid{gap:2px}
+  .client-item{flex:0 0 calc(33.3% - 2px);min-width:100px}
+  .services-intro{grid-template-columns:1fr;padding:4rem 2rem;gap:2rem}
+  .filter-wrap{padding:1.5rem 2rem}
+  .port-grid{grid-template-columns:repeat(2,1fr)}
+  .partner-cards{grid-template-columns:1fr 1fr}
+  .partners-stats{grid-template-columns:1fr 1fr}
+  .spec-section{padding:5rem 2rem}
+  .svc-cta{padding:4rem 2rem}
+  .why-section{padding:5rem 2rem}
+  .contact-left,.contact-right{padding:4rem 2.5rem}
+  .story-editorial{padding:4rem 2rem}
+  footer{grid-template-columns:1fr 1fr;padding:4rem 2rem}
+  .ft-bottom{padding:1.5rem 2rem;flex-direction:column;gap:.5rem}
+  .gal-topbar{padding:1rem 2rem}
+  .gal-body{padding:1.5rem 2rem}
+  .gal-grid{grid-template-columns:repeat(3,1fr)}
+  .gal-cats{grid-template-columns:repeat(2,1fr)}
+  .tl-step{grid-template-columns:1fr}.tl-center-line{display:none}
+  .tl-step{position:relative;padding-left:80px;margin-bottom:5rem}
+  .tl-left-content,.tl-right-content,.tl-right-content.text-end{grid-column:1;padding:0;text-align:left}
+  .tl-center-node{position:absolute;left:0;top:0;padding-top:0}
+  .tl-step-img img{height:280px}
+}
+@media(max-width:640px){
+  .hero-h1{font-size:4.5rem}
+  .spec-grid,.partner-cards,.why-grid{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .client-item{flex:0 0 calc(50% - 2px);min-width:80px}
+  .contact-3col{grid-template-columns:1fr}
+  .contact-col-map{height:300px}
+  .form-row{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr}
+  .numbers-bar{grid-template-columns:1fr 1fr}
+  .gal-grid{grid-template-columns:repeat(2,1fr)}
+  .gal-cats{grid-template-columns:1fr 1fr}
+  .partners-stats{grid-template-columns:1fr 1fr}
+  .loc-card-title{font-size:1rem}
+  .pm-mob-row{display:flex}
+  .pm-fw-wrap .pm-panel{display:none!important}
+  .pm-spot{width:36px;height:36px}
+}
+@media(max-width:480px){
+  .pm-spot{pointer-events:none}
+}
+
+/* GLOBAL POLISH — smooth transitions & micro-interactions */
+.btn-primary,.btn-ghost,.btn-submit,.nav-cta{transition:background .28s var(--ease-out),color .28s,border-color .28s,transform .2s}
+.btn-primary:active,.btn-ghost:active,.btn-submit:active{transform:scale(.98)}
+.ft-links a{transition:color .2s,padding-left .2s}
+.ft-links a:hover{padding-left:.4rem}
+.pc{transition:background .3s,box-shadow .3s}
+.pc:hover{box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.ps-item{transition:background .28s,color .28s}
+.nb-item{transition:background .28s,color .28s}
+.spec-card{transition:box-shadow .35s}
+.spec-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.svc-card{transition:background .3s,box-shadow .3s}
+.svc-card:hover{box-shadow:0 6px 28px rgba(0,0,0,.08)}
+.team-card{transition:border-color .25s,background .25s}
+.team-card:hover{background:rgba(212,175,55,.04)}
+</style>
+</head>
+<body>
+<div id="curtain"><span class="curtain-logo">AVA MARIE</span></div>
+<nav id="nav">
+  <div class="nav-logo" onclick="goPage('home')">AVA <span>MARIE</span></div>
+  <ul class="nav-links">
+    <li><a class="nav-link" href="/" data-pg="home" onclick="event.preventDefault();goPage('home')">Home</a></li>
+    <li><a class="nav-link" href="/our-story/" data-pg="story" onclick="event.preventDefault();goPage('story')">Our Story</a></li>
+    <li><a class="nav-link" href="/manufacturing/" data-pg="journey" onclick="event.preventDefault();goPage('journey')">Manufacturing</a></li>
+    <li><a class="nav-link" href="/services/" data-pg="services" onclick="event.preventDefault();goPage('services')">Services</a></li>
+    <li><a class="nav-link active" href="/portfolio/" data-pg="portfolio" onclick="event.preventDefault();goPage('portfolio')">Portfolio</a></li>
+    <li><a class="nav-link" href="/partners/" data-pg="partners" onclick="event.preventDefault();goPage('partners')">Partners</a></li>
+    <li><a class="nav-link" href="/contact/" data-pg="contact" onclick="event.preventDefault();goPage('contact')">Contact</a></li>
+  </ul>
+  <button class="nav-cta erp-btn" onclick="window.location.href='/login.html'" title="ERP Login"><i class="fas fa-lock" style="margin-right:.45rem;font-size:.7rem;opacity:.8;"></i>ERP Login</button>
+  <button class="ham" id="ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+</nav>
+<div id="mobileMenu">
+  <button class="mob-close" onclick="toggleMob()" aria-label="Close menu"><span></span><span></span></button>
+  <div class="mob-nav-items">
+    <a class="mob-link" href="/" onclick="event.preventDefault();goPage('home');toggleMob()">HOME</a>
+    <a class="mob-link" href="/our-story/" onclick="event.preventDefault();goPage('story');toggleMob()">OUR STORY</a>
+    <a class="mob-link" href="/manufacturing/" onclick="event.preventDefault();goPage('journey');toggleMob()">MANUFACTURING</a>
+    <a class="mob-link" href="/services/" onclick="event.preventDefault();goPage('services');toggleMob()">SERVICES</a>
+    <a class="mob-link" href="/portfolio/" onclick="event.preventDefault();goPage('portfolio');toggleMob()">PORTFOLIO</a>
+    <a class="mob-link" href="/partners/" onclick="event.preventDefault();goPage('partners');toggleMob()">PARTNERS</a>
+    <a class="mob-link" href="/contact/" onclick="event.preventDefault();goPage('contact');toggleMob()">CONTACT</a>
+  </div>
+  <div class="mob-divider"></div>
+  <button class="mob-erp-btn" onclick="window.location.href='/login.html';toggleMob()"><i class="fas fa-lock" style="font-size:.65rem;opacity:.8"></i> ERP Login</button>
+</div>
+
+<!-- ====== HOME ====== -->
+<div id="pg-home" class="page">
+<section class="hero"><div class="hero-video-wrap"><video id="hv-a" autoplay muted playsinline preload="auto" poster="AVA%20MARIE/AVA%20MARIE%201.jpg" src="AVA%20MARIE/HOME%201.mp4"></video><video id="hv-b" muted playsinline preload="auto"></video></div><div class="hero-grain"></div><div class="hero-overlay"></div>
+<div class="hero-content"><div class="hero-left"><h1 class="hero-h1"><em>crafting</em>EXCELLENCE</h1><p class="hero-sub">Premium fashion manufacturing for the world's most prestigious global brands. From design to delivery, your vision — flawlessly executed.</p><div class="hero-btns"><button class="btn-primary" onclick="goPage('contact')"><span>Contact Us</span><i class="fas fa-arrow-right"></i></button><button class="btn-ghost" onclick="goPage('story')" style="border-color:rgba(245,241,235,.35);color:var(--cream);">Our Story</button></div></div>
+<div class="hero-right"><div class="hero-stat"><span class="hero-stat-num">250K+</span><span class="hero-stat-lbl">Monthly Capacity</span></div><div class="hero-stat"><span class="hero-stat-num">12+</span><span class="hero-stat-lbl">Global Brands</span></div><div class="hero-stat"><span class="hero-stat-num">99%</span><span class="hero-stat-lbl">On-Time Delivery</span></div><div class="hero-stat"><span class="hero-stat-num">40+</span><span class="hero-stat-lbl">Years Experience</span></div></div></div>
+<div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div></section>
+
+<!-- TRUSTED BRANDS MARQUEE -->
+<div class="marquee-section">
+  <h2 class="marquee-title">TRUSTED BY GLOBAL <span>BRANDS</span></h2>
+  <p class="marquee-sub">Manufacturing excellence for the world's finest</p>
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="mqt">
+      <div class="m-logo"><img src="LOGO/1.png" alt="Adidas"></div>
+      <div class="m-logo"><img src="LOGO/2.png" alt="ASOS"></div>
+      <div class="m-logo"><img src="LOGO/3.png" alt="River Island"></div>
+      <div class="m-logo"><img src="LOGO/4.png" alt="Boohoo"></div>
+      <div class="m-logo"><img src="LOGO/5.png" alt="Fashion Nova"></div>
+      <div class="m-logo"><img src="LOGO/6.png" alt="PLT"></div>
+      <div class="m-logo"><img src="LOGO/7.png" alt="Little Mistress"></div>
+      <div class="m-logo"><img src="LOGO/8.png" alt="In The Style"></div>
+      <div class="m-logo"><img src="LOGO/9.png" alt="Roman"></div>
+      <div class="m-logo"><img src="LOGO/10.png" alt="ISIF"></div>
+      <div class="m-logo"><img src="LOGO/11.png" alt="Missguided"></div>
+      <div class="m-logo"><img src="LOGO/12.png" alt="Partner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT SPLIT -->
+<div class="split-section"><div class="split-img"><img src="AVA%20MARIE/AVA%20MARIE%201.jpg" alt="Ava Marie production facility in Tangier, Morocco"><div class="split-img-overlay"></div></div>
+<div class="split-text"><div class="eyebrow sr">Our Story</div><h2 class="display-title sr sr-d1" style="font-size:clamp(2.8rem,5vw,5.5rem);">WE DON'T JUST<br>MANUFACTURE.<br><span>WE BRING</span><br>VISIONS TO LIFE.</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3" style="margin-bottom:1.5rem;">Founded in England with an ambition to redefine fashion manufacturing, Ava Marie has grown into a world-class production partner trusted by global brands. Two state-of-the-art facilities in Tangier. 250,000+ garments every month. Zero compromise on quality.</p><blockquote class="sr sr-d4">"True excellence is built stitch by stitch — in the details, the dedication, and the relentless pursuit of perfection."</blockquote><div class="sr sr-d5"><button class="btn-primary" onclick="goPage('story')"><span>Discover Our Story</span><i class="fas fa-arrow-right"></i></button></div></div></div>
+
+<!-- NUMBERS BAR — 5 STATS INCLUDING 40+ YEARS -->
+<div class="numbers-bar">
+  <div class="nb-item sr"><span class="nb-num" data-count="250000">0</span><span class="nb-lbl">Garments / month</span></div>
+  <div class="nb-item sr sr-d1"><span class="nb-num" data-count="40">0</span><span class="nb-lbl">+ Years Experience</span></div>
+  <div class="nb-item sr sr-d2"><span class="nb-num" data-count="12">0</span><span class="nb-lbl">Global Brand Partners</span></div>
+  <div class="nb-item sr sr-d3"><span class="nb-num" data-count="2">0</span><span class="nb-lbl">Production Facilities</span></div>
+  <div class="nb-item sr sr-d4"><span class="nb-num" style="font-size:3rem;" data-count="99">0</span><span class="nb-lbl">% On-Time Delivery</span></div>
+</div>
+
+<!-- SPECIALTIES -->
+<section class="spec-section"><div class="eyebrow sr">Our Specialties</div><h2 class="display-title sr sr-d1">WHAT WE <span>MAKE</span></h2>
+<div class="spec-grid" style="margin-top:3rem;">
+<div class="spec-card sr sr-d2" onclick="openGal('evening')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755790/1_kritnu.png" alt="Evening"><div class="spec-info"><p class="spec-cat">Formal Wear</p><h3 class="spec-name">EVENING & OCCASION</h3><p class="spec-desc">Luxurious formal wear with intricate details and premium finishes</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d3" onclick="openGal('woven')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755956/1_dzngkz.png" alt="Woven"><div class="spec-info"><p class="spec-cat">Tailored</p><h3 class="spec-name">WOMENSWEAR — WOVEN</h3><p class="spec-desc">Sophisticated structured garments with precision tailoring</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d4" onclick="openGal('jersey')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755843/1_p0wvot.png" alt="Jersey"><div class="spec-info"><p class="spec-cat">Knitwear</p><h3 class="spec-name">JERSEY & KNITS</h3><p class="spec-desc">Versatile knit garments that combine comfort with elegance</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+</div>
+<div style="text-align:center;margin-top:3.5rem;" class="sr"><button class="btn-primary" onclick="goPage('portfolio')"><span>View Full Portfolio</span><i class="fas fa-arrow-right"></i></button></div></section>
+
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/manufacturing/" onclick="event.preventDefault();goPage('journey')">Manufacturing</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a><a href="/partners/" onclick="event.preventDefault();goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Specialties</p><div class="ft-links"><a onclick="openGal('evening')">Evening Dresses</a><a onclick="openGal('woven')">Woven Fashion</a><a onclick="openGal('jersey')">Jerseywear</a><a onclick="openGal('sportswear')">Sportswear</a><a onclick="openGal('casualwear')">Casualwear</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div>
+</div>
+
+<!-- ====== OUR STORY (Standalone) ====== -->
+<div id="pg-story" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="pg-header with-img"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">WHO WE ARE</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>STORY</span></h1><p class="serif-accent sr sr-d2" style="color:rgba(245,241,235,.5);margin-top:1.5rem;">Built on legacy. Engineered for scale. Made in Morocco.</p></div>
+
+<div class="story-editorial">
+  <div class="story-chapter sr">
+    <div class="story-chapter-img"><img src="AVA%20MARIE/AVA%20MARIE%201.jpg" alt="Ava Marie"></div>
+    <div class="story-chapter-text">
+      <p class="story-chapter-body">Ava Marie is not just a manufacturing facility. It is the result of a carefully built industrial ecosystem — structured, connected, and designed to perform at scale.</p>
+      <p class="story-chapter-body">Behind Ava Marie stands the Sarodiya network — a multi-country textile and apparel group operating across the United Kingdom, Morocco, and South Asia. Over the years, this network has evolved into a fully integrated system combining sourcing, design, production, and distribution.</p>
+      <p class="story-chapter-body">In the United Kingdom, the Sarodiya network established SWEET THREADS LTD (2017) in Leicester — specialising in fast-moving fashion segments and delivering the agility needed for high-demand markets.</p>
+      <p class="story-chapter-body">To secure raw materials and large-scale production capabilities, the network extended into South Asia through JAGUAR APPAREL (Pakistan) — ensuring direct access to cotton expertise and manufacturing scalability.</p>
+    </div>
+  </div>
+  <div class="story-chapter sr">
+    <div class="story-chapter-img"><img src="AVA%20MARIE/AVA%20MARIE%202.jpeg" alt="Ava Marie Tangier"></div>
+    <div class="story-chapter-text">
+      <p class="story-chapter-body">Ava Marie represents the next strategic evolution. Based in Tangier, at the gateway to Europe, AVA MARIE S.A.R.L.A.U was created to deliver speed, control, and excellence in one unified operation.</p>
+      <p class="story-chapter-body">With a production capacity reaching 250,000 pieces per month, Ava Marie is built to handle high-volume demands while maintaining strict quality standards.</p>
+      <p class="story-chapter-body">What sets Ava Marie apart is its end-to-end manufacturing capability. We manage every stage of the process with precision: design & product development, pattern making & prototyping, fabric sourcing & technical validation, industrial production, quality control & finishing, packaging & international shipping — all under one integrated system.</p>
+      <p class="story-chapter-body">At the core of this operation is Moroccan craftsmanship — combining two powerful forces: industrial expertise and highly skilled artisanship. Our teams bring together technical precision and human craftsmanship, ensuring that every garment meets both aesthetic and structural excellence.</p>
+      <p class="story-chapter-body">Today, Ava Marie works with international brands that require more than production. They require a partner capable of understanding their vision, protecting their standards, and executing at speed. And we deliver exactly that.</p>
+      <p class="story-chapter-body">Looking ahead, Ava Marie is continuously investing in smarter systems, stronger quality control, and more sustainable production methods — aligning with the future of global fashion.</p>
+      <p class="story-chapter-body">Because in a fast-moving industry, only structured, reliable, and adaptive partners make the difference. Ava Marie is built to be one of them.</p>
+    </div>
+  </div>
+</div>
+
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/manufacturing/" onclick="event.preventDefault();goPage('journey')">Manufacturing</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a></div></div><div><p class="ft-col-h">Our Process</p><div class="ft-links"><a href="/manufacturing/" onclick="event.preventDefault();goPage('journey')">10-Step Journey</a><a>Design & Pattern</a><a>Full Production</a><a>Finishing & Delivery</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<!-- ====== MANUFACTURING JOURNEY (New Standalone Page) ====== -->
+<div id="pg-journey" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="pg-header"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">Step by Step</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">MANUFACTURING<br><span>JOURNEY</span></h1><p class="serif-accent sr sr-d2" style="color:rgba(245,241,235,.5);margin-top:1.5rem;">From concept to delivery — 10 stages of precision, expertise, and excellence.</p></div>
+<section class="timeline-section"><div class="timeline-head"><div class="eyebrow sr">Our 10-Step Process</div><h2 class="display-title sr sr-d1">FROM DESIGN TO<br><span>DELIVERY</span></h2><p class="body-text wide sr sr-d2" style="margin-top:1.5rem;">Every stage is executed with precision, expertise, and the Ava Marie standard of excellence.</p></div>
+<div class="timeline-container"><div class="tl-center-line"></div>
+<div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 01</p><h3 class="tl-step-title">DESIGN</h3><p class="tl-step-body">Every great garment starts with a powerful idea. Our creative team works alongside your designers to develop, refine and visualize fashion concepts that push creative boundaries. We translate inspiration boards, trend reports and brand guidelines into production-ready designs — maintaining your brand DNA while elevating it to its fullest potential.</p><div class="tl-step-img"><img src="Manufacturing/1.webp" alt="Design"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">01</span></div></div><div class="tl-right-content"></div></div>
+<div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">02</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 02</p><h3 class="tl-step-title">PATTERN DEVELOPMENT</h3><p class="tl-step-body">Our master pattern makers use advanced CAD software to transform designs into precise, graded production templates. Every seam allowance, dart and construction detail is meticulously engineered for both aesthetic perfection and manufacturing efficiency — ensuring flawless consistency from first sample to bulk production at scale.</p><div class="tl-step-img"><img src="Manufacturing/2.png" alt="Pattern"></div></div></div>
+<div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 03</p><h3 class="tl-step-title">SAMPLE CUTTING & TESTING</h3><p class="tl-step-body">Before committing to bulk production, we create precise prototypes for quality assessment and design validation. Each sample is rigorously evaluated for fit, construction integrity, material behavior and visual appeal — ensuring that when production begins, the result exactly matches your vision.</p><div class="tl-step-img"><img src="Manufacturing/3.jpg" alt="Sample"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">03</span></div></div><div class="tl-right-content"></div></div>
+<div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">04</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 04</p><h3 class="tl-step-title">MODIFICATION & APPROVAL</h3><p class="tl-step-body">Your feedback drives every refinement. Our technical team adjusts fit, construction details and finishing techniques based on your sample review — continuing this iterative process until the sample perfectly meets your specifications. We move to production only when you are completely satisfied.</p><div class="tl-step-img"><img src="Manufacturing/4.jpeg" alt="Modification"></div></div></div>
+<div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 05</p><h3 class="tl-step-title">QUANTITY & SIZE PLANNING</h3><p class="tl-step-body">Strategic production planning is fundamental to commercial success. We collaborate with your merchandising team to develop optimal size distribution strategies, production ratios and quantity plans aligned with your sales data and market forecasts — maximizing sell-through rates while minimizing overstock.</p><div class="tl-step-img"><img src="Manufacturing/5.jpg" alt="Quantity"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">05</span></div></div><div class="tl-right-content"></div></div>
+<div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">06</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 06</p><h3 class="tl-step-title">RAW MATERIAL PROCUREMENT</h3><p class="tl-step-body">We source exclusively from our curated network of premium, certified fabric mills and component suppliers across Europe and Asia. Every material undergoes rigorous physical and laboratory testing before entering our facilities — because exceptional garments begin with exceptional materials.</p><div class="tl-step-img"><img src="Manufacturing/6.jfif" alt="Material"></div></div></div>
+<div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 07</p><h3 class="tl-step-title">PRECISION CUTTING</h3><p class="tl-step-body">Our automated CAD-driven cutting systems deliver millimeter-perfect accuracy across every single cut. Minimizing material waste while maximizing consistency, we achieve both environmental responsibility and impeccable quality control — each cut piece is verified against pattern specifications before assembly begins.</p><div class="tl-step-img"><img src="Manufacturing/7.png" alt="Cutting"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">07</span></div></div><div class="tl-right-content"></div></div>
+<div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">08</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 08</p><h3 class="tl-step-title">SEWING & ASSEMBLY</h3><p class="tl-step-body">Our skilled artisans and specialized sewing operators transform cut panels into finished garments using expert construction techniques. Inline quality control checkpoints verify seam strength, stitch density and construction alignment at every assembly stage — ensuring zero defective garments progress forward.</p><div class="tl-step-img"><img src="Manufacturing/8.jpg" alt="Sewing"></div></div></div>
+<div class="tl-step sr"><div class="tl-left-content tl-right-content text-end"><p class="tl-step-num">Step 09</p><h3 class="tl-step-title">FINISHING & QUALITY CHECK</h3><p class="tl-step-body">Final impression is everything. Our dedicated finishing team applies professional steam pressing, precision trimming and comprehensive quality inspection to every single garment. Thread cleanliness, label placement, button security, and overall presentation are verified item by item.</p><div class="tl-step-img"><img src="Manufacturing/9.png" alt="Finishing"></div></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">09</span></div></div><div class="tl-right-content"></div></div>
+<div class="tl-step sr"><div class="tl-left-content"></div><div class="tl-center-node"><div class="tl-node"><span class="tl-node-num">10</span></div></div><div class="tl-right-content"><p class="tl-step-num">Step 10</p><h3 class="tl-step-title">PACKAGING & DELIVERY</h3><p class="tl-step-body">Your garments are packaged to your exact brand specifications — from custom hangtags and polybags to branded boxes with tissue paper. Our global logistics network ensures on-time delivery to any destination worldwide, with real-time shipment tracking and dedicated account management.</p><div class="tl-step-img"><img src="Manufacturing/10.jpeg" alt="Packaging"></div></div></div>
+</div></section>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<!-- ====== SERVICES ====== -->
+<div id="pg-services" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="pg-header with-img"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">What We Offer</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>SERVICES</span></h1></div>
+<div class="services-intro"><div><div class="eyebrow sr">End-to-End Manufacturing</div><h2 class="display-title sr sr-d1" style="font-size:clamp(2.5rem,4vw,4.5rem);">A COMPLETE<br><span>SOLUTION</span></h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3">From initial concept to final delivery, we provide a seamless, fully managed manufacturing service — with precision, speed, and no compromise on quality.</p></div><div class="sr sr-d2"><p class="serif-accent" style="font-size:1.5rem;color:var(--text);line-height:1.7;">"We believe in long-term partnerships built on trust, transparency and consistently exceptional results."</p><div style="margin-top:2rem;"><button class="btn-primary" onclick="goPage('contact')"><span>Start a Conversation</span><i class="fas fa-arrow-right"></i></button></div></div></div>
+<div class="svc-grid">
+  <div class="svc-card sr"><span class="svc-n">01</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div><h3 class="svc-title">TECH PACK DEVELOPMENT</h3><p class="svc-body">Comprehensive technical specifications and detailed construction guides. We translate your creative vision into precise, production-ready documentation that ensures perfect consistency.</p></div>
+  <div class="svc-card sr sr-d1"><span class="svc-n">02</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8a3 3 0 0 0-3 3"/></svg></div><h3 class="svc-title">MATERIAL SOURCING</h3><p class="svc-body">Access to our global network of premium, certified fabric mills. We source ethically and sustainably with complete material traceability — balancing quality with efficiency.</p></div>
+  <div class="svc-card sr sr-d2"><span class="svc-n">03</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-4h6v4"/><path d="M3 11l9-7 9 7"/></svg></div><h3 class="svc-title">FULL PRODUCTION</h3><p class="svc-body">End-to-end manufacturing with quality control at every stage — from precision cutting to expert assembly. Our 250,000+ monthly capacity handles your largest orders.</p></div>
+  <div class="svc-card sr sr-d1"><span class="svc-n">04</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><h3 class="svc-title">PACKAGING & LOGISTICS</h3><p class="svc-body">Brand-specific packaging and global shipping coordination. From eco-friendly polybags to premium branded boxes — on-time delivery guaranteed with real-time tracking.</p></div>
+  <div class="svc-card sr sr-d2"><span class="svc-n">05</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><h3 class="svc-title">PRIVATE LABEL</h3><p class="svc-body">Complete private label services: design consultation, brand identity, and full production support. Create products that stand apart and resonate with your market.</p></div>
+  <div class="svc-card sr sr-d3"><span class="svc-n">06</span><div class="svc-icon-wrap"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><h3 class="svc-title">QUALITY ASSURANCE</h3><p class="svc-body">Multi-stage inspection protocols and lab testing. Our dedicated QC team conducts inline inspections and final audits — supporting our 99% on-time delivery rate.</p></div>
+</div>
+<!-- WHY CHOOSE US — ALL 8 -->
+<div class="why-section"><div class="eyebrow sr" style="color:var(--gold2);">Our Advantages</div><h2 class="display-title on-dark sr sr-d1">WHY GLOBAL BRANDS<br>CHOOSE <span>AVA MARIE</span></h2>
+<div class="why-grid">
+  <div class="why-card sr"><i class="fas fa-map-marked-alt why-icon"></i><h4 class="why-title">STRATEGIC GATEWAY</h4><p class="why-body">Tangier's strategic position at the crossroads of Africa & Europe enables rapid delivery — cutting lead times versus Asian alternatives.</p></div>
+  <div class="why-card sr sr-d1"><i class="fas fa-award why-icon"></i><h4 class="why-title">40+ YEARS MASTERY</h4><p class="why-body">Four decades of accumulated manufacturing wisdom. We've perfected every process in fashion production across three continents.</p></div>
+  <div class="why-card sr sr-d2"><i class="fas fa-hands why-icon"></i><h4 class="why-title">MOROCCAN CRAFT</h4><p class="why-body">World-renowned tailoring quality meets modern techniques. Morocco's artisan heritage combined with cutting-edge production systems.</p></div>
+  <div class="why-card sr sr-d3"><i class="fas fa-chart-line why-icon"></i><h4 class="why-title">ULTIMATE SCALABILITY</h4><p class="why-body">16 active production lines, easily expandable to 20+. Scale from 500 to 250,000+ pieces without sacrificing quality.</p></div>
+  <div class="why-card sr"><i class="fas fa-shield-alt why-icon"></i><h4 class="why-title">UNCOMPROMISING QUALITY</h4><p class="why-body">International quality standards at every stage. Multi-layer inspections, lab testing, and zero-defect commitment to every garment.</p></div>
+  <div class="why-card sr sr-d1"><i class="fas fa-clock why-icon"></i><h4 class="why-title">99% ON-TIME</h4><p class="why-body">Exceptional on-time delivery record keeps your supply chain running — season after season, without exception.</p></div>
+  <div class="why-card sr sr-d2"><i class="fas fa-globe why-icon"></i><h4 class="why-title">GLOBAL NETWORK</h4><p class="why-body">Strategic partnerships across Europe, North Africa and Asia. Premium material access and worldwide distribution capabilities.</p></div>
+  <div class="why-card sr sr-d3"><i class="fas fa-handshake why-icon"></i><h4 class="why-title">DEDICATED SUPPORT</h4><p class="why-body">Expert guidance throughout your entire production journey — from first enquiry to final delivery. Your dedicated account team.</p></div>
+</div></div>
+<div class="svc-cta"><div><h2 class="svc-cta-title sr">READY TO START YOUR<br>NEXT COLLECTION?</h2><p class="svc-cta-sub sr sr-d1">Let's discuss your requirements and build something exceptional together.</p></div><button class="btn-primary sr sr-d2" onclick="goPage('contact')"><span>Contact Our Team</span><i class="fas fa-arrow-right"></i></button></div>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/portfolio/" onclick="event.preventDefault();goPage('portfolio')">Portfolio</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<!-- ====== PORTFOLIO ====== -->
+<div id="pg-portfolio" class="page active"><div style="height:72px;background:var(--dark);"></div>
+<div class="pg-header"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">Our Work</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>PORTFOLIO</span></h1><p class="serif-accent sr sr-d2" style="color:rgba(245,241,235,.5);margin-top:1.5rem;">Five distinct collections, one uncompromising standard of excellence.</p></div>
+<div id="portCats">
+<section class="spec-section">
+<div class="eyebrow sr">Explore Our Collections</div>
+<h2 class="display-title sr sr-d1">CRAFTED WITH <span>PASSION</span></h2>
+<p class="body-text wide sr sr-d2" style="margin-top:1.5rem;">Every collection tells a story of precision, passion, and Moroccan craftsmanship at its finest.</p>
+<div class="spec-grid" style="margin-top:3rem;grid-template-columns:repeat(2,1fr);">
+<div class="spec-card sr sr-d1" onclick="portShowCat('woven')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755956/1_dzngkz.png" alt="Woven"><div class="spec-info"><p class="spec-cat">Tailored</p><h3 class="spec-name">WOMENSWEAR — WOVEN</h3><p class="spec-desc">Sophisticated structured garments with precision tailoring</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d2" onclick="portShowCat('jersey')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755843/1_p0wvot.png" alt="Jersey"><div class="spec-info"><p class="spec-cat">Knitwear</p><h3 class="spec-name">JERSEY &amp; KNITS</h3><p class="spec-desc">Versatile knit garments combining comfort with elegance</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d3" onclick="portShowCat('evening')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755790/1_kritnu.png" alt="Evening"><div class="spec-info"><p class="spec-cat">Formal Wear</p><h3 class="spec-name">EVENING &amp; OCCASION</h3><p class="spec-desc">Luxurious formal wear with intricate details and premium finishes</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d4" onclick="portShowCat('sportswear')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755903/1_bpeafl.png" alt="Sport"><div class="spec-info"><p class="spec-cat">Performance</p><h3 class="spec-name">SPORTSWEAR &amp; ACTIVEWEAR</h3><p class="spec-desc">High-performance activewear engineered for movement</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+<div class="spec-card sr sr-d5" style="grid-column:1/-1;max-width:calc(50% - 1.5px);margin:0 auto;" onclick="portShowCat('swimwear')"><img src="https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755933/1_e8jqa3.png" alt="Swimwear"><div class="spec-info"><p class="spec-cat">Resort</p><h3 class="spec-name">SWIMWEAR</h3><p class="spec-desc">Resort and swim collections crafted for style and comfort</p><div class="spec-arrow"><i class="fas fa-arrow-right"></i></div></div></div>
+</div>
+</section>
+</div>
+<div id="portGrid" style="display:none;">
+<section class="spec-section" style="padding-top:4rem;">
+<button class="gal-back" onclick="portBack()"><i class="fas fa-arrow-left"></i> ALL COLLECTIONS</button>
+<h2 class="display-title sr sr-d1" id="portCatTitle" style="margin:1.5rem 0 2rem;font-size:clamp(2rem,4vw,3.5rem);"></h2>
+<div id="portItems" class="gal-grid"></div>
+</section>
+</div>
+<div class="lb-wrap" id="lbWrap"><button class="lb-close" onclick="lbClose()"><i class="fas fa-times"></i></button><button class="lb-nav lb-prev" onclick="lbNav(-1)"><i class="fas fa-chevron-left"></i></button><img class="lb-img" id="lbImg" src="" alt=""><button class="lb-nav lb-next" onclick="lbNav(1)"><i class="fas fa-chevron-right"></i></button></div>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a><a href="/partners/" onclick="event.preventDefault();goPage('partners')">Partners</a></div></div><div><p class="ft-col-h">Collections</p><div class="ft-links"><a onclick="portShowCat('evening')">Evening</a><a onclick="portShowCat('woven')">Woven</a><a onclick="portShowCat('jersey')">Jersey</a><a onclick="portShowCat('sportswear')">Sport</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<div class="gal-modal" id="galModal">
+<div class="gal-topbar"><div style="display:flex;align-items:baseline;"><h3 class="gal-title" id="galTitle">OUR COLLECTIONS</h3><span class="gal-counter" id="galCounter"></span></div><div class="gal-close" onclick="galClose()"><i class="fas fa-times"></i></div></div>
+<div class="gal-body" id="galBody"></div>
+</div>
+<div class="gal-zoom" id="galZoom"><div class="gal-zoom-img-wrap" id="galZoomWrap"><img id="galZoomImg" src="" alt=""></div><div class="gal-zoom-nav prev" onclick="event.stopPropagation();galZoomNav(-1)"><i class="fas fa-chevron-left"></i></div><div class="gal-zoom-nav next" onclick="event.stopPropagation();galZoomNav(1)"><i class="fas fa-chevron-right"></i></div><div class="gal-zoom-close" onclick="galZoomClose()"><i class="fas fa-times"></i></div><div class="gal-zoom-counter" id="galZoomCounter"></div><div class="gal-zoom-hint">SCROLL TO ZOOM · DRAG TO PAN</div></div>
+
+<!-- ====== PARTNERS ====== -->
+<div id="pg-partners" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="pg-header"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">Our Network</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>PARTNERS</span></h1></div>
+<div class="partners-intro"><div class="eyebrow sr">Global Manufacturing Group</div><h2 class="display-title sr sr-d1" style="font-size:clamp(2.5rem,4.5vw,4.5rem);">A FAMILY OF<br><span>MANUFACTURING</span><br>EXCELLENCE</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3">Together with our strategic partners, we form one of the world’s most powerful fashion manufacturing networks — combined monthly capacity exceeding 390,000 garments across England, Morocco and Pakistan.</p><button class="btn-primary sr sr-d4" onclick="goPage('contact')"><span>Get In Touch</span><i class="fas fa-arrow-right"></i></button></div>
+<div class="pm-fw-section">
+<div class="pm-fw-wrap" role="region" aria-label="Interactive partner location map">
+<img src="img/partners-map.png" alt="World map showing three partner manufacturing locations: Ava Marie in Tangier Morocco, Sweet Threads in Leicester England, and Jaguar Apparel in Lahore Pakistan" class="pm-fw-img">
+<button class="pm-spot" id="pm-spot-tangier" aria-label="Ava Marie — Tangier, Morocco" aria-expanded="false" data-panel="pm-panel-tangier" style="left:44.40%;top:32.59%"></button>
+<button class="pm-spot" id="pm-spot-leicester" aria-label="Sweet Threads — Leicester, England" aria-expanded="false" data-panel="pm-panel-leicester" style="left:46.13%;top:23.33%"></button>
+<button class="pm-spot" id="pm-spot-lahore" aria-label="Jaguar Apparel — Lahore, Pakistan" aria-expanded="false" data-panel="pm-panel-lahore" style="left:64.32%;top:36.91%"></button>
+<div class="pm-panel" id="pm-panel-tangier" role="tooltip" style="left:calc(44.40% + 28px);top:29%"><div class="pm-panel-badge"><i class="fas fa-star" style="font-size:.55rem;"></i> Our Company</div><div class="pm-panel-name">AVA MARIE</div><div class="pm-panel-line"></div><p><strong>Location:</strong> Tangier, Morocco</p><p><strong>Capacity:</strong> 250,000+ garments/month</p><p><strong>Capital:</strong> £30 million</p><p><strong>Est.:</strong> 2021</p><p class="pm-panel-desc">Two state-of-the-art production facilities in Tangier’s industrial zone.</p></div>
+<div class="pm-panel" id="pm-panel-leicester" role="tooltip" style="left:calc(46.13% + 28px);top:20%"><div class="pm-panel-name">SWEET THREADS</div><div class="pm-panel-line"></div><p><strong>Location:</strong> Leicester, England</p><p><strong>Capacity:</strong> 20,000+ garments/month</p><p><strong>Capital:</strong> £5 million</p><p><strong>Est.:</strong> 2017</p><p class="pm-panel-desc">Specialist manufacturer for quick turnaround trend-driven fashion segments.</p></div>
+<div class="pm-panel" id="pm-panel-lahore" role="tooltip" style="left:calc(64.32% - 258px);top:33%"><div class="pm-panel-name">JAGUAR APPAREL</div><div class="pm-panel-line"></div><p><strong>Location:</strong> Lahore, Pakistan</p><p><strong>Capacity:</strong> 120,000+ garments/month</p><p><strong>Capital:</strong> £15 million</p><p><strong>Est.:</strong> 2010</p><p class="pm-panel-desc">High-volume production powerhouse ensuring direct access to cotton expertise and manufacturing scalability.</p></div>
+</div>
+<div class="pm-mob-row"><button class="pm-mob-btn" data-panel="pm-panel-tangier">Ava Marie — Tangier</button><button class="pm-mob-btn" data-panel="pm-panel-leicester">Sweet Threads — Leicester</button><button class="pm-mob-btn" data-panel="pm-panel-lahore">Jaguar — Lahore</button></div>
+<div class="pm-mobile-info" id="pm-mobile-info"></div>
+</div>
+<div class="partners-stats"><div class="ps-item sr"><span class="ps-num">390K+</span><span class="ps-lbl">Combined Monthly Garments</span></div><div class="ps-item sr sr-d1"><span class="ps-num">£50M+</span><span class="ps-lbl">Combined Capital</span></div><div class="ps-item sr sr-d2"><span class="ps-num">3</span><span class="ps-lbl">Partner Companies</span></div><div class="ps-item sr sr-d3"><span class="ps-num">3</span><span class="ps-lbl">Countries of Operation</span></div></div>
+<div class="partner-cards">
+<div class="pc sr"><div class="pc-badge"><i class="fas fa-star" style="font-size:.6rem;"></i> Our Company</div><div class="pc-name">AVA MARIE</div><div class="pc-line"></div><p><strong>Location:</strong> Tangier, Morocco</p><p><strong>Capacity:</strong> 250,000+ garments/month</p><p><strong>Capital:</strong> £30 million</p><p><strong>Est.:</strong> 2021</p><p class="pc-desc">Two state-of-the-art production facilities in Tangier's industrial zone.</p></div>
+<div class="pc sr sr-d1"><div class="pc-name">SWEET THREADS</div><div class="pc-line"></div><p><strong>Location:</strong> Leicester, England</p><p><strong>Capacity:</strong> 20,000+ garments/month</p><p><strong>Capital:</strong> £5 million</p><p><strong>Est.:</strong> 2017</p><p class="pc-desc">Specialist manufacturer for quick turnaround trend-driven fashion segments.</p></div>
+<div class="pc sr sr-d2"><div class="pc-name">JAGUAR</div><div class="pc-line"></div><p><strong>Location:</strong> Lahore, Pakistan</p><p><strong>Capacity:</strong> 120,000+ garments/month</p><p><strong>Capital:</strong> £15 million</p><p><strong>Est.:</strong> 2010</p><p class="pc-desc">High-volume production powerhouse ensuring direct access to cotton expertise and manufacturing scalability.</p></div></div>
+<section class="clients-section"><div class="eyebrow sr">Our Clients</div><h2 class="display-title sr sr-d1">BRANDS WE <span>MANUFACTURE FOR</span></h2><div class="clients-grid">
+<div class="client-item"><img src="LOGO/1.png" alt="Adidas"></div><div class="client-item"><img src="LOGO/2.png" alt="ASOS"></div><div class="client-item"><img src="LOGO/3.png" alt="River Island"></div><div class="client-item"><img src="LOGO/6.png" alt="PLT"></div><div class="client-item"><img src="LOGO/7.png" alt="Little Mistress"></div><div class="client-item"><img src="LOGO/8.png" alt="In The Style"></div><div class="client-item"><img src="LOGO/5.png" alt="Fashion Nova"></div><div class="client-item"><img src="LOGO/4.png" alt="Boohoo"></div><div class="client-item"><img src="LOGO/9.png" alt="Roman"></div><div class="client-item"><img src="LOGO/10.png" alt="ISIF"></div><div class="client-item"><img src="LOGO/11.png" alt="Missguided"></div><div class="client-item"><img src="LOGO/12.png" alt="Partner"></div>
+</div></section>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Partners</p><div class="ft-links"><a>Ava Marie</a><a>Sweet Threads</a><a>Jaguar</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a href="/contact/" onclick="event.preventDefault();goPage('contact')">Get In Touch →</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<!-- ====== CONTACT — 3-COLUMN LAYOUT ====== -->
+<div id="pg-contact" class="page"><div style="height:72px;background:var(--dark);"></div>
+<div class="contact-3col">
+
+  <!-- COL 1: TEAM CONTACTS -->
+  <div class="contact-col-team">
+    <div class="eyebrow sr" style="color:var(--gold2);">Management Team</div>
+    <h2 class="display-title on-dark sr sr-d1" style="font-size:clamp(2rem,3vw,3.2rem);line-height:.92;margin-bottom:1.5rem;">LET'S BUILD<br><span>SOMETHING</span><br>GREAT TOGETHER</h2>
+    <div class="gold-line sr sr-d2"></div>
+    <p class="sr sr-d2" style="font-size:.92rem;line-height:1.75;color:rgba(245,241,235,.4);margin-bottom:2rem;">Our team is ready to guide you from the first conversation to final delivery.</p>
+
+    <div class="team-card sr sr-d2">
+      <p class="tc-role"><i class="fas fa-crown" style="margin-right:.4rem;font-size:.7rem;"></i>Chief Executive Officer</p>
+      <h4 class="tc-name">ANWAR SARODIYA</h4>
+      <a class="tc-contact" href="mailto:Anwar@sweetthreadsltd.com"><i class="fas fa-envelope"></i>Anwar@sweetthreadsltd.com</a>
+      <a class="tc-contact" href="tel:+447845847104"><i class="fas fa-phone"></i>+44 7845 847104</a>
+    </div>
+    <div class="team-card sr sr-d3">
+      <p class="tc-role"><i class="fas fa-industry" style="margin-right:.4rem;font-size:.7rem;"></i>Operations Manager — Morocco</p>
+      <h4 class="tc-name">SARA OUMALIK</h4>
+      <a class="tc-contact" href="mailto:sara@avamarie.ma"><i class="fas fa-envelope"></i>sara@avamarie.ma</a>
+      <a class="tc-contact" href="tel:+212666945417"><i class="fas fa-phone"></i>+212 666 945 417</a>
+    </div>
+    <div class="team-card sr sr-d4">
+      <p class="tc-role"><i class="fas fa-pen-ruler" style="margin-right:.4rem;font-size:.7rem;"></i>Design Director</p>
+      <h4 class="tc-name">ABDERRAHMAN HADJ HAMMOU</h4>
+      <a class="tc-contact" href="mailto:abico@avamarie.ma"><i class="fas fa-envelope"></i>abico@avamarie.ma</a>
+      <a class="tc-contact" href="tel:+212656660050"><i class="fas fa-phone"></i>+212 656 660 050</a>
+    </div>
+  </div>
+
+  <!-- COL 2: FORM -->
+  <div class="contact-col-form">
+    <h3 class="form-title sr">START A<br>PARTNERSHIP</h3>
+    <p class="form-sub sr sr-d1">Fill in the form and our team will respond within 24 hours.</p>
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="submitForm(event,this)">
+      <input type="hidden" name="form-name" value="contact">
+      <input type="hidden" name="bot-field">
+      <div class="form-row">
+        <div class="fg sr sr-d2"><label>First Name</label><input type="text" name="first-name" placeholder="First name" autocomplete="given-name"></div>
+        <div class="fg sr sr-d2"><label>Last Name</label><input type="text" name="last-name" placeholder="Last name" autocomplete="family-name"></div>
+      </div>
+      <div class="fg sr sr-d2"><label>Email Address</label><input type="email" name="email" placeholder="your@email.com" autocomplete="email" required></div>
+      <div class="fg sr sr-d3"><label>Phone Number</label><input type="tel" name="phone" placeholder="+44 7700 000000" autocomplete="tel"></div>
+      <div class="fg sr sr-d3"><label>Company Name</label><input type="text" name="company" placeholder="Your company" autocomplete="organization"></div>
+      <div class="fg sr sr-d4"><label>Message</label><textarea name="message" placeholder="Tell us about your project, quantities, and timeline..." required></textarea></div>
+      <button class="btn-submit sr sr-d5" type="submit"><span>SEND MESSAGE &nbsp;→</span></button>
+    </form>
+  </div>
+
+
+</div>
+
+<!-- MAP — FULL WIDTH BELOW GRID -->
+<div class="contact-col-map">
+  <iframe
+    src="https://maps.google.com/maps?q=Ava+Marie,+Zone+Industrielle+Gzenaya,+Tangier,+Morocco&output=embed"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    title="Ava Marie — Tangier Facilities">
+  </iframe>
+</div>
+<!-- BRANCH LINKS -->
+<div class="contact-branch-bar">
+  <div class="contact-branch-item">
+    <span class="contact-branch-num">Branch 01</span>
+    <span class="contact-branch-sep">—</span>
+    <a class="contact-branch-link" href="https://maps.app.goo.gl/W2nZddMq8ob2v2eU8?g_st=ipc" target="_blank" rel="noopener noreferrer">
+      Tangier — Facility A &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
+    </a>
+  </div>
+  <div class="contact-branch-item">
+    <span class="contact-branch-num">Branch 02</span>
+    <span class="contact-branch-sep">—</span>
+    <a class="contact-branch-link" href="https://maps.app.goo.gl/UT96Cm5nSjD2cph67?g_st=ipc" target="_blank" rel="noopener noreferrer">
+      Tangier — Facility B &nbsp;<i class="fas fa-arrow-up-right-from-square"></i>
+    </a>
+  </div>
+</div>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">The Strategic Hub for Global Fashion Manufacturing. Engineered for Scale, Crafted with Heritage.</p><div class="ft-social"><a href="https://www.instagram.com/ava_marie_sarl?igsh=Zjdxb3l1MTVrZmZ1&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/share/1DYx1vYUug/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/ava-marie-sarl/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://pin.it/1vaU0tgCQ" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a href="/" onclick="event.preventDefault();goPage('home')">Home</a><a href="/our-story/" onclick="event.preventDefault();goPage('story')">Our Story</a><a href="/services/" onclick="event.preventDefault();goPage('services')">Services</a><a href="/portfolio/" onclick="event.preventDefault();goPage('portfolio')">Portfolio</a></div></div><div><p class="ft-col-h">Services</p><div class="ft-links"><a>Tech Pack Dev</a><a>Material Sourcing</a><a>Full Production</a><a>Quality Assurance</a></div></div><div><p class="ft-col-h">Contacts</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="mailto:sara@avamarie.ma">sara@avamarie.ma</a><a href="tel:+447845847104">+44 7845 847104</a></div></div></footer>
+<div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
+
+<script>
+let current='portfolio';var _urlMap={home:'/',story:'/our-story/',journey:'/manufacturing/',services:'/services/',portfolio:'/portfolio/',partners:'/partners/',contact:'/contact/'};const curtain=document.getElementById('curtain');function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function goPage(id,_np){if(id===current)return;if(!_np)history.pushState({page:id},'',_urlMap[id]||'/');curtain.classList.remove('slide-out');curtain.classList.add('slide-in');await sleep(560);document.getElementById('pg-'+current).classList.remove('active');document.getElementById('pg-'+id).classList.add('active');current=id;window.scrollTo(0,0);document.querySelectorAll('.nav-link').forEach(l=>l.classList.toggle('active',l.dataset.pg===id));setTimeout(doReveal,50);curtain.classList.remove('slide-in');curtain.classList.add('slide-out');await sleep(560);curtain.classList.remove('slide-out')}
+window.addEventListener('popstate',function(e){var id=e.state&&e.state.page?e.state.page:'home';goPage(id,true);});window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('solid',window.scrollY>50);doReveal()},{passive:true});
+function toggleMob(){const m=document.getElementById('mobileMenu');const isOpen=m.classList.toggle('open');const s=document.querySelectorAll('.ham span');if(isOpen){s[0].style.transform='rotate(45deg) translate(5px,5px)';s[1].style.opacity='0';s[2].style.transform='rotate(-45deg) translate(5px,-5px)';document.body.style.overflow='hidden'}else{s[0].style.transform='';s[1].style.opacity='';s[2].style.transform='';document.body.style.overflow=''}}
+const obs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -60px 0px'});function doReveal(){document.querySelectorAll('.page.active .sr').forEach(el=>obs.observe(el))}doReveal();
+const counterObs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting&&!e.target.dataset.counted){e.target.dataset.counted='1';const t=parseInt(e.target.dataset.count);if(!t)return;let s=0;const st=Math.ceil(t/60);const tm=setInterval(()=>{s+=st;if(s>=t){s=t;clearInterval(tm)}if(t>999)e.target.textContent=s.toLocaleString()+(t===250000?'+':t===2021?'':'+');else e.target.textContent=s+(t===99?'%':t>=10?'+':'')},30)}})},{threshold:.5});document.querySelectorAll('[data-count]').forEach(el=>counterObs.observe(el));
+const mq=document.getElementById('mqt');if(mq)mq.innerHTML+=mq.innerHTML;
+function doFilter(c,b){document.querySelectorAll('.p-item').forEach(i=>{i.style.display=(c==='all'||i.dataset.c===c)?'block':'none'});if(b){document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));b.classList.add('on')}}
+let lbArr=[],lbIdx=0;function lbOpen(el){const v=[...document.querySelectorAll('.p-item')].filter(i=>i.style.display!=='none');lbArr=v.map(i=>i.querySelector('img').src);lbIdx=v.indexOf(el);document.getElementById('lbImg').src=lbArr[lbIdx];document.getElementById('lbWrap').classList.add('open');document.body.style.overflow='hidden'}function lbNav(d){lbIdx=(lbIdx+d+lbArr.length)%lbArr.length;const img=document.getElementById('lbImg');img.style.opacity='0';img.style.transform='scale(.97)';setTimeout(()=>{img.src=lbArr[lbIdx];img.style.opacity='1';img.style.transform='scale(1)'},200)}function lbClose(){document.getElementById('lbWrap').classList.remove('open');document.body.style.overflow=''}document.getElementById('lbImg').style.transition='opacity .2s,transform .2s';
+document.addEventListener('keydown',e=>{const lb=document.getElementById('lbWrap');if(lb.classList.contains('open')){if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')lbClose()}const gz=document.getElementById('galZoom');if(gz&&gz.classList.contains('open')){if(e.key==='ArrowLeft')galZoomNav(-1);if(e.key==='ArrowRight')galZoomNav(1);if(e.key==='Escape')galZoomClose();return}const gm=document.getElementById('galModal');if(gm&&gm.classList.contains('open')&&e.key==='Escape')galClose()});
+const galData={'woven':{title:'WOMENSWEAR \u2014 WOVEN',imgs:['https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755956/1_dzngkz.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755957/2_fis4hy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755957/3_g9wuzo.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755958/4_l4goqj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755960/5_r4nmom.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755960/6_vamdsh.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755961/7_zhefsp.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755962/8_ouvvz0.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755963/9_h5rzcs.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755964/10_pygrxq.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755967/11_nzmkim.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755967/12_mcl5yw.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755968/13_plad3m.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755970/14_cjlrsa.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755971/15_hi8j7l.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755972/16_mafdyx.png']},'jersey':{title:'WOMENSWEAR \u2014 JERSEY & KNITS',imgs:['https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755843/1_p0wvot.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755843/2_dn6uat.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755844/4_bktn3t.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755845/5_tiycfs.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755846/7_yntekp.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755847/11_zekx1u.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755847/9_ji4r2t.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755847/3_mvh8ep.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755847/6_ab33ey.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755848/8_rbejqw.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755848/10_r9dh7a.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755849/12_pjp3fo.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755850/13_kzm9me.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755851/15_omhzck.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755851/16_bkzsad.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755852/17_fq7muc.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755852/14_pi8r8t.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755852/18_hqtkyf.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755854/21_etm18q.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755855/19_gclxjs.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755855/20_vddw1v.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755855/23_coxpc4.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755856/22_w636az.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755856/25_cdzhdj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755857/26_chujv8.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755858/24_d8mhiy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755858/27_nqlo4s.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755859/29_jot7qr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755859/28_xycktv.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755860/30_dnqjec.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755860/31_ccre7h.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755861/32_til65m.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755862/33_ipr48f.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755862/34_e4eqxy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755863/35_dyvr2d.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755864/36_fdbbo4.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755864/37_fda4h8.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755865/38_burwdr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755866/39_yfr5kp.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755867/40_o2tqzr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755868/42_a15eku.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755868/41_vkrowz.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755869/44_w37p41.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755869/43_gcb4tn.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755869/45_yyc3pj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755871/47_f8fz5m.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755871/46_qvu99i.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755873/49_sjl2rb.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755873/48_qekrf6.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755874/51_xo3ymr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755875/50_scjbvq.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755875/52_j7189i.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755875/53_mih8mw.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755877/54_gauxhs.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755884/55_vtq6iy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755884/56_rp648y.png']},'evening':{title:'EVENING & OCCASION WEAR',imgs:['https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755790/1_kritnu.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755791/4_lkdhul.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755792/2_nab0fu.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755792/3_jn3jb3.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755792/7_u02sgy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755792/5_pgdumv.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755793/6_tuxtfm.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755793/8_ozc5wb.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755795/9_xxalh7.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755795/11_fnhnvj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755795/10_f9opd1.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755796/12_tu5ohr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755796/13_jvdwi0.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755797/16_wopecw.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755798/15_sugk8u.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755799/17_ragdyj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755799/14_tv8ohh.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755800/20_rxkqdd.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755800/18_mpzukd.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755801/21_rqxkat.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755801/19_z90vcy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755802/25_jeux2z.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755802/22_xyvtps.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755802/24_vrkgwi.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755803/27_bz9brt.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755804/23_fh9klg.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755804/26_stfw2n.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755805/29_qsczui.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755805/30_sylrak.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755806/28_d4kxhx.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755806/31_rxyqt4.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755806/35_idjxqp.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755806/34_mtksrc.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755807/33_avc2dc.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755808/39_agkc4k.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755808/38_u48ry6.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755808/32_w9nlfp.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755809/37_tgfgja.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755809/36_wc0ekr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755810/40_qmvnhj.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755811/41_hswfr6.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755811/43_xuxi2q.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755812/44_u7x6ww.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755813/46_s7q4mr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/49_asa0ep.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/45_xw6xze.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/42_v1tepr.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/48_vrwwc6.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/47_k3yevm.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755814/50_ehebey.png']},'sportswear':{title:'SPORTSWEAR & ACTIVEWEAR',imgs:['https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755903/1_bpeafl.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755904/2_rggmyy.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755905/3_wom72w.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755906/4_iqhzz6.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755908/5_kfzvkc.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755908/6_dbyibv.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755908/7_v2iii7.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755908/8_wydebh.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755909/9_p3xrw9.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755910/10_d0rkge.png']},'swimwear':{title:'SWIMWEAR',imgs:['https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755933/1_e8jqa3.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755933/2_rj8qdq.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755934/3_dwcqu9.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755935/4_clcama.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755936/5_jcml0u.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755938/6_ee5agh.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755938/7_zizunq.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755939/8_zcjsag.png','https://res.cloudinary.com/davtnex7l/image/upload/q_auto/f_auto/v1776755940/9_zowpit.png']}};
+function galShowCategories(){const b=document.getElementById('galBody');b.innerHTML='';document.getElementById('galTitle').textContent='OUR COLLECTIONS';document.getElementById('galCounter').textContent=Object.keys(galData).length+' CATEGORIES';const cats=document.createElement('div');cats.className='gal-cats';Object.keys(galData).forEach(k=>{const d=galData[k];if(!d||!d.imgs||!d.imgs.length)return;const card=document.createElement('div');card.className='gal-cat-card';card.onclick=()=>galShowCategory(k);card.innerHTML='<img src="'+d.imgs[0]+'" alt="'+d.title+'" loading="lazy"><div class="gal-cat-label"><div class="gal-cat-name">'+d.title+'</div><div class="gal-cat-count">'+d.imgs.length+' PIECES</div></div>';cats.appendChild(card)});b.appendChild(cats)}
+function galShowCategory(k){const d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('galTitle').textContent=d.title;document.getElementById('galCounter').textContent=d.imgs.length+' PIECES';const b=document.getElementById('galBody');b.innerHTML='';b.scrollTop=0;const back=document.createElement('button');back.className='gal-back';back.innerHTML='<i class="fas fa-arrow-left"></i> ALL COLLECTIONS';back.onclick=galShowCategories;b.appendChild(back);const grid=document.createElement('div');grid.className='gal-grid';d.imgs.forEach((src,i)=>{const item=document.createElement('div');item.className='gal-grid-item';item.onclick=()=>galZoomOpen(i);const img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';item.appendChild(img);grid.appendChild(item)});b.appendChild(grid)}
+function openGal(k){document.getElementById('galModal').classList.add('open');document.body.style.overflow='hidden';if(k){galShowCategory(k)}else{galShowCategories()}}
+function galClose(){document.getElementById('galModal').classList.remove('open');document.body.style.overflow=''}
+let _gzIdx=0,_gzScale=1,_gzPanX=0,_gzPanY=0,_gzDrag=false,_gzSX=0,_gzSY=0;
+function galZoomOpen(i){_gzIdx=i;_gzScale=1;_gzPanX=0;_gzPanY=0;const img=document.getElementById('galZoomImg');img.src=window._galImgs[i];img.style.transform='scale(1) translate(0px,0px)';document.getElementById('galZoomCounter').textContent=(i+1)+' / '+window._galImgs.length;document.getElementById('galZoom').classList.add('open')}
+function galZoomNav(d){_gzIdx=(_gzIdx+d+window._galImgs.length)%window._galImgs.length;_gzScale=1;_gzPanX=0;_gzPanY=0;const img=document.getElementById('galZoomImg');img.style.opacity='0';setTimeout(function(){img.src=window._galImgs[_gzIdx];img.style.transform='scale(1) translate(0px,0px)';img.style.opacity='1';document.getElementById('galZoomCounter').textContent=(_gzIdx+1)+' / '+window._galImgs.length},150)}
+function galZoomClose(){_gzScale=1;document.getElementById('galZoom').classList.remove('open')}
+document.getElementById('galZoomImg').style.transition='opacity .15s';
+document.getElementById('galZoomWrap').addEventListener('wheel',function(e){e.preventDefault();_gzScale=Math.min(Math.max(_gzScale+(e.deltaY>0?-0.25:0.25),1),5);if(_gzScale<=1){_gzPanX=0;_gzPanY=0;_gzScale=1}document.getElementById('galZoomImg').style.transform='scale('+_gzScale+') translate('+_gzPanX+'px,'+_gzPanY+'px)'},{passive:false});
+document.getElementById('galZoomWrap').addEventListener('mousedown',function(e){if(_gzScale>1){_gzDrag=true;_gzSX=e.clientX-_gzPanX;_gzSY=e.clientY-_gzPanY;this.classList.add('dragging');e.preventDefault()}});
+document.addEventListener('mousemove',function(e){if(_gzDrag){_gzPanX=e.clientX-_gzSX;_gzPanY=e.clientY-_gzSY;document.getElementById('galZoomImg').style.transform='scale('+_gzScale+') translate('+_gzPanX+'px,'+_gzPanY+'px)'}});
+document.addEventListener('mouseup',function(){_gzDrag=false;var w=document.getElementById('galZoomWrap');if(w)w.classList.remove('dragging')});
+document.getElementById('galZoom').addEventListener('click',function(e){if(e.target===this)galZoomClose()});
+function portShowCat(k){var d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('portCats').style.display='none';var pg=document.getElementById('portGrid');pg.style.display='block';document.getElementById('portCatTitle').innerHTML=d.title.replace(/—/g,'<span>—</span>');var items=document.getElementById('portItems');items.innerHTML='';d.imgs.forEach(function(src,i){var div=document.createElement('div');div.className='gal-grid-item';div.onclick=function(){galZoomOpen(i)};var img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';div.appendChild(img);items.appendChild(div)});window.scrollTo(0,document.getElementById('portGrid').offsetTop-72)}
+function portBack(){var items=document.getElementById('portItems');if(items)items.innerHTML='';document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
+function submitForm(e,form){e.preventDefault();const btn=form.querySelector('button[type="submit"]');btn.disabled=true;btn.innerHTML='<span>SENDING…</span>';fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form)).toString()}).then(()=>{btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';form.reset();setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color='';btn.disabled=false},4000)}).catch(()=>{btn.innerHTML='<span>ERROR — TRY AGAIN</span>';btn.disabled=false})}
+// Hero video: double-buffer — A plays while B preloads next, then swap instantly
+(function(){
+  var parts=['AVA%20MARIE/HOME%201.mp4','AVA%20MARIE/HOME%202.mp4','AVA%20MARIE/HOME%203.mp4'];
+  var idx=0;
+  var vA=document.getElementById('hv-a');
+  var vB=document.getElementById('hv-b');
+  if(!vA||!vB)return;
+  var active=vA,standby=vB;
+
+  // Queue next part into standby so browser buffers it in the background
+  function loadStandby(){
+    standby.src=parts[(idx+1)%parts.length];
+    standby.load();
+  }
+
+  // Initial reveal: slow elegant fade-in on very first frame
+  function revealInitial(){
+    active.style.transition='opacity 1.4s ease';
+    active.style.opacity='1';
+    loadStandby(); // start buffering part 2 the moment part 1 is visible
+  }
+  if(active.readyState>=2){revealInitial();}
+  else{
+    active.addEventListener('canplay',revealInitial,{once:true});
+    active.addEventListener('loadeddata',revealInitial,{once:true});
+    setTimeout(revealInitial,800);
+  }
+
+  // Swap: standby (pre-buffered) becomes active — instant, zero-gap cut
+  function swap(){
+    idx=(idx+1)%parts.length;
+    // Instant opacity swap — no transition to hide the cut
+    standby.style.transition='none';
+    standby.style.opacity='1';
+    active.style.transition='none';
+    active.style.opacity='0';
+    // Exchange roles
+    var prev=active;active=standby;standby=prev;
+    // Ensure new active is playing (it was pre-buffered at position 0)
+    active.play().catch(function(){});
+    // Immediately queue the next-next clip
+    loadStandby();
+    // Listen for this part's end
+    active.addEventListener('ended',swap,{once:true});
+  }
+
+  // Guard: if standby isn't ready when active ends, wait for it
+  function safeSwap(){
+    if(standby.readyState>=3){swap();}
+    else{standby.addEventListener('canplay',swap,{once:true});}
+  }
+  active.addEventListener('ended',safeSwap,{once:true});
+})();
+// Partners image map interaction
+(function(){
+  var DELAY=200,_timer=null,_active=null,_openedBy=null;
+  function closeAll(){document.querySelectorAll('.pm-panel.open').forEach(function(p){p.classList.remove('open')});document.querySelectorAll('.pm-spot[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false')});_active=null;_openedBy=null;}
+  function openPanel(id,spot,via){if(_timer){clearTimeout(_timer);_timer=null;}closeAll();var p=document.getElementById(id);if(p){p.classList.add('open');_active=id;_openedBy=via||'hover';if(spot)spot.setAttribute('aria-expanded','true');}}
+  function schedClose(){if(_openedBy==='click')return;_timer=setTimeout(closeAll,DELAY);}
+  function cancelClose(){if(_timer){clearTimeout(_timer);_timer=null;}}
+  function triggerMobile(pid){
+    var mInfo=document.getElementById('pm-mobile-info');var panel=document.getElementById(pid);
+    if(!mInfo||!panel)return;
+    var alreadyOpen=mInfo.getAttribute('data-open')===pid;
+    document.querySelectorAll('.pm-mob-btn').forEach(function(b){b.classList.remove('active')});
+    if(alreadyOpen){mInfo.innerHTML='';mInfo.classList.remove('open');mInfo.removeAttribute('data-open');}
+    else{var btn=document.querySelector('.pm-mob-btn[data-panel="'+pid+'"]');if(btn)btn.classList.add('active');mInfo.innerHTML='<div class="pm-panel">'+panel.innerHTML+'</div>';mInfo.classList.add('open');mInfo.setAttribute('data-open',pid);mInfo.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  }
+  document.querySelectorAll('.pm-spot').forEach(function(spot){
+    var pid=spot.dataset.panel;var panel=document.getElementById(pid);
+    spot.addEventListener('mouseenter',function(){if(window.innerWidth<=640)return;cancelClose();openPanel(pid,spot,'hover');});
+    spot.addEventListener('mouseleave',function(){if(window.innerWidth<=640)return;schedClose();});
+    if(panel){panel.addEventListener('mouseenter',function(){if(window.innerWidth<=640)return;cancelClose();});panel.addEventListener('mouseleave',function(){if(window.innerWidth<=640)return;schedClose();});}
+    spot.addEventListener('click',function(e){e.stopPropagation();if(window.innerWidth<=640){triggerMobile(pid);}else{if(_active===pid&&_openedBy==='click'){closeAll();}else{openPanel(pid,spot,'click');}}});
+    spot.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();if(window.innerWidth<=640){triggerMobile(pid);}else{if(_active===pid&&_openedBy==='click'){closeAll();}else{openPanel(pid,spot,'click');}}}if(e.key==='Escape')closeAll();});
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest('.pm-panel')&&!e.target.closest('.pm-spot'))closeAll();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll();});
+  document.querySelectorAll('.pm-mob-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){triggerMobile(btn.dataset.panel);});
+  });
+})();
+if(window.netlifyIdentity){netlifyIdentity.on('init',u=>{if(!u){netlifyIdentity.on('login',()=>{document.location.href='/admin/'})}})}
+</script></body></html>
