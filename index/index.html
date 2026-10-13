@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
   --cream:#F5F1EB;--cream2:#EDE8DF;--cream3:#E3DDD3;
@@ -302,26 +300,11 @@ img{display:block;max-width:100%}a{text-decoration:none}
 .gal-zoom-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.72rem;letter-spacing:.2em;color:rgba(255,255,255,.3)}
 .gal-zoom-hint{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);font-size:.6rem;letter-spacing:.15em;color:rgba(255,255,255,.15);text-transform:uppercase}
 
-/* PARTNERS MAP — LEAFLET */
+/* PARTNERS MAP — SVG */
 .partners-hero{display:grid;grid-template-columns:1fr 1fr;min-height:550px}
 .partners-txt{background:var(--dark);padding:7rem 5rem;display:flex;flex-direction:column;justify-content:center}
-.partners-map-area{background:#f0ede7;position:relative;overflow:hidden}
-#partnersMap{background:#f0ede7}
-#partnersMap .leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg)}
-#partnersMap .leaflet-control-zoom{border:none;box-shadow:none}
-#partnersMap .leaflet-control-zoom a{background:rgba(26,23,20,.85);color:var(--gold);border:1px solid rgba(212,175,55,.2);width:30px;height:30px;line-height:30px;font-size:14px}
-#partnersMap .leaflet-control-zoom a:hover{background:var(--dark);border-color:var(--gold)}
-.gold-marker{position:relative;width:18px;height:18px}
-.gold-marker-dot{width:14px;height:14px;background:radial-gradient(circle at 35% 35%,#f0d060,#D4AF37 50%,#a88b2a);border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(212,175,55,.6),0 0 20px rgba(212,175,55,.3),0 2px 6px rgba(0,0,0,.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2}
-.gold-marker-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid rgba(212,175,55,.5);animation:markerPulse 2s ease-in-out infinite;z-index:1}
-@keyframes markerPulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.7}70%{transform:translate(-50%,-50%) scale(2.8);opacity:0}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
-.lf-popup .leaflet-popup-content-wrapper{background:var(--dark);color:var(--white);border-radius:0;box-shadow:0 8px 30px rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.15)}
-.lf-popup .leaflet-popup-tip{background:var(--dark)}
-.lf-popup .leaflet-popup-content{margin:1rem 1.2rem;font-family:'DM Sans',sans-serif}
-.lf-popup .leaflet-popup-close-button{color:rgba(245,241,235,.4);font-size:18px;top:6px;right:8px}
-.lf-popup .leaflet-popup-close-button:hover{color:var(--gold)}
-.lf-popup-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:var(--gold);margin-bottom:.4rem}
-.lf-popup-desc{font-size:.8rem;line-height:1.6;color:rgba(245,241,235,.55)}
+.partners-map-area{background:#1e1c18;position:relative;overflow:hidden}
+#partnersMap{display:block;width:100%;height:100%}
 
 .partners-stats{background:var(--gold);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--gold3)}
 .ps-item{padding:3rem 2rem;text-align:center;border-right:1px solid var(--gold3);transition:background .3s}
@@ -525,8 +508,7 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
     <div class="story-chapter-text">
       <p class="story-chapter-body">Ava Marie is not just a manufacturing facility. It is the result of a carefully built industrial ecosystem — structured, connected, and designed to perform at scale.</p>
       <p class="story-chapter-body" style="margin-top:1.2rem;">Behind Ava Marie stands the Sarodiya network — a multi-country textile and apparel group operating across the United Kingdom, Morocco, and South Asia. Over the years, this network has evolved into a fully integrated system combining sourcing, design, production, and distribution.</p>
-      <p class="story-chapter-body" style="margin-top:1.2rem;">The group's modern industrial foundation was established in Leicester, UK, with FIGA STORE LIMITED (2009) — specializing in structured garments and workwear, setting the standard for precision and compliance.</p>
-      <p class="story-chapter-body" style="margin-top:1.2rem;">This was followed by SWEET THREADS LTD (2017), expanding into fast-moving fashion segments and strengthening agility in high-demand markets.</p>
+      <p class="story-chapter-body" style="margin-top:1.2rem;">In the United Kingdom, the Sarodiya network established SWEET THREADS LTD (2017) in Leicester — specialising in fast-moving fashion segments and delivering the agility needed for high-demand markets.</p>
       <p class="story-chapter-body" style="margin-top:1.2rem;">To secure raw materials and large-scale production capabilities, the network extended into South Asia through JAGUAR APPAREL (Pakistan) — ensuring direct access to cotton expertise and manufacturing scalability.</p>
     </div>
   </div>
@@ -634,21 +616,89 @@ footer{background:var(--dark);color:var(--white);padding:5rem;display:grid;grid-
 <div id="pg-partners" class="page"><div style="height:72px;background:var(--dark);"></div>
 <div class="pg-header"><div class="pg-header-bg"></div><div class="eyebrow sr" style="color:var(--gold2);">Our Network</div><h1 class="display-title on-dark sr sr-d1" style="font-size:clamp(5rem,10vw,10rem);">OUR<br><span>PARTNERS</span></h1></div>
 <div class="partners-hero">
-<div class="partners-txt"><div class="eyebrow sr" style="color:var(--gold2);">Global Manufacturing Group</div><h2 class="display-title on-dark sr sr-d1" style="font-size:clamp(2.5rem,4.5vw,4.5rem);">A FAMILY OF<br><span>MANUFACTURING</span><br>EXCELLENCE</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3" style="color:rgba(245,241,235,.5);margin-bottom:2rem;">Together with our strategic partners, we form one of the world's most powerful fashion manufacturing networks — combined monthly capacity exceeding 420,000 garments across England, Morocco and Pakistan.</p><button class="btn-primary sr sr-d4" onclick="goPage('contact')"><span>Join Our Network</span><i class="fas fa-arrow-right"></i></button></div>
-<!-- DOTTED MAP — White BG, gray dots, gold pins -->
+<div class="partners-txt"><div class="eyebrow sr" style="color:var(--gold2);">Global Manufacturing Group</div><h2 class="display-title on-dark sr sr-d1" style="font-size:clamp(2.5rem,4.5vw,4.5rem);">A FAMILY OF<br><span>MANUFACTURING</span><br>EXCELLENCE</h2><div class="gold-line sr sr-d2"></div><p class="body-text sr sr-d3" style="color:rgba(245,241,235,.5);margin-bottom:2rem;">Together with our strategic partners, we form one of the world's most powerful fashion manufacturing networks — combined monthly capacity exceeding 390,000 garments across England, Morocco and Pakistan.</p><button class="btn-primary sr sr-d4" onclick="goPage('contact')"><span>Join Our Network</span><i class="fas fa-arrow-right"></i></button></div>
+<!-- PARTNERS SVG MAP — self-contained, no API key required -->
 <div class="partners-map-area" style="padding:0;">
-  <div id="partnersMap" style="width:100%;height:100%;min-height:450px;"></div>
+<svg id="partnersMap" viewBox="0 0 1000 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;min-height:340px;display:block;" aria-label="Global partner network map">
+<defs><style>
+.pm-land{fill:#2a2720;stroke:#3a3730;stroke-width:.5}
+.pm-sea{fill:#1e1c18}
+.pm-grid{stroke:#252220;stroke-width:.35;fill:none}
+.pm-arc{fill:none;stroke:#D4AF37;stroke-width:1.5;opacity:.8;stroke-dasharray:6 3;animation:pmDash 2.4s linear infinite}
+.pm-glow{fill:none;stroke:#D4AF37;stroke-width:5;opacity:.1}
+.pm-pulse{fill:none;stroke:#D4AF37;stroke-width:1.5;transform-box:fill-box;transform-origin:center;animation:pmPulse 2s ease-out infinite}
+.pm-dot{fill:#D4AF37}
+.pm-cityname{fill:#D4AF37;font-family:'Bebas Neue','Arial Narrow',sans-serif;font-size:9.5px;letter-spacing:.14em}
+.pm-compname{fill:rgba(245,241,235,.45);font-family:'DM Sans','Arial',sans-serif;font-size:6.5px;letter-spacing:.1em}
+@keyframes pmDash{to{stroke-dashoffset:-18}}
+@keyframes pmPulse{0%,20%{transform:scale(1);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+</style></defs>
+<rect width="1000" height="450" class="pm-sea"/>
+<line x1="0" y1="50" x2="1000" y2="50" class="pm-grid"/>
+<line x1="0" y1="150" x2="1000" y2="150" class="pm-grid"/>
+<line x1="0" y1="250" x2="1000" y2="250" class="pm-grid"/>
+<line x1="0" y1="350" x2="1000" y2="350" class="pm-grid"/>
+<line x1="0" y1="0" x2="0" y2="450" class="pm-grid"/>
+<line x1="150" y1="0" x2="150" y2="450" class="pm-grid"/>
+<line x1="300" y1="0" x2="300" y2="450" class="pm-grid"/>
+<line x1="450" y1="0" x2="450" y2="450" class="pm-grid"/>
+<line x1="600" y1="0" x2="600" y2="450" class="pm-grid"/>
+<line x1="750" y1="0" x2="750" y2="450" class="pm-grid"/>
+<line x1="900" y1="0" x2="900" y2="450" class="pm-grid"/>
+<polygon class="pm-land" points="100,150 163,138 155,122 150,113 135,100 129,78 118,64 85,70 90,85 100,102 97,130 95,148"/>
+<polygon class="pm-land" points="95,105 88,118 85,130 64,133 50,130 64,100"/>
+<polygon class="pm-land" points="150,113 156,80 170,65 200,55 222,60 228,75 210,85 184,90 174,120 165,130 155,130"/>
+<polygon class="pm-land" points="105,170 130,158 175,140 226,165 220,212 166,222 132,218"/>
+<polygon class="pm-land" points="60,213 132,218 182,225 180,265 130,283 96,290 60,280 60,250"/>
+<polygon class="pm-land" points="222,210 275,200 310,235 335,250 305,272 278,257 252,228 233,210"/>
+<polygon class="pm-land" points="270,155 300,155 370,155 415,185 440,235 365,248 350,270 372,285 350,290 335,272 307,272 290,255 292,232 270,210"/>
+<polygon class="pm-land" points="365,248 438,240 510,228 568,235 600,255 590,270 548,275 500,270 465,277 415,285 395,270"/>
+<polygon class="pm-sea" points="388,248 432,242 510,233 568,240 568,254 510,254 432,252 388,258"/>
+<polygon class="pm-land" points="568,235 605,230 615,246 595,255 568,250"/>
+<polygon class="pm-land" points="500,284 520,278 526,286 508,291"/>
+<polygon class="pm-land" points="22,293 96,292 135,295 140,302 140,332 138,368 62,374 22,374"/>
+<polygon class="pm-land" points="138,295 151,290 230,278 262,277 268,312 240,354 170,354 138,332"/>
+<polygon class="pm-land" points="262,277 282,275 355,270 414,274 406,342 406,450 240,450 240,354"/>
+<polygon class="pm-land" points="414,274 450,270 505,268 515,290 500,350 496,450 406,450 406,342"/>
+<rect x="0" y="350" width="1000" height="100" class="pm-land"/>
+<polygon class="pm-land" points="505,268 515,290 590,270 635,278 686,340 720,396 750,425 750,450 500,450 496,450 500,350 515,290"/>
+<polygon class="pm-land" points="590,270 615,246 640,236 696,238 756,250 790,272 795,306 762,396 686,340 635,278"/>
+<polygon class="pm-land" points="640,236 756,250 800,248 872,252 870,240 810,224 750,200 680,200 640,215"/>
+<polygon class="pm-land" points="756,250 800,248 872,252 876,296 856,312 820,346 775,336 762,306 790,272"/>
+<polygon class="pm-land" points="856,312 892,278 925,280 932,302 940,376 848,426 792,406 762,396 795,306 820,346"/>
+<polygon class="pm-land" points="925,280 1000,290 1000,450 870,450 848,426 940,376 932,302"/>
+<path class="pm-glow" d="M139,124 Q52,208 92,292"/>
+<path class="pm-arc" d="M139,124 Q52,208 92,292"/>
+<path class="pm-glow" d="M139,124 Q516,46 894,335"/>
+<path class="pm-arc" d="M139,124 Q516,46 894,335" style="animation-delay:-.8s"/>
+<path class="pm-glow" d="M92,292 Q493,412 894,335"/>
+<path class="pm-arc" d="M92,292 Q493,412 894,335" style="animation-delay:-1.6s"/>
+<circle cx="92" cy="292" r="4.5" class="pm-dot"/>
+<circle cx="92" cy="292" r="6" class="pm-pulse"/>
+<circle cx="92" cy="292" r="6" class="pm-pulse" style="animation-delay:.7s"/>
+<text x="100" y="284" class="pm-cityname">TANGIER</text>
+<text x="100" y="295" class="pm-compname">AVA MARIE</text>
+<circle cx="139" cy="124" r="4.5" class="pm-dot"/>
+<circle cx="139" cy="124" r="6" class="pm-pulse" style="animation-delay:.3s"/>
+<circle cx="139" cy="124" r="6" class="pm-pulse" style="animation-delay:1s"/>
+<text x="148" y="116" class="pm-cityname">LEICESTER</text>
+<text x="148" y="127" class="pm-compname">SWEET THREADS</text>
+<circle cx="894" cy="335" r="4.5" class="pm-dot"/>
+<circle cx="894" cy="335" r="6" class="pm-pulse" style="animation-delay:.6s"/>
+<circle cx="894" cy="335" r="6" class="pm-pulse" style="animation-delay:1.3s"/>
+<text x="854" y="320" class="pm-cityname">LAHORE</text>
+<text x="856" y="331" class="pm-compname">JAGUAR APPAREL</text>
+</svg>
 </div></div>
-<div class="partners-stats"><div class="ps-item sr"><span class="ps-num">420K+</span><span class="ps-lbl">Combined Monthly Garments</span></div><div class="ps-item sr sr-d1"><span class="ps-num">£115M+</span><span class="ps-lbl">Combined Capital</span></div><div class="ps-item sr sr-d2"><span class="ps-num">4</span><span class="ps-lbl">Partner Companies</span></div><div class="ps-item sr sr-d3"><span class="ps-num">3</span><span class="ps-lbl">Countries of Operation</span></div></div>
+<div class="partners-stats"><div class="ps-item sr"><span class="ps-num">390K+</span><span class="ps-lbl">Combined Monthly Garments</span></div><div class="ps-item sr sr-d1"><span class="ps-num">£50M+</span><span class="ps-lbl">Combined Capital</span></div><div class="ps-item sr sr-d2"><span class="ps-num">3</span><span class="ps-lbl">Partner Companies</span></div><div class="ps-item sr sr-d3"><span class="ps-num">3</span><span class="ps-lbl">Countries of Operation</span></div></div>
 <div class="partner-cards">
 <div class="pc sr"><div class="pc-badge"><i class="fas fa-star" style="font-size:.6rem;"></i> Our Company</div><div class="pc-name">AVA MARIE</div><div class="pc-line"></div><p><strong>Location:</strong> Tangier, Morocco</p><p><strong>Capacity:</strong> 250,000+ garments/month</p><p><strong>Capital:</strong> £30 million</p><p><strong>Est.:</strong> 2021</p><p class="pc-desc">Two state-of-the-art production facilities in Tangier's industrial zone.</p></div>
-<div class="pc sr sr-d1"><div class="pc-name">FIGA UK</div><div class="pc-line"></div><p><strong>Location:</strong> England, UK</p><p><strong>Capacity:</strong> 30,000+ garments/month</p><p><strong>Capital:</strong> £50 million</p><p><strong>Est.:</strong> 2005</p><p class="pc-desc">One of the UK's leading fashion manufacturing groups.</p></div>
-<div class="pc sr sr-d2"><div class="pc-name">SWEET THREADS</div><div class="pc-line"></div><p><strong>Location:</strong> England, UK</p><p><strong>Capacity:</strong> 20,000+ garments/month</p><p><strong>Capital:</strong> £15 million</p><p><strong>Est.:</strong> 2018</p><p class="pc-desc">Specialist manufacturer for quick turnaround trend-driven fashion.</p></div>
-<div class="pc sr sr-d3"><div class="pc-name">JAGUAR</div><div class="pc-line"></div><p><strong>Location:</strong> Pakistan</p><p><strong>Capacity:</strong> 120,000+ garments/month</p><p><strong>Capital:</strong> £20 million</p><p><strong>Est.:</strong> 2010</p><p class="pc-desc">High-volume production powerhouse for the world's largest orders.</p></div></div>
+<div class="pc sr sr-d1"><div class="pc-name">SWEET THREADS</div><div class="pc-line"></div><p><strong>Location:</strong> Leicester, England</p><p><strong>Capacity:</strong> 20,000+ garments/month</p><p><strong>Capital:</strong> £5 million</p><p><strong>Est.:</strong> 2017</p><p class="pc-desc">Specialist manufacturer for quick turnaround trend-driven fashion segments.</p></div>
+<div class="pc sr sr-d2"><div class="pc-name">JAGUAR</div><div class="pc-line"></div><p><strong>Location:</strong> Lahore, Pakistan</p><p><strong>Capacity:</strong> 120,000+ garments/month</p><p><strong>Capital:</strong> £15 million</p><p><strong>Est.:</strong> 2010</p><p class="pc-desc">High-volume production powerhouse ensuring direct access to cotton expertise and manufacturing scalability.</p></div></div>
 <section class="clients-section"><div class="eyebrow sr">Our Clients</div><h2 class="display-title sr sr-d1">BRANDS WE <span>MANUFACTURE FOR</span></h2><div class="clients-grid">
 <div class="client-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/2560px-Adidas_Logo.svg.png" alt="Adidas"></div><div class="client-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Asos.svg/1024px-Asos.svg.png" alt="ASOS"></div><div class="client-item"><img src="https://1000logos.net/wp-content/uploads/2018/07/River-Island-Logo-2012.png" alt="River Island"></div><div class="client-item"><img src="https://cdn.influenster.com/media/product/image/1d8620166e73cc7b5a4608d7e86c93be.png" alt="PLT"></div><div class="client-item"><img src="https://static2.hotukdeals.com/images/260x136/images/l/Little_Mistress_Logo.png" alt="Little Mistress"></div><div class="client-item"><img src="https://images.squarespace-cdn.com/content/v1/560314b7e4b0743e1c078a6a/1615143564449-2X08YROXUITV5ON90RBL/logo-inthestyle%402x.png" alt="In The Style"></div><div class="client-item"><img src="https://logos-world.net/wp-content/uploads/2023/03/Fashion-Nova-Logo.png" alt="Fashion Nova"></div><div class="client-item"><img src="https://cdn.freelogovectors.net/wp-content/uploads/2019/01/Boohoo-logo.png" alt="Boohoo"></div><div class="client-item"><img src="https://www.prshots.com/contents/archives/2751/1290/1598/logo/logo_v1.png?v=223_1739204605" alt="Roman"></div><div class="client-item"><img src="https://static.independent.co.uk/s3fs-public/thumbnails/image/2018/05/22/15/isaw-png.png" alt="ISAW"></div><div class="client-item"><img src="https://www.studentsaviour.com/_next/image/?url=http%3A%2F%2F20.77.104.94%3A9000%2Fmedia%2FMissguided%20Logo.png&w=3840&q=75" alt="Missguided"></div>
 </div></section>
-<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Partners</p><div class="ft-links"><a>Ava Marie</a><a>FIGA UK</a><a>Sweet Threads</a><a>Jaguar</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
+<footer><div><div class="ft-logo" onclick="goPage('home')">AVA <span>MARIE</span></div><p class="ft-desc">Premium fashion manufacturing.</p><div class="ft-social"><a href="https://www.instagram.com/avamarie.co/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="https://www.facebook.com/avamariemanufacturing" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/avamarie" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://x.com/avamarie_co" target="_blank" aria-label="X"><i class="fab fa-x-twitter"></i></a><a href="https://www.pinterest.com/avamarie_co/" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></div></div><div><p class="ft-col-h">Navigate</p><div class="ft-links"><a onclick="goPage('home')">Home</a><a onclick="goPage('story')">Our Story</a><a onclick="goPage('services')">Services</a><a onclick="goPage('contact')">Contact</a></div></div><div><p class="ft-col-h">Partners</p><div class="ft-links"><a>Ava Marie</a><a>Sweet Threads</a><a>Jaguar</a></div></div><div><p class="ft-col-h">Contact</p><div class="ft-links"><a href="mailto:Anwar@sweetthreadsltd.com">Anwar@sweetthreadsltd.com</a><a href="tel:+447845847104">+44 7845 847104</a><a onclick="goPage('contact')">Get In Touch →</a></div></div></footer>
 <div class="ft-bottom"><p class="ft-copy">© 2026 Ava Marie Manufacturing</p><span class="ft-quote">"Where vision meets craftsmanship — excellence is our standard."</span></div></div>
 
 <!-- ====== CONTACT — SYMMETRICAL: Form Left, Map+Submit Right ====== -->
@@ -704,20 +754,6 @@ document.getElementById('galZoomWrap').addEventListener('mousedown',function(e){
 document.addEventListener('mousemove',function(e){if(_gzDrag){_gzPanX=e.clientX-_gzSX;_gzPanY=e.clientY-_gzSY;document.getElementById('galZoomImg').style.transform='scale('+_gzScale+') translate('+_gzPanX+'px,'+_gzPanY+'px)'}});
 document.addEventListener('mouseup',function(){_gzDrag=false;var w=document.getElementById('galZoomWrap');if(w)w.classList.remove('dragging')});
 document.getElementById('galZoom').addEventListener('click',function(e){if(e.target===this)galZoomClose()});
-/* LEAFLET MAP INIT */
-let pMap=null;
-function initPartnersMap(){if(pMap)return;const el=document.getElementById('partnersMap');if(!el||!el.offsetParent)return;pMap=L.map('partnersMap',{center:[33,30],zoom:3,minZoom:2,maxZoom:7,zoomControl:true,attributionControl:false,scrollWheelZoom:false});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd'}).addTo(pMap);
-const goldIcon=L.divIcon({className:'gold-marker',html:'<div class="gold-marker-dot"></div><div class="gold-marker-pulse"></div>',iconSize:[18,18],iconAnchor:[9,9],popupAnchor:[0,-14]});
-const markers=[
-{lat:35.7595,lng:-5.834,title:'AVA MARIE',desc:'Headquarters & Production — Tangier, Morocco. 250,000+ garments/month across two state-of-the-art facilities in Zone Industrielle Gzenaya.'},
-{lat:52.6369,lng:-1.1398,title:'FIGA STORE LIMITED',desc:'Leicester, England — Est. 2009. Specializing in structured garments and workwear. Setting the standard for precision and compliance.'},
-{lat:52.6250,lng:-1.1200,title:'SWEET THREADS LTD',desc:'Leicester, England — Est. 2017. Fast-moving fashion segments, strengthening agility in high-demand markets.'},
-{lat:31.5204,lng:74.3587,title:'JAGUAR APPAREL',desc:'Lahore, Pakistan — 120,000+ garments/month. Direct access to cotton expertise and large-scale manufacturing scalability.'}
-];
-markers.forEach(m=>{const mk=L.marker([m.lat,m.lng],{icon:goldIcon}).addTo(pMap).bindPopup('<div class="lf-popup-title">'+m.title+'</div><div class="lf-popup-desc">'+m.desc+'</div>',{className:'lf-popup',maxWidth:260});mk.on('mouseover',function(){this.openPopup()});mk.on('click',function(){this.openPopup()})});
-setTimeout(()=>pMap.invalidateSize(),300)}
-const origGoPage=goPage;goPage=async function(id){await origGoPage.call(this,id);if(id==='partners')setTimeout(initPartnersMap,200)};
 function portShowCat(k){var d=galData[k];if(!d)return;window._galImgs=d.imgs;document.getElementById('portCats').style.display='none';var pg=document.getElementById('portGrid');pg.style.display='block';document.getElementById('portCatTitle').innerHTML=d.title.replace(/—/g,'<span>—</span>');var items=document.getElementById('portItems');items.innerHTML='';d.imgs.forEach(function(src,i){var div=document.createElement('div');div.className='gal-grid-item';div.onclick=function(){galZoomOpen(i)};var img=document.createElement('img');img.src=src;img.alt=d.title+' '+(i+1);img.loading='lazy';div.appendChild(img);items.appendChild(div)});window.scrollTo(0,document.getElementById('portGrid').offsetTop-72)}
 function portBack(){document.getElementById('portCats').style.display='block';document.getElementById('portGrid').style.display='none';window.scrollTo(0,document.getElementById('portCats').offsetTop-72)}
 function submitForm(btn){btn.innerHTML='<span>SENT SUCCESSFULLY ✓</span>';btn.style.background='var(--gold)';btn.style.color='var(--dark)';setTimeout(()=>{btn.innerHTML='<span>SEND MESSAGE &nbsp;→</span>';btn.style.background='';btn.style.color=''},3000)}
