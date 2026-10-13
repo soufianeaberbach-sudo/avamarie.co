@@ -6,23 +6,42 @@ Disallow: /login.html
 Disallow: /views/
 Disallow: /api/
 
-# Sitemap
 Sitemap: https://avamarie.co/sitemap.xml
 
-# Search crawlers — full access to public marketing content
+# Search retrieval crawlers — full access to public content, same restrictions as above
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /erp.html
+Disallow: /login.html
+Disallow: /views/
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /erp.html
+Disallow: /login.html
+Disallow: /views/
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin/
+Disallow: /erp.html
+Disallow: /login.html
+Disallow: /views/
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin/
+Disallow: /erp.html
+Disallow: /login.html
+Disallow: /views/
+Disallow: /api/
 
-# Training crawlers — disallow; search retrieval access above is sufficient
+# AI training crawlers — disallow all
 User-agent: GPTBot
 Disallow: /
 
