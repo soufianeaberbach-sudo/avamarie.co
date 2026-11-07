@@ -12,12 +12,19 @@
     // API requests, legacy redirects and Admin SPA deep links reach the Worker.
     "run_worker_first": ["/api/*", "/admin", "/admin/*", "/index", "/index/"]
   },
+  "kv_namespaces": [
+    {
+      "binding": "CONTACT_ENQUIRIES",
+      "id": "c0db1995db8743888ccc54d79f033802"
+    }
+  ],
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "production",
     "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co"
   }
-  // Activation only: add dedicated CONTACT_ENQUIRIES KV and CONTACT_RATE_LIMITER.
+  // Dedicated avamarie-contact-enquiries KV is bound above.
+  // Activation still requires CONTACT_RATE_LIMITER and the documented variables/secrets.
   // No invented resource identifiers. See docs/CONTACT-ACTIVATION.md.
   // RESEND_API_KEY and TURNSTILE_SECRET are secrets; never put them here.
 }
