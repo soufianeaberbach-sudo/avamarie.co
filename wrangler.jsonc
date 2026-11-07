@@ -30,7 +30,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "production",
-    "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co"
+    "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co",
+    "CONTACT_FROM_EMAIL": "no-reply@avamarie.co",
+    "CONTACT_TO_EMAIL": "soufiane@avamarie.ma",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAF3mHpSgYR1mifsQ"
   }
   // Dedicated enquiry KV and native rate limiter are bound above.
   // Activation still requires the documented variables/secrets and account checks.
