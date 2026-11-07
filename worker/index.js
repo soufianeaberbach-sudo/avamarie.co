@@ -99,7 +99,7 @@ async function providerJson(url, options, timeout) {
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
     const response = await fetch(url, { ...options, signal: controller.signal, redirect: 'error' });
-    if (!response.ok) throw new Error('provider_rejected');
+    if (!response.ok) { const error = new Error('provider_rejected'); error.status = response.status; throw error; }
     return await response.json();
   } finally { clearTimeout(timer); }
 }
@@ -125,7 +125,18 @@ async function contact(request, env, url) {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ secret: env.TURNSTILE_SECRET, response: raw.token, ...(ip ? { remoteip: ip } : {}) }),
     }, 8000);
-  } catch { reject(503, 'verification_unavailable', 'Security verification is unavailable. Please try again.'); }
+  } catch (error) {
+    // Operational diagnostics only: never log Turnstile tokens, secrets, IPs or enquiry data.
+    const reason = error?.message === 'provider_rejected' ? 'provider_http_error'
+      : error?.name === 'AbortError' ? 'timeout'
+      : error instanceof SyntaxError ? 'invalid_json'
+      : error instanceof TypeError ? 'fetch_error' : 'unexpected_error';
+    console.warn(JSON.stringify({
+      event: 'contact_turnstile_siteverify_unavailable', reason,
+      ...(Number.isInteger(error?.status) ? { httpStatus: error.status } : {}),
+    }));
+    reject(503, 'verification_unavailable', 'Security verification is unavailable. Please try again.');
+  }
   const expectedHostname = isLocal(url, env) ? 'dummy-key-pass' : url.hostname;
   if (verification.success !== true || verification.action !== ACTION || verification.hostname !== expectedHostname) {
     reject(400, 'verification', 'Security verification failed. Please try again.');
