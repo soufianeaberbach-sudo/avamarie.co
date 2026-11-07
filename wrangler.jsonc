@@ -12,12 +12,31 @@
     // API requests, legacy redirects and Admin SPA deep links reach the Worker.
     "run_worker_first": ["/api/*", "/admin", "/admin/*", "/index", "/index/"]
   },
+  "kv_namespaces": [
+    {
+      "binding": "CONTACT_ENQUIRIES",
+      "id": "c0db1995db8743888ccc54d79f033802"
+    }
+  ],
+  // No conflicts found in audited repository configs; account-wide uniqueness
+  // is unverified. See docs/CONTACT-ACTIVATION.md before production activation.
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "1862459001",
+      "simple": { "limit": 20, "period": 60 }
+    }
+  ],
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "production",
-    "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co"
+    "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co",
+    "CONTACT_FROM_EMAIL": "no-reply@avamarie.co",
+    "CONTACT_TO_EMAIL": "soufiane@avamarie.ma",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAF3mHpSgYR1mifsQ"
   }
-  // Activation only: add dedicated CONTACT_ENQUIRIES KV and CONTACT_RATE_LIMITER.
-  // No invented resource identifiers. See docs/CONTACT-ACTIVATION.md.
+  // Dedicated enquiry KV and native rate limiter are bound above.
+  // Activation still requires the documented variables/secrets and account checks.
+  // KV ID supplied by the owner; rate-limit ID is project-selected.
   // RESEND_API_KEY and TURNSTILE_SECRET are secrets; never put them here.
 }

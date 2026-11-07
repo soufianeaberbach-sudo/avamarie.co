@@ -98,8 +98,11 @@ Rate limiting يستخدم Cloudflare native binding وهو تقريبي لكل 
    الصادرة من Resend دون تخمين أو تعديل هوية portfolio.
 3. إنشاء Turnstile widget مستقل وallowed hostnames الفعلية، وضبط الموقع العام
    `TURNSTILE_SITE_KEY` والسر `TURNSTILE_SECRET` من الـwidget نفسه.
-4. إنشاء/ربط KV مستقل باسم binding `CONTACT_ENQUIRIES` بمعرف حقيقي؛ تحديد
-   namespace identifier غير مستخدم لـ`CONTACT_RATE_LIMITER` وحد 20 محاولة/60 ثانية.
+4. التحقق من KV المخصص المضاف `CONTACT_ENQUIRIES` بالمعرّف
+   `c0db1995db8743888ccc54d79f033802`. أُضيف Native Rate Limiting باسم
+   `CONTACT_RATE_LIMITER` ومعرّف `1862459001` وحد 20 محاولة/60 ثانية. لم يظهر تعارض
+   في الإعدادات المتاحة، لكن التفرد على مستوى حساب Cloudflare غير متحقق؛ يلزم فحصه
+   قبل التفعيل وفق دليل التشغيل. هذا الربط ليس KV.
 5. ضبط `CONTACT_TO_EMAIL` من المالك و`CONTACT_FROM_EMAIL` على هوية الإرسال المتحققة،
    وضبط `RESEND_API_KEY` المستقل كـSecret، و`ENVIRONMENT=production` و`CONTACT_ORIGINS`.
 6. إعادة الفحوص وDry run، ثم Deploy المصرح به، وفحص API والملفات العامة وحجب ملفات التطوير.
@@ -109,8 +112,8 @@ Rate limiting يستخدم Cloudflare native binding وهو تقريبي لكل 
    إرسال تلقائية، ولا حذف سجل لمجرد غياب علامة قبول، فقد يكون رد المزود قد ضاع.
 
 القيم التي لا تزال تتطلب المالك: المستلم، عنوان ونطاق الإرسال المتحقق وسجلاته،
-Resend key، مفتاحا Turnstile، KV namespace ID المستقل، rate-limit namespace identifier
-المتاح، تأكيد حساب/مسارات Cloudflare وأي صلاحيات نشر وسياسة احتفاظ وخصوصية ملائمة.
+Resend key، مفتاحا Turnstile، تأكيد حساب KV وتفرد rate-limit namespace ID على مستوى
+الحساب، تأكيد حساب/مسارات Cloudflare وأي صلاحيات نشر وسياسة احتفاظ وخصوصية ملائمة.
 
 ## F — تأكيد السلامة
 
