@@ -1,15 +1,23 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "avamarie",
-  "compatibility_date": "2026-04-18",
-  "observability": {
-    "enabled": true
-  },
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-07",
+  "build": { "command": "npm run build" },
+  "observability": { "enabled": true },
   "assets": {
-    "directory": ".",
-    "not_found_handling": "404-page"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // API requests, legacy redirects and Admin SPA deep links reach the Worker.
+    "run_worker_first": ["/api/*", "/admin", "/admin/*", "/index", "/index/"]
   },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENVIRONMENT": "production",
+    "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co"
+  }
+  // Activation only: add dedicated CONTACT_ENQUIRIES KV and CONTACT_RATE_LIMITER.
+  // No invented resource identifiers. See docs/CONTACT-ACTIVATION.md.
+  // RESEND_API_KEY and TURNSTILE_SECRET are secrets; never put them here.
 }

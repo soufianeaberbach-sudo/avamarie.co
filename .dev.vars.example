@@ -1,0 +1,9 @@
+# LOCAL ONLY. Never copy these testing keys to production.
+# Cloudflare's documented always-pass test key pair. Verification is NOT skipped.
+ENVIRONMENT="development"
+TURNSTILE_SITE_KEY="1x00000000000000000000AA"
+TURNSTILE_SECRET="1x0000000000000000000000000000000AA"
+# No real email credentials are needed for automated tests. Fake key intentionally rejects live calls.
+RESEND_API_KEY="local-placeholder-not-a-real-key"
+CONTACT_TO_EMAIL="owner@example.com"
+CONTACT_FROM_EMAIL="sender@example.com"
