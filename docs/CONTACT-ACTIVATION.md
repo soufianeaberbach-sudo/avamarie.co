@@ -88,33 +88,46 @@ outside the repo, must permit Turnstile scripts and frames from
 
 ## 4. Create dedicated recovery storage and abuse control
 
-Check existing namespaces in the correct account before creating one:
+The owner-created namespace `avamarie-contact-enquiries` is already declared in
+`wrangler.jsonc` as `CONTACT_ENQUIRIES`, ID
+`c0db1995db8743888ccc54d79f033802`. Confirm it belongs to the intended Cloudflare
+account at activation; do not create a duplicate or reuse portfolio's `BRIEFS`.
+No R2, uploads, queue or automatic resend mechanism is needed. Use isolated
+resources for staging; never bind preview to production customer data.
 
-```sh
-npx wrangler kv namespace list
-npx wrangler kv namespace create avamarie-CONTACT_ENQUIRIES \
-  --binding CONTACT_ENQUIRIES --update-config
-```
-
-The second command is necessary only if a dedicated Ava Marie namespace does not
-already exist. It writes the **real** `kv_namespaces` binding/id into Wrangler.
-Verify that it is not portfolio's `BRIEFS` namespace. Do not reuse or copy any
-portfolio IDs. No R2, uploads, queue or automatic resend mechanism is needed.
-Use isolated resources for any staging Worker; never bind preview to production
-customer data.
-
-For rate limiting, inventory existing rate-limit namespace IDs in this account
-and choose an **unused positive integer**, unique to Ava Marie. This is an
-owner-selected identifier, not a KV namespace ID. Add this top-level entry in
-`wrangler.jsonc`, replacing the explanatory placeholder before using Wrangler:
+The native Rate Limiting binding is also committed (it is **not KV**):
 
 ```jsonc
 "ratelimits": [{
   "name": "CONTACT_RATE_LIMITER",
-  "namespace_id": "<owner-selected-unused-positive-integer>",
+  "namespace_id": "1862459001",
   "simple": { "limit": 20, "period": 60 }
 }]
 ```
+
+`1862459001` is a project-selected positive integer expressed as a string, as
+required by Cloudflare's schema. It is not an existing KV namespace identifier,
+and no resource creation or deployment was performed to choose it.
+
+**Conflict audit, 7 November 2026:** ten Wrangler config snapshots across the
+accessible Ava Marie remote branch refs (including main and this PR branch) had
+no native rate-limit namespace IDs. The current read-only `portfolio` default
+branch config (blob `9f337872127f39881cdbdab93c1e219bfcb9e134`) also has none.
+`TECHFA`'s visible default-branch tree has no Wrangler config, and the separate
+`avamarie` repository is empty (GitHub HTTP 409). GitHub code searches for
+`ratelimits` and `namespace_id` under the owner's repositories returned only the
+activation-document example. No conflict with the chosen ID was found in these
+accessible configurations; search indexing is not an authoritative inventory.
+
+**Account-wide uniqueness is unverified.** This audit did not enumerate every
+live Worker/environment, dashboard-only config, other owner's repository, or
+unavailable private config in the Cloudflare account. Matching IDs can share
+counters across Workers, so before approved production activation the owner must
+check all live rate-limit bindings in that account for `1862459001` (through an
+authorized Workers settings/API inventory). If already used by an unrelated
+binding, choose another unused positive integer and revalidate this config.
+Do not change portfolio/aberbach.co resources to free an ID. The dry run checks
+configuration/bundling; it does not establish global uniqueness or live quotas.
 
 This uses Cloudflare's supported native Rate Limiting binding (Wrangler >=4.36).
 The Worker hashes `CF-Connecting-IP` for this limiter and never persists the IP
@@ -130,8 +143,8 @@ origin checks, bounded JSON, validation and honeypot remain additional controls.
 | Name | Kind | Required owner value |
 |---|---|---|
 | `ASSETS` | assets binding | `./dist`, committed |
-| `CONTACT_ENQUIRIES` | KV binding | dedicated real namespace from step 4 |
-| `CONTACT_RATE_LIMITER` | rate-limit binding | unique namespace identifier from step 4 |
+| `CONTACT_ENQUIRIES` | KV binding | committed owner-provided namespace; verify account at activation |
+| `CONTACT_RATE_LIMITER` | native rate-limit binding | committed ID `1862459001`, 20/60s; account-wide conflict check still required |
 | `ENVIRONMENT` | variable | `production` |
 | `CONTACT_ORIGINS` | variable | exact HTTPS origins, comma-separated; committed apex/www default |
 | `CONTACT_TO_EMAIL` | variable | owner-selected recipient mailbox |

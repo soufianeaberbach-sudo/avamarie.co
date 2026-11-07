@@ -18,13 +18,22 @@
       "id": "c0db1995db8743888ccc54d79f033802"
     }
   ],
+  // No conflicts found in audited repository configs; account-wide uniqueness
+  // is unverified. See docs/CONTACT-ACTIVATION.md before production activation.
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "1862459001",
+      "simple": { "limit": 20, "period": 60 }
+    }
+  ],
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "production",
     "CONTACT_ORIGINS": "https://avamarie.co,https://www.avamarie.co"
   }
-  // Dedicated avamarie-contact-enquiries KV is bound above.
-  // Activation still requires CONTACT_RATE_LIMITER and the documented variables/secrets.
-  // No invented resource identifiers. See docs/CONTACT-ACTIVATION.md.
+  // Dedicated enquiry KV and native rate limiter are bound above.
+  // Activation still requires the documented variables/secrets and account checks.
+  // KV ID supplied by the owner; rate-limit ID is project-selected.
   // RESEND_API_KEY and TURNSTILE_SECRET are secrets; never put them here.
 }
