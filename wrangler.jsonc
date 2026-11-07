@@ -9,8 +9,8 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    // All API methods, including browser-navigation POSTs, must reach the Worker.
-    "run_worker_first": ["/api/*"]
+    // API requests, legacy redirects and Admin SPA deep links reach the Worker.
+    "run_worker_first": ["/api/*", "/admin", "/admin/*", "/index", "/index/"]
   },
   "compatibility_flags": ["nodejs_compat"],
   "vars": {

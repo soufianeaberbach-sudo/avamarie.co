@@ -166,10 +166,28 @@ async function contact(request, env, url) {
   }
   return json(200, { ok: true, reference: id, message: 'Thank you. Your message has been submitted successfully.' });
 }
+// These are the routes declared by the existing compiled Admin router.
+// Scope the shell fallback to real SPA routes; missing bundles and unknown paths
+// retain a genuine 404. Static serving is routing, not an authentication bypass.
+const ADMIN_ROUTE = /^\/admin\/(?:models(?:\/[^/]+)?|orders|planning|cutting|sewing|finishing|packing|materials|settings)\/?$/;
+async function website(request, env, url) {
+  if (url.pathname === '/index' || url.pathname === '/index/') {
+    return new Response(null, { status: 301, headers: { Location: `/${url.search}` } });
+  }
+  const asset = await env.ASSETS.fetch(request);
+  if (asset.status === 404 && ['GET', 'HEAD'].includes(request.method) && ADMIN_ROUTE.test(url.pathname)) {
+    // Fetch the canonical directory URL: /admin/index.html would redirect back
+    // to /admin/ under Cloudflare's default HTML handling and lose the SPA route.
+    const shell = new URL(request.url);
+    shell.pathname = '/admin/';
+    return env.ASSETS.fetch(new Request(shell, request));
+  }
+  return asset;
+}
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    if (!url.pathname.startsWith('/api/')) return website(request, env, url);
     try {
       if (url.pathname === '/api/contact-config') {
         if (request.method !== 'GET') return json(405, { ok: false, code: 'method' }, { Allow: 'GET' });

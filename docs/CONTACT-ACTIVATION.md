@@ -28,18 +28,27 @@ npx wrangler whoami
 Requires Node 22.18+ (tested with 24), Python 3, pinned Wrangler 4.158.0. The build
 remains `scripts/build.py` from `index.html`; `scripts/stage_assets.py` stages the
 public allowlist into `dist/`. Wrangler runs `npm run build` automatically.
-Never set `assets.directory` back to `.`. `/api/*` must keep `run_worker_first`;
-otherwise HTML-navigation requests can be intercepted by the asset router.
-The seven public entry points all use `/js/contact.js`. The legacy Netlify form
-attributes and handler are replaced; unrelated `netlify.toml` remains unchanged.
-A Netlify-only deployment will not supply this Cloudflare API.
+Never set `assets.directory` back to `.`. Keep the committed selective
+`run_worker_first` routes for `/api/*`, `/admin`, `/admin/*`, `/index` and `/index/`.
+The Worker handles API methods before static routing, canonical legacy redirects,
+and real Admin SPA deep links. Other static requests keep asset-first serving;
+`not_found_handling:404-page` preserves genuine 404s without a global SPA fallback.
+The seven public entry points all use `/js/contact.js`. This repository runs
+exclusively on Cloudflare; no retired hosting or Identity widget is required.
+See [the migration audit](CLOUDFLARE-ONLY.ar.md) for authentication findings and
+external services that the owner must disconnect separately.
 
 Review current automatic deployment hooks before merging this PR. For a Workers
 Builds project use `npm ci` then `npx wrangler deploy` with its build command
 configured here; avoid another pipeline overwriting the result with assets-only
-uploads. No production routes are newly hardcoded in this PR. Confirm the existing
+uploads. No account-level custom domains or zone routes are added by this PR. Confirm the existing
 custom domain points to Worker `avamarie`, and that both API and static paths use
-that Worker. If `www.avamarie.co` redirects to the apex, preserve the redirect.
+that Worker. `/index` and `/index/` return 301 to `/` preserving the query string;
+Admin routes such as `/admin/orders` and `/admin/models/AM-001` render the existing
+app directly and survive refresh. Missing Admin bundles and unknown URLs return
+404, not the Admin shell. Add any future real Admin routes to the scoped Worker
+matcher when changing the compiled app router. If `www.avamarie.co` redirects
+to the apex, preserve the redirect.
 Do not create/change domain or DNS records until separately approved.
 
 ## 2. Configure a dedicated Resend sender
@@ -269,6 +278,8 @@ recipient, keys and storage; it is not implicitly allowed on workers.dev.
 
 ## Official references checked 7 November 2026
 
+- [Cloudflare HTML handling](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/)
+- [Cloudflare redirects and Worker limitations](https://developers.cloudflare.com/workers/static-assets/redirects/)
 - [Worker-first asset routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
 - [Native rate limiting and accuracy](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
 - [Turnstile Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)

@@ -25,14 +25,16 @@ portfolio عند `e72bec76978b89985b9621e64c34f8d4aac59e0e` دون تعديل م
 | `index.html` — معدل | ربط النموذج، حدود الحقول، labels، fallback إلى عنوان الأعمال الموجود، إزالة معالجة Netlify القديمة |
 | `contact/`, `our-story/`, `manufacturing/`, `services/`, `portfolio/`, `partners/` | إعادة التوليد باستخدام `scripts/build.py` دون تعديل مستقل |
 | `scripts/stage_assets.py` — جديد | Allowlist للملفات العامة إلى `dist/`؛ رفض hidden files وsymlinks والصيغ غير المراجعة |
-| `wrangler.jsonc` — معدل | نقطة دخول Worker وASSETS و`run_worker_first:["/api/*"]` والبناء؛ دون اختلاق Resource IDs |
+| `wrangler.jsonc` — معدل | نقطة دخول Worker وASSETS وتوجيه API وAdmin والتحويلات قبل الأصول والبناء؛ دون اختلاق Resource IDs |
 | `package.json`, `package-lock.json`, `playwright.config.js` — جديدة | أدوات اختبار وبناء محلية بإصدارات مثبتة؛ لا Runtime dependencies |
 | `tests/worker.test.js`, `tests/test_site.py`, `tests/browser/contact.spec.js` — جديدة | اختبارات Backend والمتصفح والحفاظ على الموقع |
 | `.github/workflows/contact-checks.yml` — جديد | فحوص Pull Request؛ لا Deploy فعلي |
 | `.gitignore`, `.dev.vars.example` | حماية ملفات الأسرار والمخرجات؛ مفاتيح Turnstile الاختبارية العامة للتطوير فقط |
 | `docs/CONTACT-ACTIVATION.md` | دليل التشغيل والتفعيل والاسترداد المرتب للمالك |
 
-أُبقي `scripts/build.py` و`netlify.toml` دون تغيير. لم يتغير ترتيب الحقول أو إلزاميتها:
+أُبقي `scripts/build.py` دون تغيير. في التحديث الإلزامي أُزيل `netlify.toml` وسكربت
+Netlify Identity ومعالجه بالكامل؛ نُقل التوجيه المطلوب إلى Worker. راجع
+[تقرير Cloudflare-only](CLOUDFLARE-ONLY.ar.md). لم يتغير ترتيب الحقول أو إلزاميتها:
 Email وMessage مطلوبان؛ بقية الحقول اختيارية. الحد الكلي للطلب 16 KiB، والرسالة
 5000 حرف وفق طول JavaScript، مع حدود منفصلة للحقول وتطبيع المسافات/الأسطر.
 يُرفض JSON غير السليم والأنواع غير المدعومة والأساليب غير المسموحة.
@@ -55,9 +57,8 @@ Rate limiting يستخدم Cloudflare native binding وهو تقريبي لكل 
 
 ## C — التحقق وحدوده
 
-- `npm test`: **69 Backend tests** و**4 مجموعات Website regression** ناجحة.
-- `npm run test:browser`: **36 حالة متصفح ناجحة** (35 في التشغيل الكامل، ثم نجح
-  اختبار no-JavaScript المصحح بإعادة تشغيل موجهة)؛ تشمل مسارات
+- `npm test`: **87 Backend/routing tests** و**6 مجموعات Website regression** ناجحة.
+- `npm run test:browser`: **40 حالة متصفح**؛ تشمل مسارات
   النجاح والفشل والتكرار والمهلة وJavaScript المعطّل والتنقل والاستجابة على الهاتف.
 - عشر مقارنات صور كاملة مع `main`: Home وContact وManufacturing وServices وPortfolio
   بعرض 1440 و390؛ تتطابق الصور في بيئة الاختبار المضبوطة.
@@ -116,7 +117,8 @@ Resend key، مفتاحا Turnstile، KV namespace ID المستقل، rate-limi
 - التصميم: CSS وترتيب الحقول وصفحات الأعمال محفوظة؛ المقارنات المضبوطة متطابقة.
 - SEO وcanonical وstructured data: محفوظة ومقارنة آليًا.
 - الصور والفيديو والملفات الثابتة السابقة: لم تتغير؛ فُحصت مطابقة المحتوى العام.
-- Admin/ERP: الملفات محفوظة وتقديم الصفحات الثابتة مختبر؛ تسجيل الدخول والعمليات
-  المتصلة ببيانات حقيقية **غير مختبرة** ولم تُعدل.
+- Admin/ERP: الملفات محفوظة. اختُبر تشغيل مسارات Admin العميقة وتحديث الصفحة،
+  وERP guard ورفض كلمة مرور خاطئة وDemo sign-in وlogout محليًا. هذه ليست
+  مصادقة خادم آمنة؛ بيانات الإنتاج والحماية الخارجية **غير متحققة** ولم تُعدل.
 - aberbach.co/portfolio: مرجع للقراءة فقط؛ working tree نظيف، ولم تُعدل موارده أو أسراره.
 - الإنتاج وDNS وCloudflare وResend: لم تُجرَ تغييرات خارجية أو اختبارات بريد حقيقية.

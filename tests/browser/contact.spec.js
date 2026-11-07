@@ -83,3 +83,31 @@ test('network timeout re-enables form and preserves customer input',async({page}
 });
 test('unavailable Turnstile script preserves data and re-enables submission',async({page})=>{await setup(page);await page.route('**/turnstile/v0/api.js?render=explicit',route=>route.abort());await button(page).click();await expect(status(page)).toContainText('could not load');await expect(button(page)).toBeEnabled();await expect(page.locator('#contact-email')).toHaveValue('customer@example.com');});
 test('mobile navigation and form submission',async({page})=>{await page.setViewportSize({width:390,height:844});await setup(page);await page.evaluate(()=>window.goPage('home'));await page.locator('#ham').click();await page.locator('#mobileMenu .mob-link[href="/contact/"]').click();await expect(page.locator('#pg-contact')).toHaveClass(/active/);await page.route('**/api/contact',route=>route.fulfill({json:success}));await button(page).click();await expect(status(page)).toHaveText(success.message);});
+test('Cloudflare legacy redirects, real Admin routes, and genuine 404s',async({request})=>{
+ const base='http://127.0.0.1:8787';
+ for(const path of ['/index','/index/']){for(const method of ['GET','HEAD']){const r=await request.fetch(base+path+'?source=legacy',{method,maxRedirects:0});expect(r.status()).toBe(301);expect(r.headers().location).toBe('/?source=legacy');}}
+ const shell=await (await request.get(base+'/admin/')).text();
+ for(const path of ['/admin/models','/admin/models/AM-001','/admin/orders','/admin/planning','/admin/cutting','/admin/sewing','/admin/finishing','/admin/packing','/admin/materials','/admin/settings']){const r=await request.get(base+path+'?filter=open');expect(r.status()).toBe(200);expect(await r.text()).toBe(shell);const head=await request.head(base+path);expect(head.status()).toBe(200);expect(await head.body()).toHaveLength(0);}
+ for(const path of ['/unknown-page','/admin/unknown-page','/admin/assets/missing.js','/missing.png']){const r=await request.get(base+path,{headers:{Accept:'text/html'}});expect(r.status()).toBe(404);expect(await r.text()).toContain('404');}
+ expect((await request.post(base+'/admin/orders',{data:'not a form endpoint'})).status()).toBe(405);
+ for(const accept of ['text/html','application/json']){const r=await request.get(base+'/api/contact-config',{headers:{Accept:accept}});expect(r.status()).toBe(503);expect((await r.json()).ok).toBe(false);}
+});
+test('Admin deep links boot their independent app and survive refresh',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',route=>new URL(route.request().url()).origin==='http://127.0.0.1:8787'?route.continue():route.abort());
+ await page.goto('http://127.0.0.1:8787/admin/orders');await expect(page.locator('#root')).toContainText('Orders');await page.reload();await expect(page.locator('#root')).toContainText('Orders');
+ await page.goto('http://127.0.0.1:8787/admin/models');await expect(page.locator('#root')).toContainText('Models');expect(errors).toEqual([]);
+});
+test('legacy ERP guard, failed sign-in, demo sign-in and logout stay independent',async({page})=>{
+ await page.route('**/*',route=>{const url=new URL(route.request().url());if(url.hostname==='unpkg.com')return route.fulfill({contentType:'application/javascript',body:'window.lucide={createIcons(){}};'});return url.origin==='http://127.0.0.1:8787'?route.continue():route.abort();});
+ await page.goto('http://127.0.0.1:8787/erp.html');await expect(page).toHaveURL(/\/login(?:\.html)?$/);
+ await page.locator('#email').fill('local-qa@example.com');await page.locator('#password').fill('incorrect');await page.getByRole('button',{name:'Sign In to ERP'}).click();await expect(page.locator('#errorMsg')).toContainText('Incorrect password');expect(await page.evaluate(()=>sessionStorage.getItem('erp_auth'))).toBeNull();
+ await page.locator('#password').fill('avamarie2026');await page.getByRole('button',{name:'Sign In to ERP'}).click();await expect(page).toHaveURL(/\/erp(?:\.html)?$/);await expect(page.locator('#sec-dashboard')).toHaveAttribute('data-loaded','1');
+ await page.getByRole('button',{name:'Logout',exact:true}).click();await expect(page).toHaveURL(/\/login(?:\.html)?$/);expect(await page.evaluate(()=>sessionStorage.getItem('erp_auth'))).toBeNull();
+});
+test('public entry points request no retired platform resources',async({page})=>{
+ const retired=[];page.on('request',r=>{if(/netlify|gotrue/i.test(r.url()))retired.push(r.url());});
+ await page.route('**/*',route=>new URL(route.request().url()).origin==='http://127.0.0.1:8080'?route.continue():route.abort());
+ for(const path of ['/','/contact/','/our-story/','/manufacturing/','/services/','/portfolio/','/partners/']){await page.goto(path);await expect(page.locator('form[name="contact"]')).toHaveCount(1);}
+ expect(retired).toEqual([]);
+});
