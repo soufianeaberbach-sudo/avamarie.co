@@ -1,0 +1,17 @@
+{
+  "name": "avamarie-contact",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "build": "python3 scripts/build.py && python3 scripts/stage_assets.py",
+    "dev": "wrangler dev --local",
+    "test": "node tests/worker.test.js && python3 -m unittest discover -s tests -p 'test_*.py'",
+    "test:browser": "playwright test",
+    "check": "npm test && npm run test:browser && wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "wrangler": "4.158.0"
+  }
+}
