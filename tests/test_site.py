@@ -64,6 +64,14 @@ class SiteRegression(unittest.TestCase):
             path.symlink_to(ROOT/'worker/index.js')
             with self.assertRaises(ValueError):module.stage()
         finally:path.unlink()
+        path=ROOT/'untrusted-public-dir'
+        module.PUBLIC.append(path.name)
+        try:
+            path.symlink_to(ROOT/'js', target_is_directory=True)
+            with self.assertRaises(ValueError):module.stage()
+        finally:
+            path.unlink()
+            module.PUBLIC.pop()
         module.stage()
 
 if __name__ == '__main__': unittest.main()

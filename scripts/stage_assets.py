@@ -26,6 +26,8 @@ def stage():
     out.mkdir()
     for entry in PUBLIC:
         source = ROOT / entry
+        if source.is_symlink():
+            raise ValueError(f'Unsafe public asset: {entry}')
         paths = sorted(source.rglob('*')) if source.is_dir() else [source]
         for path in paths:
             rel = path.relative_to(ROOT)
