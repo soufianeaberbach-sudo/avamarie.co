@@ -98,7 +98,9 @@ async function providerJson(url, options, timeout) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
-    const response = await fetch(url, { ...options, signal: controller.signal, redirect: 'error' });
+    // Workers does not support redirect: 'error' (throws TypeError before network I/O).
+    // Manual redirects stay blocked by the response.ok check below.
+    const response = await fetch(url, { ...options, signal: controller.signal, redirect: 'manual' });
     if (!response.ok) { const error = new Error('provider_rejected'); error.status = response.status; throw error; }
     return await response.json();
   } finally { clearTimeout(timer); }
