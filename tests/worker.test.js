@@ -51,7 +51,7 @@ test('valid submission: normalized fields, private storage, provider acceptance 
     assert.ok(email.text.includes(`${label}: ${value}`));
     assert.ok(email.html.includes(label)); assert.ok(email.html.includes(value));
   }
-  for (const heading of ['Contact Details','Company','Message','Reference / Metadata']) assert.match(email.html, new RegExp(`<h2[^>]*>${heading}</h2>`));
+  for (const heading of ['Contact Details','Company','Message','REFERENCE / METADATA']) assert.match(email.html, new RegExp(`<h2[^>]*>${heading}</h2>`));
   assert.ok(email.text.includes(body.message)); assert.ok(email.html.includes(body.message));
   assert.equal(res.headers.get('access-control-allow-origin'), null);
   assert.equal(res.headers.get('cache-control'), 'no-store');
@@ -80,8 +80,9 @@ test('customer HTML is escaped in HTML and preserved as plain text', async t => 
   assert.doesNotMatch(email.html, /<(script|b)\b/i);
   assert.match(email.html, /<img src="https:\/\/avamarie\.co\/AVA%20MARIE\/icon\.png"/);
   assert.doesNotMatch(email.html, /<img[^>]+onerror=|javascript:/i);
-  assert.match(email.html, /#D4AF37/);
-  assert.match(email.html, /mailto:client@example\.com/);
+  assert.match(email.html, /background-color:#FFFFFF/);
+  assert.match(email.html, /AVA <span style="color:#C09D38;">MARIE<\/span>/);
+  assert.doesNotMatch(email.html, /background(?:-color)?:#(?:F5F1EB|1A1714)/i);
   assert.match(email.text, /<script>/);
 });
 for (const key of ['RESEND_API_KEY','CONTACT_TO_EMAIL','CONTACT_FROM_EMAIL','TURNSTILE_SITE_KEY','TURNSTILE_SECRET','CONTACT_ORIGINS','CONTACT_ENQUIRIES','CONTACT_RATE_LIMITER']) {
