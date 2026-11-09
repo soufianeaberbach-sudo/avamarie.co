@@ -42,7 +42,17 @@ test('valid submission: normalized fields, private storage, provider acceptance 
   assert.ok(h.writes.every(w => w.config.expirationTtl === 90 * 86400));
   const email = JSON.parse(h.calls[1].init.body);
   assert.equal(email.reply_to, body.email); assert.deepEqual(email.to, [h.env.CONTACT_TO_EMAIL]);
-  assert.match(email.subject, /Ava Marie website enquiry/); assert.equal(email.html, undefined);
+  assert.equal(email.subject, 'New Website Enquiry — Ava Marie');
+  assert.equal(typeof email.html, 'string'); assert.equal(typeof email.text, 'string');
+  assert.equal(email.from, h.env.CONTACT_FROM_EMAIL);
+  assert.equal(h.calls[1].init.headers.Authorization, `Bearer ${h.env.RESEND_API_KEY}`);
+  assert.equal(h.calls[1].init.headers['Idempotency-Key'], `ava-contact/${data.reference}`);
+  for (const [label, value] of [['First Name','Ava'],['Last Name',body['last-name']],['Email',body.email],['Phone',body.phone],['Company Name',body.company],['Reference ID',data.reference],['Submission source','avamarie.co'],['Submission type','Website contact form']]) {
+    assert.ok(email.text.includes(`${label}: ${value}`));
+    assert.ok(email.html.includes(label)); assert.ok(email.html.includes(value));
+  }
+  for (const heading of ['Contact Details','Company','Message','Reference / Metadata']) assert.match(email.html, new RegExp(`<h2[^>]*>${heading}</h2>`));
+  assert.ok(email.text.includes(body.message)); assert.ok(email.html.includes(body.message));
   assert.equal(res.headers.get('access-control-allow-origin'), null);
   assert.equal(res.headers.get('cache-control'), 'no-store');
   const stored = JSON.stringify([...h.records]);
@@ -61,10 +71,14 @@ test('optional fields stay optional; multiline messages survive', async t => {
   const h=setup(t); const r=await h.submit({'first-name':'','last-name':'',company:'',phone:'',message:'one\r\ntwo'});
   assert.equal(r.status,200); assert.equal([...h.records.values()][0].data.message,'one\ntwo');
 });
-test('script injection remains inert plain text', async t => {
+test('customer HTML is escaped in HTML and preserved as plain text', async t => {
   const h=setup(t); const r=await h.submit({message:'<script>alert(1)</script><img src=x onerror=alert(1)>',company:'<b>Brand</b>'});
   assert.equal(r.status,200); const email=JSON.parse(h.calls[1].init.body);
-  assert.equal(email.html,undefined); assert.match(email.text, /<script>/);
+  assert.match(email.html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+  assert.match(email.html, /&lt;img src=x onerror=alert\(1\)&gt;/);
+  assert.match(email.html, /&lt;b&gt;Brand&lt;\/b&gt;/);
+  assert.doesNotMatch(email.html, /<(script|img|b)\b/i);
+  assert.match(email.text, /<script>/);
 });
 for (const key of ['RESEND_API_KEY','CONTACT_TO_EMAIL','CONTACT_FROM_EMAIL','TURNSTILE_SITE_KEY','TURNSTILE_SECRET','CONTACT_ORIGINS','CONTACT_ENQUIRIES','CONTACT_RATE_LIMITER']) {
   test('fails closed without ' + key, async t=>{const h=setup(t);delete h.env[key];const r=await h.submit();assert.equal(r.status,503);assert.equal(h.calls.length,0);assert.equal(h.records.size,0);});
@@ -111,3 +125,34 @@ for (const path of ['/admin/models','/admin/models/AM-001','/admin/orders','/adm
 });
 for(const path of ['/missing','/admin/missing','/admin/assets/missing.js','/admin/missing.css','/administrator/orders']) test('unmatched route retains 404 '+path,async t=>{const h=setup(t);let count=0;h.env.ASSETS.fetch=async()=>{count++;return new Response('404',{status:404});};const r=await worker.fetch(new Request(origin+path),h.env);assert.equal(r.status,404);assert.equal(count,1);});
 test('Admin static assets and non-GET requests never become shell responses',async t=>{const h=setup(t);let count=0;h.env.ASSETS.fetch=async request=>{count++;return new Response('asset',{status:request.method==='GET'?200:405});};assert.equal((await worker.fetch(new Request(origin+'/admin/assets/app.js'),h.env)).status,200);assert.equal((await worker.fetch(new Request(origin+'/admin/orders',{method:'POST'}),h.env)).status,405);assert.equal(count,2);});
+test('formatted alternatives preserve multilingual messages, blank lines and escaped field values', async t => {
+  const h=setup(t);
+  const customerEmail="o'connor+team@example.com";
+  const message='مرحبًا — Bonjour & <sample> "L’été"\r\n\r\nLine 3  double spaces';
+  const r=await h.submit({'first-name':`Ava & <Marie> "O'Neil"`,email:customerEmail,message});
+  assert.equal(r.status,200);
+  const email=JSON.parse(h.calls[1].init.body);
+  assert.equal(email.reply_to,customerEmail);
+  assert.equal(email.subject,'New Website Enquiry — Ava Marie');
+  assert.ok(email.text.includes(message.replace(/\r\n/g,'\n')));
+  assert.ok(email.text.includes(`First Name: Ava & <Marie> "O'Neil"`));
+  assert.ok(email.html.includes('Ava &amp; &lt;Marie&gt; &quot;O&#39;Neil&quot;'));
+  assert.ok(email.html.includes('مرحبًا — Bonjour &amp; &lt;sample&gt; &quot;L’été&quot;<br><br>Line 3  double spaces'));
+  assert.ok(email.html.includes('o&#39;connor+team@example.com'));
+  assert.doesNotMatch(email.html, /<sample>|<Marie>|<script\b/i);
+  for (const value of ['fake-resend-secret','fake-turnstile-secret',body.token]) {
+    assert.ok(!email.html.includes(value)); assert.ok(!email.text.includes(value));
+  }
+});
+test('empty optional contact details are clearly identified in both alternatives', async t => {
+  const h=setup(t);const r=await h.submit({'first-name':'','last-name':'',phone:'',company:''});
+  assert.equal(r.status,200);const email=JSON.parse(h.calls[1].init.body);
+  for(const key of ['html','text'])assert.equal(email[key].match(/Not provided/g).length,4);
+  for(const label of ['First Name','Last Name','Phone','Company Name'])assert.ok(email.text.includes(`${label}: Not provided`));
+});
+test('the full maximum-length message is retained in HTML and text', async t => {
+  const h=setup(t);const message='x'.repeat(4989)+'\nFinal line';assert.equal(message.length,5000);
+  assert.equal((await h.submit({message})).status,200);
+  const email=JSON.parse(h.calls[1].init.body);
+  assert.ok(email.text.includes(message)); assert.ok(email.html.includes(message.replace('\n','<br>')));
+});

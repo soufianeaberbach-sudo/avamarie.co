@@ -105,6 +105,57 @@ async function providerJson(url, options, timeout) {
     return await response.json();
   } finally { clearTimeout(timer); }
 }
+// Presentation only. Keep both alternatives deterministic for unchanged retries.
+function contactEmail(data, id) {
+  const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char]);
+  const contactDetails = [
+    ['First Name', data['first-name'] || 'Not provided'],
+    ['Last Name', data['last-name'] || 'Not provided'],
+    ['Email', data.email],
+    ['Phone', data.phone || 'Not provided'],
+  ];
+  const company = [['Company Name', data.company || 'Not provided']];
+  const metadata = [
+    ['Reference ID', id],
+    ['Submission source', 'avamarie.co'],
+    ['Submission type', 'Website contact form'],
+  ];
+  const textFields = fields => fields.map(([label, value]) => `${label}: ${value}`);
+  const htmlFields = fields => `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;table-layout:fixed;">${fields.map(([label, value]) =>
+    `<tr><th scope="row" align="left" valign="top" width="112" style="width:112px;padding:6px 16px 6px 0;font-size:14px;line-height:22px;font-weight:600;color:#555555;">${escapeHtml(label)}</th><td valign="top" style="padding:6px 0;font-size:14px;line-height:22px;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;"><span dir="auto">${escapeHtml(value)}</span></td></tr>`
+  ).join('')}</table>`;
+  const section = (title, content) => `<tr><td style="padding:0 0 16px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;border:1px solid #dddddd;table-layout:fixed;"><tr><td style="padding:16px;"><h2 style="margin:0 0 8px;font-size:16px;line-height:24px;font-weight:600;">${title}</h2>${content}</td></tr></table></td></tr>`;
+  const message = `<div dir="auto" style="margin:0;font-size:14px;line-height:24px;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div>`;
+  return {
+    subject: 'New Website Enquiry — Ava Marie',
+    text: [
+      'Ava Marie Website Enquiry', 'New message received from the contact form', '',
+      'CONTACT DETAILS', '---------------', ...textFields(contactDetails), '',
+      'COMPANY', '-------', ...textFields(company), '',
+      'MESSAGE', '-------', data.message, '',
+      'REFERENCE / METADATA', '--------------------', ...textFields(metadata), '',
+    ].join('\n'),
+    // Tables, inline styles and the Outlook width wrapper require no CSS framework,
+    // images, web fonts or external assets. Every customer value is escaped above.
+    html: `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ava Marie Website Enquiry</title></head>
+<body style="margin:0;padding:0;background-color:#ffffff;color:#222222;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;"><tr><td align="center" style="padding:24px 12px;">
+<!--[if mso]><table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;text-align:left;">
+<tr><td style="padding:0 0 24px;"><h1 style="margin:0 0 8px;font-size:24px;line-height:32px;font-weight:600;">Ava Marie Website Enquiry</h1><p style="margin:0;font-size:14px;line-height:22px;color:#666666;">New message received from the contact form</p></td></tr>
+${section('Contact Details', htmlFields(contactDetails))}
+${section('Company', htmlFields(company))}
+${section('Message', message)}
+${section('Reference / Metadata', htmlFields(metadata))}
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr></table>
+</body></html>`,
+  };
+}
 async function contact(request, env, url) {
   if (request.method !== 'POST') return json(405, { ok: false, code: 'method', message: 'Use POST.' }, { Allow: 'POST' });
   if (!configured(url, env)) reject(503, 'unavailable', UNAVAILABLE);
@@ -151,15 +202,14 @@ async function contact(request, env, url) {
       id, receivedAt: new Date().toISOString(), data, emailState: 'unconfirmed',
     }), { expirationTtl: RETENTION });
   } catch { reject(503, 'storage', 'Your message could not be saved or sent. Please try again or email our team directly.'); }
-  const text = ['Ava Marie website enquiry', `Reference: ${id}`, '',
-    ...Object.entries(data).map(([key, value]) => `${key}: ${value}`)].join('\n');
+  const email = contactEmail(data, id);
   let accepted;
   try {
     accepted = await providerJson('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`,
         'Content-Type': 'application/json', 'Idempotency-Key': `ava-contact/${id}` },
       body: JSON.stringify({ from: env.CONTACT_FROM_EMAIL, to: [env.CONTACT_TO_EMAIL],
-        reply_to: data.email, subject: `Ava Marie website enquiry [${id}]`, text }),
+        reply_to: data.email, ...email }),
     }, 10000);
     if (typeof accepted.id !== 'string' || !accepted.id.trim()) throw new Error('invalid_acceptance');
   } catch {

@@ -248,7 +248,9 @@ npx wrangler kv key get 'accepted:<reference>' --binding CONTACT_ENQUIRIES --rem
 Paginate listings until complete (Cloudflare Dashboard/KV API can also be used).
 KV is eventually consistent: allow propagation and recheck. An enquiry without
 an accepted marker needs investigation; it does **not** prove email was never
-accepted. Search Resend for the exact reference in the subject and inspect
+accepted. The subject is `New Website Enquiry — Ava Marie`; the full reference
+is in both HTML and plain-text bodies under Reference / Metadata. Locate the message in
+Resend, match its body reference, and inspect
 `contact_email_unconfirmed` / `contact_acceptance_marker_failed` events. A timeout
 can lose a successful provider response, and a marker write may fail after a real
 acceptance. Check Resend before contacting the customer or manually re-sending.
