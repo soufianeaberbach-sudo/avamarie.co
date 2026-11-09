@@ -107,7 +107,8 @@ async function providerJson(url, options, timeout) {
 }
 // Presentation only. Keep both alternatives deterministic for unchanged retries.
 function contactEmail(data, id) {
-  const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
+  // Email HTML uses an explicit allowlisted brand asset; all submitted data is escaped.
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   })[char]);
   const contactDetails = [
@@ -123,33 +124,51 @@ function contactEmail(data, id) {
     ['Submission type', 'Website contact form'],
   ];
   const textFields = fields => fields.map(([label, value]) => `${label}: ${value}`);
-  const htmlFields = fields => `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;table-layout:fixed;">${fields.map(([label, value]) =>
-    `<tr><th scope="row" align="left" valign="top" width="112" style="width:112px;padding:6px 16px 6px 0;font-size:14px;line-height:22px;font-weight:600;color:#555555;">${escapeHtml(label)}</th><td valign="top" style="padding:6px 0;font-size:14px;line-height:22px;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;"><span dir="auto">${escapeHtml(value)}</span></td></tr>`
+  const htmlFields = fields => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;table-layout:fixed;">${fields.map(([label, value], index) =>
+    `<tr><td width="124" valign="top" style="width:124px;padding:${index ? '11px' : '4px'} 12px 11px 0;border-bottom:1px solid #E7E0D6;font-size:12px;line-height:20px;font-weight:600;letter-spacing:.01em;color:#7A756A;">${label}</td><td valign="top" style="padding:${index ? '11px' : '4px'} 0 11px;border-bottom:1px solid #E7E0D6;font-size:14px;line-height:20px;color:#1A1714;overflow-wrap:anywhere;word-wrap:break-word;word-break:break-word;"><span dir="auto">${escapeHtml(value)}</span></td></tr>`
   ).join('')}</table>`;
-  const section = (title, content) => `<tr><td style="padding:0 0 16px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;border:1px solid #dddddd;table-layout:fixed;"><tr><td style="padding:16px;"><h2 style="margin:0 0 8px;font-size:16px;line-height:24px;font-weight:600;">${title}</h2>${content}</td></tr></table></td></tr>`;
-  const message = `<div dir="auto" style="margin:0;font-size:14px;line-height:24px;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div>`;
+  const section = (title, body) => `<tr><td style="padding:0 34px 26px;"><h2 style="margin:0 0 14px;padding:0 0 9px;border-bottom:1px solid #D4AF37;color:#1A1714;font-family:Georgia,Times New Roman,serif;font-size:18px;line-height:26px;font-weight:400;">${title}</h2>${body}</td></tr>`;
+  const message = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#F5F1EB" style="width:100%;border-collapse:collapse;background:#F5F1EB;"><tr><td width="4" bgcolor="#D4AF37" style="width:4px;background:#D4AF37;font-size:1px;">&nbsp;</td><td style="padding:22px 22px 24px;color:#1A1714;font-size:15px;line-height:25px;overflow-wrap:anywhere;word-wrap:break-word;word-break:break-word;"><div dir="auto" style="white-space:normal;">${escapeHtml(data.message).replace(/\n/g, '<br>')}</div></td></tr></table>`;
   return {
     subject: 'New Website Enquiry — Ava Marie',
     text: [
-      'Ava Marie Website Enquiry', 'New message received from the contact form', '',
+      'AVA MARIE | PREMIUM FASHION MANUFACTURING', '',
+      'NEW WEBSITE ENQUIRY',
+      'A new message has been received via avamarie.co.', '',
       'CONTACT DETAILS', '---------------', ...textFields(contactDetails), '',
       'COMPANY', '-------', ...textFields(company), '',
       'MESSAGE', '-------', data.message, '',
       'REFERENCE / METADATA', '--------------------', ...textFields(metadata), '',
+      'Reply to this email to respond directly to the sender.',
+      'Ava Marie Manufacturing | Tangier, Morocco | https://avamarie.co/',
     ].join('\n'),
-    // Tables, inline styles and the Outlook width wrapper require no CSS framework,
-    // images, web fonts or external assets. Every customer value is escaped above.
+    // Table-first, inline-only HTML for Gmail/Outlook. Fallback wordmark remains
+    // visible if the allowlisted brand monogram image is blocked by the email client.
     html: `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ava Marie Website Enquiry</title></head>
-<body style="margin:0;padding:0;background-color:#ffffff;color:#222222;font-family:Arial,Helvetica,sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;"><tr><td align="center" style="padding:24px 12px;">
-<!--[if mso]><table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;text-align:left;">
-<tr><td style="padding:0 0 24px;"><h1 style="margin:0 0 8px;font-size:24px;line-height:32px;font-weight:600;">Ava Marie Website Enquiry</h1><p style="margin:0;font-size:14px;line-height:22px;color:#666666;">New message received from the contact form</p></td></tr>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ava Marie Website Enquiry</title></head>
+<body style="margin:0;padding:0;background:#F5F1EB;color:#1A1714;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F5F1EB" style="width:100%;border-collapse:collapse;background:#F5F1EB;"><tr><td align="center" style="padding:32px 12px 40px;">
+<!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width:100%;max-width:600px;border-collapse:collapse;background:#FFFFFF;text-align:left;">
+<tr><td height="4" bgcolor="#D4AF37" style="height:4px;background:#D4AF37;font-size:1px;line-height:4px;">&nbsp;</td></tr>
+<tr><td bgcolor="#1A1714" style="padding:26px 34px 28px;background:#1A1714;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;"><tr>
+<td width="54" valign="middle" style="width:54px;padding:0 14px 0 0;"><a href="https://avamarie.co/" style="text-decoration:none;"><img src="https://avamarie.co/AVA%20MARIE/icon.png" width="36" height="47" alt="Ava Marie monogram" style="display:block;width:36px;height:47px;border:0;background:#F5F1EB;padding:5px;"></a></td>
+<td valign="middle" style="padding:0;"><a href="https://avamarie.co/" style="color:#FFFFFF;text-decoration:none;font-family:Impact,Arial Narrow,Arial,sans-serif;font-size:29px;line-height:32px;letter-spacing:2px;font-weight:700;">AVA <span style="color:#D4AF37;">MARIE</span></a><div style="margin-top:5px;font-size:9px;line-height:15px;letter-spacing:2px;font-weight:600;color:#D9D4CA;">PREMIUM FASHION MANUFACTURING</div></td>
+</tr></table>
+</td></tr>
+<tr><td bgcolor="#F5F1EB" style="padding:30px 34px 28px;background:#F5F1EB;">
+<div style="font-size:10px;letter-spacing:2.5px;line-height:16px;color:#A88B2A;font-weight:700;">WEBSITE CONTACT / NEW ENQUIRY</div>
+<h1 style="margin:12px 0 10px;font-family:Georgia,Times New Roman,serif;font-size:30px;line-height:36px;font-weight:400;color:#1A1714;">A new conversation<br>begins here.</h1>
+<p style="margin:0;color:#7A756A;font-size:14px;line-height:23px;">A new message has been received through the Ava Marie contact form.</p>
+</td></tr>
+<tr><td height="28" style="height:28px;font-size:1px;">&nbsp;</td></tr>
 ${section('Contact Details', htmlFields(contactDetails))}
 ${section('Company', htmlFields(company))}
 ${section('Message', message)}
 ${section('Reference / Metadata', htmlFields(metadata))}
+<tr><td style="padding:0 34px 34px;"><a href="mailto:${escapeHtml(data.email)}?subject=Re%3A%20Ava%20Marie%20Website%20Enquiry" style="display:inline-block;padding:15px 22px;background:#1A1714;color:#FFFFFF;font-size:11px;line-height:17px;letter-spacing:1.3px;font-weight:700;text-decoration:none;">REPLY TO CLIENT &#8594;</a><p style="margin:13px 0 0;font-size:12px;line-height:18px;color:#7A756A;">You can also reply directly to this email.</p></td></tr>
+<tr><td bgcolor="#1A1714" style="padding:20px 34px 22px;background:#1A1714;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="font-size:11px;line-height:19px;color:#EDE8DF;"><strong style="color:#FFFFFF;letter-spacing:1px;">AVA MARIE</strong><br>Tangier, Morocco &nbsp;·&nbsp; <a href="https://avamarie.co/" style="color:#D4AF37;text-decoration:none;">avamarie.co</a></td></tr></table></td></tr>
 </table>
 <!--[if mso]></td></tr></table><![endif]-->
 </td></tr></table>
