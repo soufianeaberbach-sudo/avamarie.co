@@ -77,7 +77,11 @@ test('customer HTML is escaped in HTML and preserved as plain text', async t => 
   assert.match(email.html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
   assert.match(email.html, /&lt;img src=x onerror=alert\(1\)&gt;/);
   assert.match(email.html, /&lt;b&gt;Brand&lt;\/b&gt;/);
-  assert.doesNotMatch(email.html, /<(script|img|b)\b/i);
+  assert.doesNotMatch(email.html, /<(script|b)\\b/i);
+  assert.match(email.html, /<img src="https:\/\/avamarie\.co\/AVA%20MARIE\/icon\.png"/);
+  assert.doesNotMatch(email.html, /onerror=|javascript:/i);
+  assert.match(email.html, /#D4AF37/);
+  assert.match(email.html, /mailto:client@example\.com/);
   assert.match(email.text, /<script>/);
 });
 for (const key of ['RESEND_API_KEY','CONTACT_TO_EMAIL','CONTACT_FROM_EMAIL','TURNSTILE_SITE_KEY','TURNSTILE_SECRET','CONTACT_ORIGINS','CONTACT_ENQUIRIES','CONTACT_RATE_LIMITER']) {
